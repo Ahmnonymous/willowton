@@ -1,0 +1,87 @@
+/* Body and general layout styles */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  min-height: 100vh; /* Ensures the body takes up the full height */
+  background-color: #F7FAFC; /* Light background */
+}
+
+.generic-table-container {
+  margin-top: 20px;
+  max-width: 100%;
+  overflow-x: auto;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.generic-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  /* background-color: #ffffff; Light table background */
+}
+
+.generic-table th,
+.generic-table td {
+  text-align: left;
+  padding: 12px;
+  font-size: 12px;
+  border-bottom: 1px solid #ddd;
+  white-space: nowrap;
+}
+
+/* Column header styling */
+.generic-table th {
+  font-weight: 600;
+  text-transform: none;
+}
+
+/* Dark mode adjustments */
+body.dark-mode {
+  background-color: #2D3748;
+}
+
+body.dark-mode .generic-table {
+  background-color: #1A202C; /* Dark table background */
+}
+
+body.dark-mode .generic-table th,
+body.dark-mode .generic-table td {
+  color: #F7FAFC; /* Light text color in dark mode */
+}
+
+body.dark-mode .generic-search-input {
+  border: 1px solid #ddd;
+  background-color: #2D3748;
+  color: white;
+}
+
+/* No records found styling */
+.no-matching-records {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+  font-size: 16px;
+}
+
+/* Search input styling */
+.generic-search-container {
+  margin-bottom: 10px;
+  text-align: left;
+}
+
+.generic-search-input {
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 200px;
+  background-color: #ffffff; /* Default background for search bar */
+  color: #1e293b; /* Default text color */
+}
+
+.generic-search-input:focus {
+  outline: none;
+  border-color: #1e293b;
+}

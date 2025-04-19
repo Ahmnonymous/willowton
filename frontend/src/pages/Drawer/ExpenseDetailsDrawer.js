@@ -46,7 +46,7 @@ const ExpenseDetailsDrawer = ({ open, onClose, studentId, expenseDetailsId, onSa
 
   useEffect(() => {
     if (open && expenseDetailsId) {
-      fetch(`http://localhost/api/expense-details/id/${expenseDetailsId}`)
+      fetch(`https//localhost/api/expense-details/id/${expenseDetailsId}`)
         .then(res => res.json())
         .then(data => {
           if (data) {
@@ -147,8 +147,8 @@ const ExpenseDetailsDrawer = ({ open, onClose, studentId, expenseDetailsId, onSa
     }, {});
   
     const url = expenseDetailsId
-      ? `http://localhost/api/expense-details/update/${expenseDetailsId}`
-      : `http://localhost/api/expense-details/insert`;
+      ? `https//localhost/api/expense-details/update/${expenseDetailsId}`
+      : `https//localhost/api/expense-details/insert`;
   
     const method = expenseDetailsId ? 'PUT' : 'POST';
   
@@ -174,7 +174,7 @@ const ExpenseDetailsDrawer = ({ open, onClose, studentId, expenseDetailsId, onSa
   const handleDeleteConfirm = async () => {
     if (!expenseDetailsId) return;
     try {
-      await fetch(`http://localhost/api/expense-details/delete/${expenseDetailsId}`, {
+      await fetch(`https//localhost/api/expense-details/delete/${expenseDetailsId}`, {
         method: 'DELETE',
       });
       onSave(null);

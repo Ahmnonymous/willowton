@@ -21,7 +21,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const response = await axios.get('http://localhost/api/dashboard');
+        const response = await axios.get('https://localhost/api/dashboard');
         setDashboardData(response.data);
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
@@ -32,7 +32,7 @@ const Dashboard = () => {
 
     const fetchNationalityData = async () => {
       try {
-        const response = await axios.get('http://localhost/api/student-nationality-distribution');
+        const response = await axios.get('https://localhost/api/student-nationality-distribution');
         const updatedData = response.data.map(item => ({
           ...item,
           count: Number(item.count),
@@ -45,7 +45,7 @@ const Dashboard = () => {
 
     const fetchEducationData = async () => {
       try {
-        const response = await axios.get('http://localhost/api/student-highest-education-distribution');
+        const response = await axios.get('https://localhost/api/student-highest-education-distribution');
         const updatedData = response.data.map(item => ({
           ...item,
           count: Number(item.count),
@@ -58,7 +58,7 @@ const Dashboard = () => {
 
     const fetchCurrentEducationData = async () => {
       try {
-        const response = await axios.get('http://localhost/api/student-current-education-distribution');
+        const response = await axios.get('https://localhost/api/student-current-education-distribution');
         const updatedData = response.data.map(item => ({
           ...item,
           count: Number(item.count),
@@ -71,7 +71,7 @@ const Dashboard = () => {
 
     const fetchRaceData = async () => {
       try {
-        const response = await axios.get('http://localhost/api/student-race-distribution');
+        const response = await axios.get('https://localhost/api/student-race-distribution');
         const updatedData = response.data.map(item => ({
           ...item,
           count: Number(item.count),
@@ -84,7 +84,7 @@ const Dashboard = () => {
 
     const fetchMaritalData = async () => {
       try {
-        const response = await axios.get('http://localhost/api/student-marital-status-distribution');
+        const response = await axios.get('https://localhost/api/student-marital-status-distribution');
         const updatedData = response.data.map(item => ({
           ...item,
           count: Number(item.count),
@@ -97,7 +97,7 @@ const Dashboard = () => {
 
     const fetchEmploymentData = async () => {
       try {
-        const response = await axios.get('http://localhost/api/student-employment-status-distribution');
+        const response = await axios.get('https://localhost/api/student-employment-status-distribution');
         const updatedData = response.data.map(item => ({
           ...item,
           count: Number(item.count),

@@ -33,7 +33,7 @@ const AssetsLiabilitiesDrawer = ({ open, onClose, studentId, assetLiabilityId, o
 
   useEffect(() => {
     if (open && assetLiabilityId) {
-      fetch(`http://localhost/api/assets-liabilities/id/${assetLiabilityId}`)
+      fetch(`https//localhost/api/assets-liabilities/id/${assetLiabilityId}`)
         .then(res => res.json())
         .then(data => {
           if (data) {
@@ -63,8 +63,8 @@ const AssetsLiabilitiesDrawer = ({ open, onClose, studentId, assetLiabilityId, o
 
   const handleSave = () => {
     const url = assetLiabilityId
-      ? `http://localhost/api/assets-liabilities/update/${assetLiabilityId}`
-      : `http://localhost/api/assets-liabilities/insert`;
+      ? `https//localhost/api/assets-liabilities/update/${assetLiabilityId}`
+      : `https//localhost/api/assets-liabilities/insert`;
     const method = assetLiabilityId ? "PUT" : "POST";
 
     fetch(url, {
@@ -88,7 +88,7 @@ const AssetsLiabilitiesDrawer = ({ open, onClose, studentId, assetLiabilityId, o
   const handleDeleteConfirm = async () => {
     if (!assetLiabilityId) return;
     try {
-      await fetch(`http://localhost/api/assets-liabilities/delete/${assetLiabilityId}`, {
+      await fetch(`https//localhost/api/assets-liabilities/delete/${assetLiabilityId}`, {
         method: "DELETE"
       });
       onSave(null);

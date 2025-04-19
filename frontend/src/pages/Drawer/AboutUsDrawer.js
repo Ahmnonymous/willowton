@@ -53,7 +53,7 @@ const AboutusDrawer = ({ open, onClose, studentId, aboutMeId, onSave }) => {
     if (open) {
       if (aboutMeId) {
         // Editing mode
-        fetch(`http://localhost/api/about-me/id/${aboutMeId}`)
+        fetch(`https//localhost/api/about-me/id/${aboutMeId}`)
           .then((res) => res.json())
           .then((data) => {
             setFormData(data);
@@ -82,8 +82,8 @@ const AboutusDrawer = ({ open, onClose, studentId, aboutMeId, onSave }) => {
   const handleSave = async () => {
     const isUpdate = !!formData.id;
     const url = isUpdate
-      ? `http://localhost/api/about-me/update/${formData.id}`
-      : `http://localhost/api/about-me/insert`;
+      ? `https//localhost/api/about-me/update/${formData.id}`
+      : `https//localhost/api/about-me/insert`;
     const method = isUpdate ? "PUT" : "POST";
 
     const dataToSend = { ...formData };
@@ -118,7 +118,7 @@ const AboutusDrawer = ({ open, onClose, studentId, aboutMeId, onSave }) => {
 
     try {
       const res = await fetch(
-        `http://localhost/api/about-me/delete/${formData.id}`,
+        `https//localhost/api/about-me/delete/${formData.id}`,
         { method: "DELETE" }
       );
 

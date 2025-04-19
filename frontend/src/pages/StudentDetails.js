@@ -68,7 +68,7 @@ const StudentDetails = () => {
 
   const fetchStudentDetails = useCallback(async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/student-details");
+      const response = await fetch("http://localhost/api/student-details");
       const data = await response.json();
       setStudentDetails(data);
       return data;
@@ -80,7 +80,7 @@ const StudentDetails = () => {
 
   const fetchAboutMe = async (studentId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/about-me/${studentId}`);
+      const response = await fetch(`http://localhost/api/about-me/${studentId}`);
       const data = await response.json();
       setAboutMe(Array.isArray(data) ? data : []);
     } catch (error) {
@@ -90,7 +90,7 @@ const StudentDetails = () => {
 
   const fetchParentsDetails = async (studentId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/parents-details/${studentId}`);
+      const response = await fetch(`http://localhost/api/parents-details/${studentId}`);
       const data = await response.json();
       setParentsDetails(data);
     } catch (error) {
@@ -100,7 +100,7 @@ const StudentDetails = () => {
 
   const fetchUniversityDetails = async (studentId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/university-details/${studentId}`);
+      const response = await fetch(`http://localhost/api/university-details/${studentId}`);
       const data = await response.json();
       setUniversityDetails(data);
     } catch (error) {
@@ -110,7 +110,7 @@ const StudentDetails = () => {
 
   const fetchAttachmentsDetails = async (studentId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/attachments/${studentId}`);
+      const response = await fetch(`http://localhost/api/attachments/${studentId}`);
       const data = await response.json();
       setAttachments(data);
     } catch (error) {
@@ -120,7 +120,7 @@ const StudentDetails = () => {
 
   const fetchExpenseDetails = async (studentId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/expense-details/${studentId}`);
+      const response = await fetch(`http://localhost/api/expense-details/${studentId}`);
       const data = await response.json();
       setExpensesSummary(data);
     } catch (error) {
@@ -130,7 +130,7 @@ const StudentDetails = () => {
 
   const fetchAssetsLiabilities = async (studentId) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/assets-liabilities/${studentId}`);
+      const res = await fetch(`http://localhost/api/assets-liabilities/${studentId}`);
       const data = await res.json();
       setAssetsLiabilities(data);
     } catch (err) {
@@ -140,7 +140,7 @@ const StudentDetails = () => {
 
   const fetchAcademicResults = async (studentId) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/academic-results/${studentId}`);
+      const res = await fetch(`http://localhost/api/academic-results/${studentId}`);
       const data = await res.json();
       setAcademicResults(data);
     } catch (err) {
@@ -150,7 +150,7 @@ const StudentDetails = () => {
 
   const fetchVoluntaryServices = async (studentId) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/voluntary-service/${studentId}`);
+      const res = await fetch(`http://localhost/api/voluntary-service/${studentId}`);
       const data = await res.json();
       setVoluntaryServices(data);
     } catch (err) {
@@ -160,7 +160,7 @@ const StudentDetails = () => {
 
   const fetchPaymentsDetails = async (studentId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/payments/${studentId}`);
+      const response = await fetch(`http://localhost/api/payments/${studentId}`);
       const data = await response.json();
       setPayments(data);
     } catch (error) {
@@ -170,7 +170,7 @@ const StudentDetails = () => {
 
   const fetchInterviewsDetails = async (studentId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/interviews/${studentId}`);
+      const response = await fetch(`http://localhost/api/interviews/${studentId}`);
       const data = await response.json();
       setInterviews(data);
     } catch (error) {
@@ -263,7 +263,7 @@ const StudentDetails = () => {
         try {
           const responses = await Promise.all(
             ["about-me", "parents-details", "university-details", "attachments", "expenses-summary", "assets-liabilities", "academic-results", "voluntary-services", "payments", "interviews"]
-              .map((key) => fetch(`http://localhost:5000/api/${key}/${selectedStudent.id}`).then(res => res.json()))
+              .map((key) => fetch(`http://localhost/api/${key}/${selectedStudent.id}`).then(res => res.json()))
           );
 
           setAboutMe(responses[0]);

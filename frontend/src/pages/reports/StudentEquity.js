@@ -23,7 +23,7 @@ function GenericTable() {
   // Fetch student details when the component mounts
   useEffect(() => {
     const fetchStudents = async () => {
-      const response = await axios.get('http://localhost:5000/api/view/student-equity');
+      const response = await axios.get('http://localhost/api/view/student-equity');
 
       if (response.data.length > 0) {
         // Dynamically set the columns from the first student's object, remove the 'id' column

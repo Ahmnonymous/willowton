@@ -49,7 +49,7 @@ const UserReport = () => {
   // Fetch users data
   useEffect(() => {
     const fetchUsers = async () => {
-      const response = await fetch("http://localhost:5000/api/users");
+      const response = await fetch("http://localhost/api/users");
       const data = await response.json();
       setUsers(data);
     };
@@ -58,7 +58,7 @@ const UserReport = () => {
 
   // Fetch user by ID for editing
   const fetchUserById = async (id) => {
-    const response = await fetch(`http://localhost:5000/api/users/${id}`);
+    const response = await fetch(`http://localhost/api/users/${id}`);
     const data = await response.json();
     setEditUser(data);
   };
@@ -76,12 +76,12 @@ const UserReport = () => {
     enableReinitialize: true, // Reinitialize when `editUser` changes
     onSubmit: async (values) => {
       const response = editUser
-        ? await fetch(`http://localhost:5000/api/users/${editUser.user_id}`, {
+        ? await fetch(`http://localhost/api/users/${editUser.user_id}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(values),
           })
-        : await fetch("http://localhost:5000/api/users", {
+        : await fetch("http://localhost/api/users", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(values),
@@ -118,7 +118,7 @@ const UserReport = () => {
   const handleDeleteConfirm = async () => {
     if (!editUser) return;
     try {
-      await fetch(`http://localhost:5000/api/users/${editUser.user_id}`, {
+      await fetch(`http://localhost/api/users/${editUser.user_id}`, {
         method: "DELETE",
       });
       setUsers((prevUsers) => prevUsers.filter((user) => user.user_id !== editUser.user_id));

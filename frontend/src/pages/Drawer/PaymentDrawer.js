@@ -41,7 +41,7 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
         Student_Details_Portal_id: studentId
       });
     } else {
-      fetch(`http://localhost:5000/api/payments/id/${recordId}`)
+      fetch(`http://localhost/api/payments/id/${recordId}`)
         .then(res => res.json())
         .then(data => {
           setFormData({
@@ -79,8 +79,8 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
   const handleSave = async () => {
     const isUpdate = !!formData.id;
     const url = isUpdate
-      ? `http://localhost:5000/api/payments/update/${formData.id}`
-      : `http://localhost:5000/api/payments/insert`;
+      ? `http://localhost/api/payments/update/${formData.id}`
+      : `http://localhost/api/payments/insert`;
     const method = isUpdate ? "PUT" : "POST";
 
     const body = new FormData();
@@ -113,7 +113,7 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
   const handleDeleteConfirm = async () => {
     if (!formData.id) return;
     try {
-      await fetch(`http://localhost:5000/api/payments/delete/${formData.id}`, {
+      await fetch(`http://localhost/api/payments/delete/${formData.id}`, {
         method: "DELETE"
       });
       onSave(null);
@@ -130,7 +130,7 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
 
   const handleViewFile = () => {
     if (formData.id) {
-      window.open(`http://localhost:5000/api/payments/view/${formData.id}`, "_blank");
+      window.open(`http://localhost/api/payments/view/${formData.id}`, "_blank");
     }
   };
 

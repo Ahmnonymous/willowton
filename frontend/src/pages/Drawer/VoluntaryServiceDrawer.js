@@ -39,7 +39,7 @@ const VoluntaryServiceDrawer = ({ open, onClose, studentId, recordId, onSave }) 
         Student_Details_Portal_id: studentId
       });
     } else {
-      fetch(`http://localhost:5000/api/voluntary-service/id/${recordId}`)
+      fetch(`http://localhost/api/voluntary-service/id/${recordId}`)
         .then(res => res.json())
         .then(data => {
           setFormData({
@@ -75,8 +75,8 @@ const VoluntaryServiceDrawer = ({ open, onClose, studentId, recordId, onSave }) 
   const handleSave = async () => {
     const isUpdate = !!formData.id;
     const url = isUpdate
-      ? `http://localhost:5000/api/voluntary-service/update/${formData.id}`
-      : `http://localhost:5000/api/voluntary-service/insert`;
+      ? `http://localhost/api/voluntary-service/update/${formData.id}`
+      : `http://localhost/api/voluntary-service/insert`;
     const method = isUpdate ? "PUT" : "POST";
 
     const body = new FormData();
@@ -106,7 +106,7 @@ const VoluntaryServiceDrawer = ({ open, onClose, studentId, recordId, onSave }) 
   const handleDeleteConfirm = async () => {
     if (!formData.id) return;
     try {
-      await fetch(`http://localhost:5000/api/voluntary-service/delete/${formData.id}`, {
+      await fetch(`http://localhost/api/voluntary-service/delete/${formData.id}`, {
         method: "DELETE"
       });
       onSave(null);
@@ -123,7 +123,7 @@ const VoluntaryServiceDrawer = ({ open, onClose, studentId, recordId, onSave }) 
 
   const handleViewFile = () => {
     if (formData.id) {
-      window.open(`http://localhost:5000/api/voluntary-service/view/${formData.id}`, "_blank");
+      window.open(`http://localhost/api/voluntary-service/view/${formData.id}`, "_blank");
     }
   };
 

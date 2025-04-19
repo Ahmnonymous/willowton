@@ -43,7 +43,7 @@ const AttachmentsDrawer = ({ open, onClose, studentId, attachmentId, onSave }) =
     }
 
     // Editing mode
-    fetch(`http://localhost:5000/api/attachments/id/${attachmentId}`)
+    fetch(`http://localhost/api/attachments/id/${attachmentId}`)
       .then((res) => res.json())
       .then((data) => {
         setFormData({
@@ -76,8 +76,8 @@ const AttachmentsDrawer = ({ open, onClose, studentId, attachmentId, onSave }) =
   const handleSave = async () => {
     const isUpdate = !!formData.id;
     const url = isUpdate
-      ? `http://localhost:5000/api/attachments/update/${formData.id}`
-      : `http://localhost:5000/api/attachments/insert`;
+      ? `http://localhost/api/attachments/update/${formData.id}`
+      : `http://localhost/api/attachments/insert`;
     const method = isUpdate ? "PUT" : "POST";
 
     const body = new FormData();
@@ -107,7 +107,7 @@ const AttachmentsDrawer = ({ open, onClose, studentId, attachmentId, onSave }) =
   const handleDeleteConfirm = async () => {
     if (!formData.id) return;
     try {
-      await fetch(`http://localhost:5000/api/attachments/delete/${formData.id}`, {
+      await fetch(`http://localhost/api/attachments/delete/${formData.id}`, {
         method: "DELETE",
       });
       onSave(null);
@@ -125,7 +125,7 @@ const AttachmentsDrawer = ({ open, onClose, studentId, attachmentId, onSave }) =
 
   const handleViewFile = () => {
     if (formData.id) {
-      window.open(`http://localhost:5000/api/attachments/view/${formData.id}`, "_blank");
+      window.open(`http://localhost/api/attachments/view/${formData.id}`, "_blank");
     }
   };
 

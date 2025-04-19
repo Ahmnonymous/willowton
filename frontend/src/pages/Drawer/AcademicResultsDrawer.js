@@ -42,7 +42,7 @@ const AcademicResultsDrawer = ({ open, onClose, studentId, resultId, onSave }) =
       return;
     }
 
-    fetch(`http://localhost:5000/api/academic-results/id/${resultId}`)
+    fetch(`http://localhost/api/academic-results/id/${resultId}`)
       .then(res => res.json())
       .then(data => {
         setFormData({
@@ -75,8 +75,8 @@ const AcademicResultsDrawer = ({ open, onClose, studentId, resultId, onSave }) =
   const handleSave = async () => {
     const isUpdate = !!formData.id;
     const url = isUpdate
-      ? `http://localhost:5000/api/academic-results/update/${formData.id}`
-      : `http://localhost:5000/api/academic-results/insert`;
+      ? `http://localhost/api/academic-results/update/${formData.id}`
+      : `http://localhost/api/academic-results/insert`;
     const method = isUpdate ? "PUT" : "POST";
 
     const body = new FormData();
@@ -105,7 +105,7 @@ const AcademicResultsDrawer = ({ open, onClose, studentId, resultId, onSave }) =
   const handleDeleteConfirm = async () => {
     if (!formData.id) return;
     try {
-      await fetch(`http://localhost:5000/api/academic-results/delete/${formData.id}`, {
+      await fetch(`http://localhost/api/academic-results/delete/${formData.id}`, {
         method: "DELETE"
       });
       onSave(null);
@@ -122,7 +122,7 @@ const AcademicResultsDrawer = ({ open, onClose, studentId, resultId, onSave }) =
 
   const handleViewFile = () => {
     if (formData.id) {
-      window.open(`http://localhost:5000/api/academic-results/view/${formData.id}`, "_blank");
+      window.open(`http://localhost/api/academic-results/view/${formData.id}`, "_blank");
     }
   };
 

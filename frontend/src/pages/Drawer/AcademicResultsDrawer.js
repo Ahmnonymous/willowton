@@ -42,7 +42,7 @@ const AcademicResultsDrawer = ({ open, onClose, studentId, resultId, onSave }) =
       return;
     }
 
-    fetch(`https//localhost/api/academic-results/id/${resultId}`)
+    fetch(`https//willowtonbursary.co.za/api/academic-results/id/${resultId}`)
       .then(res => res.json())
       .then(data => {
         setFormData({
@@ -75,8 +75,8 @@ const AcademicResultsDrawer = ({ open, onClose, studentId, resultId, onSave }) =
   const handleSave = async () => {
     const isUpdate = !!formData.id;
     const url = isUpdate
-      ? `https//localhost/api/academic-results/update/${formData.id}`
-      : `https//localhost/api/academic-results/insert`;
+      ? `https//willowtonbursary.co.za/api/academic-results/update/${formData.id}`
+      : `https//willowtonbursary.co.za/api/academic-results/insert`;
     const method = isUpdate ? "PUT" : "POST";
 
     const body = new FormData();
@@ -105,7 +105,7 @@ const AcademicResultsDrawer = ({ open, onClose, studentId, resultId, onSave }) =
   const handleDeleteConfirm = async () => {
     if (!formData.id) return;
     try {
-      await fetch(`https//localhost/api/academic-results/delete/${formData.id}`, {
+      await fetch(`https//willowtonbursary.co.za/api/academic-results/delete/${formData.id}`, {
         method: "DELETE"
       });
       onSave(null);
@@ -122,7 +122,7 @@ const AcademicResultsDrawer = ({ open, onClose, studentId, resultId, onSave }) =
 
   const handleViewFile = () => {
     if (formData.id) {
-      window.open(`https//localhost/api/academic-results/view/${formData.id}`, "_blank");
+      window.open(`https//willowtonbursary.co.za/api/academic-results/view/${formData.id}`, "_blank");
     }
   };
 

@@ -78,7 +78,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave }) => {
       if (studentId) {
         const fetchStudentData = async () => {
           try {
-            const response = await fetch(`https//localhost/api/student-details/${studentId}`);
+            const response = await fetch(`https//willowtonbursary.co.za/api/student-details/${studentId}`);
             const data = await response.json();
             setFormData((prev) => ({
               ...prev,
@@ -140,8 +140,8 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave }) => {
 
   const handleSave = async () => {
     const url = studentId
-      ? `https//localhost/api/student-details/update/${studentId}`
-      : `https//localhost/api/student-details/insert`;
+      ? `https//willowtonbursary.co.za/api/student-details/update/${studentId}`
+      : `https//willowtonbursary.co.za/api/student-details/insert`;
     const method = studentId ? "PUT" : "POST";
 
     try {
@@ -172,7 +172,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave }) => {
 
     try {
       const response = await fetch(
-        `https//localhost/api/student-details/delete/${studentId}`,
+        `https//willowtonbursary.co.za/api/student-details/delete/${studentId}`,
         { method: "DELETE" }
       );
 

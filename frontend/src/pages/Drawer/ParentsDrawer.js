@@ -30,7 +30,7 @@ const ParentsDrawer = ({ open, onClose, studentId, parentId, onSave }) => {
   useEffect(() => {
     if (open) {
       if (parentId) {
-        fetch(`https//willowtonbursary.co.za/api/parents-details/id/${parentId}`)
+        fetch(`https://willowtonbursary.co.za/api/parents-details/id/${parentId}`)
           .then((res) => res.json())
           .then((data) => setFormData(data));
       } else {
@@ -62,8 +62,8 @@ const ParentsDrawer = ({ open, onClose, studentId, parentId, onSave }) => {
   const handleSave = async () => {
     const isUpdate = !!formData.id;
     const url = isUpdate
-      ? `https//willowtonbursary.co.za/api/parents-details/update/${formData.id}`
-      : "https//willowtonbursary.co.za/api/parents-details/insert";
+      ? `https://willowtonbursary.co.za/api/parents-details/update/${formData.id}`
+      : "https://willowtonbursary.co.za/api/parents-details/insert";
     const method = isUpdate ? "PUT" : "POST";
 
     const body = { ...formData };
@@ -88,7 +88,7 @@ const ParentsDrawer = ({ open, onClose, studentId, parentId, onSave }) => {
   const handleDelete = async () => {
     if (!formData.id) return;
     setDeleteConfirmationOpen(false);
-    const res = await fetch(`https//willowtonbursary.co.za/api/parents-details/delete/${formData.id}`, {
+    const res = await fetch(`https://willowtonbursary.co.za/api/parents-details/delete/${formData.id}`, {
       method: "DELETE",
     });
     if (res.ok) {

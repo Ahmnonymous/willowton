@@ -41,7 +41,7 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
         Student_Details_Portal_id: studentId
       });
     } else {
-      fetch(`https//willowtonbursary.co.za/api/payments/id/${recordId}`)
+      fetch(`https://willowtonbursary.co.za/api/payments/id/${recordId}`)
         .then(res => res.json())
         .then(data => {
           setFormData({
@@ -79,8 +79,8 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
   const handleSave = async () => {
     const isUpdate = !!formData.id;
     const url = isUpdate
-      ? `https//willowtonbursary.co.za/api/payments/update/${formData.id}`
-      : `https//willowtonbursary.co.za/api/payments/insert`;
+      ? `https://willowtonbursary.co.za/api/payments/update/${formData.id}`
+      : `https://willowtonbursary.co.za/api/payments/insert`;
     const method = isUpdate ? "PUT" : "POST";
 
     const body = new FormData();
@@ -113,7 +113,7 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
   const handleDeleteConfirm = async () => {
     if (!formData.id) return;
     try {
-      await fetch(`https//willowtonbursary.co.za/api/payments/delete/${formData.id}`, {
+      await fetch(`https://willowtonbursary.co.za/api/payments/delete/${formData.id}`, {
         method: "DELETE"
       });
       onSave(null);
@@ -130,7 +130,7 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
 
   const handleViewFile = () => {
     if (formData.id) {
-      window.open(`https//willowtonbursary.co.za/api/payments/view/${formData.id}`, "_blank");
+      window.open(`https://willowtonbursary.co.za/api/payments/view/${formData.id}`, "_blank");
     }
   };
 

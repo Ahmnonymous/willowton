@@ -53,7 +53,7 @@ const AboutusDrawer = ({ open, onClose, studentId, aboutMeId, onSave }) => {
     if (open) {
       if (aboutMeId) {
         // Editing mode
-        fetch(`https//willowtonbursary.co.za/api/about-me/id/${aboutMeId}`)
+        fetch(`https://willowtonbursary.co.za/api/about-me/id/${aboutMeId}`)
           .then((res) => res.json())
           .then((data) => {
             setFormData(data);
@@ -82,8 +82,8 @@ const AboutusDrawer = ({ open, onClose, studentId, aboutMeId, onSave }) => {
   const handleSave = async () => {
     const isUpdate = !!formData.id;
     const url = isUpdate
-      ? `https//willowtonbursary.co.za/api/about-me/update/${formData.id}`
-      : `https//willowtonbursary.co.za/api/about-me/insert`;
+      ? `https://willowtonbursary.co.za/api/about-me/update/${formData.id}`
+      : `https://willowtonbursary.co.za/api/about-me/insert`;
     const method = isUpdate ? "PUT" : "POST";
 
     const dataToSend = { ...formData };
@@ -118,7 +118,7 @@ const AboutusDrawer = ({ open, onClose, studentId, aboutMeId, onSave }) => {
 
     try {
       const res = await fetch(
-        `https//willowtonbursary.co.za/api/about-me/delete/${formData.id}`,
+        `https://willowtonbursary.co.za/api/about-me/delete/${formData.id}`,
         { method: "DELETE" }
       );
 

@@ -83,7 +83,12 @@ const LayoutHandler = () => {
   const isWebAppPage = location.pathname.startsWith("/dashboard") ||
                        location.pathname.startsWith("/add-student") ||
                        location.pathname.startsWith("/student-details") ||
-                       location.pathname.startsWith("/create-admin");
+                       location.pathname.startsWith("/create-admin") ||
+                       location.pathname.startsWith("/reports/student-report") ||
+                       location.pathname.startsWith("/reports/parent-report") ||
+                       location.pathname.startsWith("/reports/student-equity") ||
+                       location.pathname.startsWith("/reports/payment-report") ||
+                       location.pathname.startsWith("/reports/voluntary-report");
 
   const isReportPage = location.pathname.startsWith("/reports");
 

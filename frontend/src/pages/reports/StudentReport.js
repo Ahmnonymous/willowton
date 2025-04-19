@@ -2,7 +2,7 @@ import Breadcrumb from "../../components/Breadcrumb";
 import React, { useState, useEffect, useContext } from 'react';
 import { Box } from '@mui/material';
 import axios from 'axios';
-import { ThemeContext } from '../../config/ThemeContext'; // Import ThemeContext
+import { ThemeContext } from '../../config/ThemeContext.js'; // Import ThemeContext
 import './GenericTable.css'; // Updated generic class names for styling
 
 function GenericTable() {
@@ -23,7 +23,7 @@ function GenericTable() {
   // Fetch student details when the component mounts
   useEffect(() => {
     const fetchStudents = async () => {
-      const response = await axios.get('https//willowtonbursary.co.za/api/view/student-details');
+      const response = await axios.get('https://willowtonbursary.co.za/api/view/student-details');
 
       if (response.data.length > 0) {
         // Dynamically set the columns from the first student's object, remove the 'id' column

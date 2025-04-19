@@ -46,7 +46,7 @@ const ExpenseDetailsDrawer = ({ open, onClose, studentId, expenseDetailsId, onSa
 
   useEffect(() => {
     if (open && expenseDetailsId) {
-      fetch(`https//willowtonbursary.co.za/api/expense-details/id/${expenseDetailsId}`)
+      fetch(`https://willowtonbursary.co.za/api/expense-details/id/${expenseDetailsId}`)
         .then(res => res.json())
         .then(data => {
           if (data) {
@@ -147,8 +147,8 @@ const ExpenseDetailsDrawer = ({ open, onClose, studentId, expenseDetailsId, onSa
     }, {});
   
     const url = expenseDetailsId
-      ? `https//willowtonbursary.co.za/api/expense-details/update/${expenseDetailsId}`
-      : `https//willowtonbursary.co.za/api/expense-details/insert`;
+      ? `https://willowtonbursary.co.za/api/expense-details/update/${expenseDetailsId}`
+      : `https://willowtonbursary.co.za/api/expense-details/insert`;
   
     const method = expenseDetailsId ? 'PUT' : 'POST';
   
@@ -174,7 +174,7 @@ const ExpenseDetailsDrawer = ({ open, onClose, studentId, expenseDetailsId, onSa
   const handleDeleteConfirm = async () => {
     if (!expenseDetailsId) return;
     try {
-      await fetch(`https//willowtonbursary.co.za/api/expense-details/delete/${expenseDetailsId}`, {
+      await fetch(`https://willowtonbursary.co.za/api/expense-details/delete/${expenseDetailsId}`, {
         method: 'DELETE',
       });
       onSave(null);

@@ -43,7 +43,7 @@ const AttachmentsDrawer = ({ open, onClose, studentId, attachmentId, onSave }) =
     }
 
     // Editing mode
-    fetch(`https//willowtonbursary.co.za/api/attachments/id/${attachmentId}`)
+    fetch(`https://willowtonbursary.co.za/api/attachments/id/${attachmentId}`)
       .then((res) => res.json())
       .then((data) => {
         setFormData({
@@ -76,8 +76,8 @@ const AttachmentsDrawer = ({ open, onClose, studentId, attachmentId, onSave }) =
   const handleSave = async () => {
     const isUpdate = !!formData.id;
     const url = isUpdate
-      ? `https//willowtonbursary.co.za/api/attachments/update/${formData.id}`
-      : `https//willowtonbursary.co.za/api/attachments/insert`;
+      ? `https://willowtonbursary.co.za/api/attachments/update/${formData.id}`
+      : `https://willowtonbursary.co.za/api/attachments/insert`;
     const method = isUpdate ? "PUT" : "POST";
 
     const body = new FormData();
@@ -107,7 +107,7 @@ const AttachmentsDrawer = ({ open, onClose, studentId, attachmentId, onSave }) =
   const handleDeleteConfirm = async () => {
     if (!formData.id) return;
     try {
-      await fetch(`https//willowtonbursary.co.za/api/attachments/delete/${formData.id}`, {
+      await fetch(`https://willowtonbursary.co.za/api/attachments/delete/${formData.id}`, {
         method: "DELETE",
       });
       onSave(null);
@@ -125,7 +125,7 @@ const AttachmentsDrawer = ({ open, onClose, studentId, attachmentId, onSave }) =
 
   const handleViewFile = () => {
     if (formData.id) {
-      window.open(`https//willowtonbursary.co.za/api/attachments/view/${formData.id}`, "_blank");
+      window.open(`https://willowtonbursary.co.za/api/attachments/view/${formData.id}`, "_blank");
     }
   };
 

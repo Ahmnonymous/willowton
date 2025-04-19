@@ -33,7 +33,7 @@ const AssetsLiabilitiesDrawer = ({ open, onClose, studentId, assetLiabilityId, o
 
   useEffect(() => {
     if (open && assetLiabilityId) {
-      fetch(`https//willowtonbursary.co.za/api/assets-liabilities/id/${assetLiabilityId}`)
+      fetch(`https://willowtonbursary.co.za/api/assets-liabilities/id/${assetLiabilityId}`)
         .then(res => res.json())
         .then(data => {
           if (data) {
@@ -63,8 +63,8 @@ const AssetsLiabilitiesDrawer = ({ open, onClose, studentId, assetLiabilityId, o
 
   const handleSave = () => {
     const url = assetLiabilityId
-      ? `https//willowtonbursary.co.za/api/assets-liabilities/update/${assetLiabilityId}`
-      : `https//willowtonbursary.co.za/api/assets-liabilities/insert`;
+      ? `https://willowtonbursary.co.za/api/assets-liabilities/update/${assetLiabilityId}`
+      : `https://willowtonbursary.co.za/api/assets-liabilities/insert`;
     const method = assetLiabilityId ? "PUT" : "POST";
 
     fetch(url, {
@@ -88,7 +88,7 @@ const AssetsLiabilitiesDrawer = ({ open, onClose, studentId, assetLiabilityId, o
   const handleDeleteConfirm = async () => {
     if (!assetLiabilityId) return;
     try {
-      await fetch(`https//willowtonbursary.co.za/api/assets-liabilities/delete/${assetLiabilityId}`, {
+      await fetch(`https://willowtonbursary.co.za/api/assets-liabilities/delete/${assetLiabilityId}`, {
         method: "DELETE"
       });
       onSave(null);

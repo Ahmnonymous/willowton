@@ -87,7 +87,7 @@ const InterviewDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
         Student_Details_Portal_id: studentId
       });
     } else {
-      fetch(`https//willowtonbursary.co.za/api/interviews/id/${recordId}`)
+      fetch(`https://willowtonbursary.co.za/api/interviews/id/${recordId}`)
         .then(res => res.json())
         .then(data => {
           setFormData({
@@ -134,8 +134,8 @@ const InterviewDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
   const handleSave = async () => {
     const isUpdate = !!formData.id;
     const url = isUpdate
-      ? `https//willowtonbursary.co.za/api/interviews/update/${formData.id}`
-      : `https//willowtonbursary.co.za/api/interviews/insert`;
+      ? `https://willowtonbursary.co.za/api/interviews/update/${formData.id}`
+      : `https://willowtonbursary.co.za/api/interviews/insert`;
     const method = isUpdate ? "PUT" : "POST";
 
     const res = await fetch(url, {
@@ -159,7 +159,7 @@ const InterviewDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
   const handleDeleteConfirm = async () => {
     if (!formData.id) return;
     try {
-      await fetch(`https//willowtonbursary.co.za/api/interviews/delete/${formData.id}`, {
+      await fetch(`https://willowtonbursary.co.za/api/interviews/delete/${formData.id}`, {
         method: "DELETE"
       });
       onSave(null);

@@ -17,7 +17,7 @@ const AboutUsPage = () => {
         </Box>
 
         <Box sx={{ mb: 4 }}>
-          <Typography variant="h6" sx={{ fontWeight: 'bold', color: "white", color: "white", mb: 2, fontSize: '1rem', fontFamily: 'Sansation Light, sans-serif' }}>
+          <Typography variant="h6" sx={{ fontWeight: 'bold', color: "white", mb: 2, fontSize: '1rem', fontFamily: 'Sansation Light, sans-serif' }}>
             About The Willowton Group
           </Typography>
           <Divider />

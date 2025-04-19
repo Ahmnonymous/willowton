@@ -37,7 +37,7 @@ const UniversityDetailsDrawer = ({
     if (open) {
       if (universityDetailsId) {
         // Editing mode
-        fetch(`https//willowtonbursary.co.za/api/university-details/id/${universityDetailsId}`)
+        fetch(`https://willowtonbursary.co.za/api/university-details/id/${universityDetailsId}`)
           .then((res) => res.json())
           .then((data) => {
             setFormData(data);
@@ -96,8 +96,8 @@ const UniversityDetailsDrawer = ({
   const handleSave = async () => {
     const isUpdate = !!formData.id;
     const url = isUpdate
-      ? `https//willowtonbursary.co.za/api/university-details/update/${formData.id}`
-      : `https//willowtonbursary.co.za/api/university-details/insert`;
+      ? `https://willowtonbursary.co.za/api/university-details/update/${formData.id}`
+      : `https://willowtonbursary.co.za/api/university-details/insert`;
     const method = isUpdate ? "PUT" : "POST";
 
     const body = { ...formData };
@@ -129,7 +129,7 @@ const UniversityDetailsDrawer = ({
 
     try {
       const res = await fetch(
-        `https//willowtonbursary.co.za/api/university-details/delete/${formData.id}`,
+        `https://willowtonbursary.co.za/api/university-details/delete/${formData.id}`,
         { method: "DELETE" }
       );
 

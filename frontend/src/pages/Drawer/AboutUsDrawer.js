@@ -12,6 +12,7 @@ import {
   DialogContent,
   DialogTitle
 } from "@mui/material";
+import { useMediaQuery } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import SaveIcon from "@mui/icons-material/Save";
 import AddIcon from "@mui/icons-material/Add";
@@ -23,6 +24,11 @@ const AboutusDrawer = ({ open, onClose, studentId, aboutMeId, onSave }) => {
 
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
   const [formData, setFormData] = useState({});
+  // Check for larger or smaller screen size
+  const isLargeScreen = useMediaQuery("(min-width:600px)");
+
+  // Drawer width based on screen size
+  const drawerWidth = isLargeScreen ? 500 : 330;  
 
   // Custom questions
   const questions = [
@@ -143,7 +149,7 @@ const AboutusDrawer = ({ open, onClose, studentId, aboutMeId, onSave }) => {
     <Drawer anchor="right" open={open} onClose={onClose}>
       <Box
         sx={{
-          width: 400,
+          width: drawerWidth,
           height: "100%",
           display: "flex",
           flexDirection: "column",

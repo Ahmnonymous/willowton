@@ -53,7 +53,7 @@ export const FontSizeProvider = ({ children }) => {
         fontSize: fontSize === "large" ? "1rem" : fontSize === "small" ? "0.8rem" : "0.875rem",
       },
       button: {
-        fontSize: fontSize === "large" ? "1rem" : fontSize === "small" ? "0.85rem" : "0.9rem",
+        fontSize: fontSize === "large" ? "1rem" : fontSize === "small" ? "0.75rem" : "0.8rem",
       },
       caption: {
         fontSize: fontSize === "large" ? "0.9rem" : fontSize === "small" ? "0.7rem" : "0.75rem",

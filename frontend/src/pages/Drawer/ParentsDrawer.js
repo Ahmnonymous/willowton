@@ -14,6 +14,7 @@ import {
   DialogTitle,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import { useMediaQuery } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -26,6 +27,11 @@ const ParentsDrawer = ({ open, onClose, studentId, parentId, onSave }) => {
   const [formData, setFormData] = useState({});
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  // Check for larger or smaller screen size
+  const isLargeScreen = useMediaQuery("(min-width:600px)");
+
+  // Drawer width based on screen size
+  const drawerWidth = isLargeScreen ? 500 : 330;
 
   useEffect(() => {
     if (open) {
@@ -101,7 +107,7 @@ const ParentsDrawer = ({ open, onClose, studentId, parentId, onSave }) => {
   return (
     <Drawer anchor="right" open={open} onClose={onClose}>
       <Box sx={{
-        width: 400,
+        width: drawerWidth,
         height: "100%",
         display: "flex",
         flexDirection: "column",

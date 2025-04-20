@@ -127,7 +127,7 @@ const LayoutHandler = () => {
           mt: isWebAppPage ? 8 : 0,
           ml: sidebarOpen && isWebAppPage ? 30 : 0,
           transition: "margin 0.3s ease",
-          p: isWebAppPage ? 3 : 0,
+          p: isWebAppPage ? 3 : 0 
         }}
         className={isWebPage ? 'web-page' : ''}
       >

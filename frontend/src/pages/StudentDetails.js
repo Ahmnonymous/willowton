@@ -220,7 +220,7 @@ const StudentDetails = () => {
     { label: "Parents Details", key: "parents-details" },
     { label: "University Details", key: "university-details" },
     { label: "Attachments", key: "attachments" },
-    { label: "Financial Details", key: "financial-details" },
+    { label: "Financial Details", key: "expenses-summary" },
     { label: "Assets & Liabilities", key: "assets-liabilities" },
     { label: "Academic Results", key: "academic-results" },
     { label: "Voluntary Services", key: "voluntary-services" },
@@ -303,7 +303,7 @@ const StudentDetails = () => {
       <Box sx={{ padding: 0, border: '1px solid #ccc', marginBottom: 2, backgroundColor: isDarkMode ? '#1e293b' : 'white', color: pageStyle.color }}>
         <Box sx={{ padding: 1,display: 'flex', alignItems: 'center', marginBottom: 0.5, borderBottom: 1, borderBottomColor: '#ccc', height: 40,backgroundColor: isDarkMode ? '#1e293b' : '#e1f5fe' }}>
           <Typography variant="h6" sx={{ fontWeight: 'bold', marginLeft: 1 }}>
-            {capitalizeWords(sectionKey)}
+            {capitalizeWords(sectionKey === "expenses-summary" ? "financial-details" : sectionKey)}
           </Typography>
 
           {(isAboutMe || isParents || isUniversityDetails || isAttachments || isExpenses 
@@ -366,12 +366,12 @@ const StudentDetails = () => {
                 {Object.keys(data[0])
                   .filter(field => field !== "id" && field !== "student_details_portal_id")
                   .map((field, idx) => (
-                    <TableCell key={idx} sx={{
+                    <TableCell key={idx} 
+                    sx={{
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
-                      maxWidth: 200,
-                      fontSize: '0.7rem',
+                      maxWidth: 300,
                       fontWeight: 'bold',
                       textTransform: 'capitalize',
                       color: isDarkMode ? 'white': 'black'
@@ -388,7 +388,7 @@ const StudentDetails = () => {
                     {(isAboutMe || isParents || isUniversityDetails || isAttachments || isExpenses 
                     || isAssetsLiabilities || isAcademicResults || isVoluntaryServices || isPayments || isInterview) && (
                       <EditIcon
-                        sx={{ cursor: 'pointer', fontSize: '1rem',color: isDarkMode ? 'white': 'black' }}
+                        sx={{ cursor: 'pointer', fontSize: 'large',color: isDarkMode ? 'white': 'black' }}
                         onClick={() => {
                           if (isAboutMe) {
                             setEditingAboutMeId(row.id);
@@ -481,14 +481,13 @@ const StudentDetails = () => {
           sx={{
             display: 'flex',
             alignItems: 'center',
-            backgroundColor: isDarkMode ? 'white' : 'black',//'#1E293B',
-            color: isDarkMode ? 'black':'white',//'#fff',
-            fontSize: '0.75rem',
+            backgroundColor: isDarkMode ? 'white' : 'black',
+            color: isDarkMode ? 'black':'white',
             padding: '2px 6px',
             textTransform: 'none',
           }}
         >
-          <AddIcon sx={{ marginRight: 1, fontSize: 15 }} />
+          <AddIcon sx={{ marginRight: 1, fontSize: 'small' }} />
           Create
         </Button>
       </Box>
@@ -592,14 +591,13 @@ const StudentDetails = () => {
                 sx={{
                   display: 'flex',
                   alignItems: 'center',
-                  backgroundColor: isDarkMode ? 'white' : 'black',//'#1E293B',
-                  color: isDarkMode ? 'black':'white',//'#fff',
-                  fontSize: '0.75rem',
+                  backgroundColor: isDarkMode ? 'white' : 'black',
+                  color: isDarkMode ? 'black':'white',
                   padding: '2px 6px',
                   textTransform: 'none',
                 }}
               >
-                <EditIcon sx={{ marginRight: 1, fontSize: 15 }} />
+                <EditIcon sx={{ marginRight: 1, fontSize: 'small' }} />
                 Edit
               </Button>
             </Box>
@@ -632,8 +630,7 @@ const StudentDetails = () => {
                 aria-label="tabs"
                 sx={{
                   "& .MuiTab-root": {
-                    fontSize: '0.7rem',
-                    fontWeight: '550',
+                    fontWeight: '600',
                     textTransform: 'capitalize',
                     mr: -2,
                     color: isDarkMode ? 'white' : 'black'

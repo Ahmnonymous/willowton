@@ -19,6 +19,7 @@ import {
   DialogTitle
 } from "@mui/material";
 import { useFormik } from "formik";
+import { useMediaQuery } from "@mui/material";
 import * as yup from "yup";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
@@ -45,6 +46,11 @@ const UserReport = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editUser, setEditUser] = useState(null);
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
+  // Check for larger or smaller screen size
+  const isLargeScreen = useMediaQuery("(min-width:600px)");
+
+  // Drawer width based on screen size
+  const drawerWidth = isLargeScreen ? 500 : 330;
 
   // Fetch users data
   useEffect(() => {
@@ -146,12 +152,12 @@ const UserReport = () => {
           variant="contained"
           color="primary"
           onClick={handleCreateClick}
+          fontSize="small"
           sx={{
             display: "flex",
             alignItems: "center",
             backgroundColor: isDarkMode ? 'white' : 'black',//'#1E293B',
             color: isDarkMode ? 'black' : 'white',//'#fff',
-            fontSize: "0.75rem",
             padding: "2px 6px",
             textTransform: "none",
           }}
@@ -181,7 +187,8 @@ const UserReport = () => {
                     <TableCell sx={{ padding: "5px" }}>
                       <Button
                         onClick={() => handleEditClick(user)}
-                        sx={{ cursor: "pointer", fontSize: "1rem" }}
+                        fontsize="small"
+                        sx={{ cursor: "pointer" }}
                       >
                         <EditIcon />
                       </Button>
@@ -200,7 +207,7 @@ const UserReport = () => {
 
       {/* Drawer for creating or editing user */}
       <Drawer anchor="right" open={drawerOpen} onClose={handleCloseDrawer}>
-        <Box sx={{ width: 400, height: '100%', display: 'flex', flexDirection: 'column', backgroundColor: isDarkMode ? '#2D3748' : '#ffffff' }}>
+        <Box sx={{ width: drawerWidth, height: '100%', display: 'flex', flexDirection: 'column', backgroundColor: isDarkMode ? '#2D3748' : '#ffffff' }}>
           <Box sx={{ p: 2, borderBottom: "1px solid #ccc" }}>
             <Typography variant="h6" sx={{ color: isDarkMode ? '#F7FAFC' : '#1E293B' }}>{editUser ? "Edit User" : "Create User"}</Typography>
           </Box>

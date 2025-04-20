@@ -13,6 +13,7 @@ import {
   DialogTitle,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import { useMediaQuery } from "@mui/material";
 import SaveIcon from '@mui/icons-material/Save';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -20,6 +21,11 @@ import { ThemeContext } from '../../config/ThemeContext'; // Import ThemeContext
 
 const ExpenseDetailsDrawer = ({ open, onClose, studentId, expenseDetailsId, onSave }) => {
   const { isDarkMode } = useContext(ThemeContext);  // Access theme context
+  // Check for larger or smaller screen size
+  const isLargeScreen = useMediaQuery("(min-width:600px)");
+
+  // Drawer width based on screen size
+  const drawerWidth = isLargeScreen ? 500 : 330;
 
   const [formData, setFormData] = useState({
     Father_Monthly_Salary: '',
@@ -191,7 +197,7 @@ const ExpenseDetailsDrawer = ({ open, onClose, studentId, expenseDetailsId, onSa
 
   return (
     <Drawer anchor="right" open={open} onClose={onClose}>
-      <Box sx={{ width: 400, height: '100%', display: 'flex', flexDirection: 'column', backgroundColor: isDarkMode ? '#2D3748' : '#fff' }}>
+      <Box sx={{ width: drawerWidth, height: '100%', display: 'flex', flexDirection: 'column', backgroundColor: isDarkMode ? '#2D3748' : '#fff' }}>
         {/* Header */}
         <Box sx={{ p: 2, borderBottom: '1px solid #ccc', backgroundColor: isDarkMode ? '#1E293B' : '#e1f5fe' }}>
           <Typography variant="h6" sx={{ fontWeight: "bold", color: isDarkMode ? '#F7FAFC' : '#1E293B' }}>

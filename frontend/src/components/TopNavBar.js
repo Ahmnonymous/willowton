@@ -11,12 +11,13 @@ const TopNavBar = ({ toggleSidebar }) => {
 
   return (
     <AppBar
-      position="fixed"
-      sx={{
-        backgroundColor: isDarkMode ? "#1E293B" : "#F7FAFC", // Light background in light mode, dark in dark mode
-        color: isDarkMode ? "#fff" : "#000", // Light text color in dark mode, dark text in light mode
-      }}
-    >
+  position="fixed"
+  sx={{
+    backgroundColor: isDarkMode ? "#1E293B" : "#F7FAFC", // Light background in light mode, dark in dark mode
+    color: isDarkMode ? "#fff" : "#000", // Light text color in dark mode, dark text in light mode
+    height: "64px",  // Set the height of the navbar here
+  }}
+>
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
         {/* Left - Sidebar Toggle Button & Title */}
         <Box sx={{ display: "flex", alignItems: "center" }}>

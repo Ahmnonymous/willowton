@@ -48,21 +48,22 @@ const SideNavMenu = ({ open }) => {
 
   return (
     <Drawer
-      variant="persistent"
-      anchor="left"
-      open={open}
-      sx={{
-        width: open ? 240 : 0,
-        flexShrink: 0,
-        "& .MuiDrawer-paper": {
-          width: 220,
-          boxSizing: "border-box",
-          top: 65,
-          backgroundColor: isDarkMode ? "#1E293B" : "#F7FAFC", // Dynamic background based on theme
-          color: isDarkMode ? "#fff" : "#000", // Dynamic text color based on theme
-        },
-      }}
-    >
+  variant="persistent"
+  anchor="left"
+  open={open}
+  sx={{
+    width: open ? 240 : 0,
+    flexShrink: 0,
+    "& .MuiDrawer-paper": {
+      width: 220,
+      boxSizing: "border-box",
+      top: 64,  // Adjust the top value to match the height of your top navbar
+      position: 'fixed',  // Keep it fixed so it doesn't overlap with the main content
+      backgroundColor: isDarkMode ? "#1E293B" : "#F7FAFC", // Dynamic background based on theme
+      color: isDarkMode ? "#fff" : "#000", // Dynamic text color based on theme
+    },
+  }}
+>
       <List>
         {menuItems.map((item, index) => (
           <React.Fragment key={index}>

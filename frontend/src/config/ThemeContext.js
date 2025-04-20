@@ -35,7 +35,7 @@ export const ThemeProvider = ({ children, pageBackgroundColor }) => {
         style={{
           backgroundColor: getBackgroundColor(),
           color: isDarkMode ? darkTheme.text : lightTheme.text,
-          minHeight: '100vh',  // Ensure full height for background to fill
+          minHeight: '100vh',  
         }}
       >
         {children}

@@ -124,7 +124,7 @@ const WebNavBar = () => {
           },
         }}
         component={Link}
-        to="/login"
+        to="/login-register"
       >
         Login/Register
       </Button>
@@ -137,7 +137,7 @@ const WebNavBar = () => {
     { text: 'Eligibility', link: '/eligibility' },
     { text: 'POPIA', link: '/popia' },
     { text: 'Contact Us', link: '/contact-us' },
-    { text: 'Login/Register', link: '/login' },
+    { text: 'Login/Register', link: '/login-register' },
   ];
 
   return (

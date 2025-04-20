@@ -14,7 +14,8 @@ const ContactUs = () => {
     borderRadius: '2px',
     '& .MuiInputBase-input': {
       color: '#DE3831',
-      fontFamily: "Sansation Light"
+      fontFamily: "Sansation Light",
+      fontWeight: "bolder"
     },
     '& .MuiOutlinedInput-root': {
       borderRadius: '2px'

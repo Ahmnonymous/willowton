@@ -20,6 +20,7 @@ import Dashboard from "./pages/Dashboard";
 import AddStudent from "./pages/AddStudent";
 import StudentDetails from "./pages/StudentDetails";
 import UserCreation from "./pages/CreateAdmin";
+import LogReg from "./pages/logreg";
 
 // Import Reports
 import ParentReport from "./pages/reports/ParentReport";
@@ -46,6 +47,7 @@ const PageTitleUpdater = () => {
     else if (path === "/student-details") title = "Student Details";
     else if (path === "/create-admin") title = "Create Admin";
     else if (path === "/add-student") title = "Add Student";
+    else if (path === "/login-register") title = "Login/Register";
     else if (path.startsWith("/reports")) {
       if (path === "/reports/parent-report") title = "Parent Report";
       else if (path === "/reports/student-equity") title = "Student Equity Report";
@@ -76,6 +78,7 @@ const LayoutHandler = () => {
     '/contact-us': '#DE3831',
     '/eligibility': '#FFFFFF',
     '/popia': '#000000',
+    '/login-register': '#FFB612'
   };
 
   const pageBackgroundColor = pageBackgroundColors[location.pathname] || null;
@@ -96,7 +99,7 @@ const LayoutHandler = () => {
     "/", "/about-us", "/contact-us", "/eligibility", "/popia",
     "/dashboard", "/add-student", "/student-details", "/create-admin",
     "/reports/parent-report", "/reports/student-equity", "/reports/payment-report",
-    "/reports/student-report", "/reports/voluntary-report"
+    "/reports/student-report", "/reports/voluntary-report", "/login-register"
   ];
   
   const isKnownRoute = validPaths.includes(location.pathname);
@@ -135,6 +138,7 @@ const LayoutHandler = () => {
           <Route path="/contact-us" element={<ContactUs />} />
           <Route path="/eligibility" element={<Eligibility />} />
           <Route path="/popia" element={<POPIA />} />
+          <Route path="/login-register" element={<LogReg />} />
 
           {/* Admin Pages */}
           <Route path="/dashboard" element={<Dashboard />} />

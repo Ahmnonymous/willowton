@@ -55,7 +55,7 @@ const WebNavBar = () => {
       case '/popia':
         return '#000000'; // POPIA
       default:
-        return 'black';
+        return '#FFB612';
     }
   };
   const navItems = (

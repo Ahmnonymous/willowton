@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Drawer, List, ListItemButton, ListItemIcon, ListItemText, Collapse } from "@mui/material";
 import { Home, Assessment, ExpandLess, ExpandMore } from "@mui/icons-material";
 import { Link, useLocation } from "react-router-dom";
@@ -26,26 +26,28 @@ const SideNavMenu = ({ open }) => {
     setUser(storedUser);  // Set user data
   }, []);
 
-  // Conditional menu items based on user type
-  const menuItems = user?.user_type === "admin" ? [
-    { text: "Dashboard", path: "/dashboard", icon: <Home /> },
-    { text: "Student Details", path: "/student-details", icon: <SchoolIcon /> },
-    {
-      text: "Reports",
-      icon: <Assessment />,
-      subItems: [
-        { text: "Student Report", path: "/reports/student-report", icon: <LocalLibraryIcon /> },
-        { text: "Parents Report", path: "/reports/parent-report", icon: <FamilyRestroomIcon /> },
-        { text: "Student Equity", path: "/reports/student-equity", icon: <BalanceIcon /> },
-        { text: "Payment Report", path: "/reports/payment-report", icon: <PaymentsIcon /> },
-        { text: "Voluntary Service", path: "/reports/voluntary-report", icon: <AssistWalkerIcon /> },
-      ],
-    },
-    { text: "Create Admin", path: "/create-admin", icon: <AdminPanelSettingsIcon /> },
-  ] : [
-    { text: "Student Details", path: "/student-details", icon: <SchoolIcon /> },
-    { text: "Create Admin", path: "/create-admin", icon: <AdminPanelSettingsIcon /> },
-  ];
+  // Conditional menu items based on user type wrapped in useMemo
+  const menuItems = useMemo(() => {
+    return user?.user_type === "admin" ? [
+      { text: "Dashboard", path: "/dashboard", icon: <Home /> },
+      { text: "Student Details", path: "/student-details", icon: <SchoolIcon /> },
+      {
+        text: "Reports",
+        icon: <Assessment />,
+        subItems: [
+          { text: "Student Report", path: "/reports/student-report", icon: <LocalLibraryIcon /> },
+          { text: "Parents Report", path: "/reports/parent-report", icon: <FamilyRestroomIcon /> },
+          { text: "Student Equity", path: "/reports/student-equity", icon: <BalanceIcon /> },
+          { text: "Payment Report", path: "/reports/payment-report", icon: <PaymentsIcon /> },
+          { text: "Voluntary Service", path: "/reports/voluntary-report", icon: <AssistWalkerIcon /> },
+        ],
+      },
+      { text: "Create Admin", path: "/create-admin", icon: <AdminPanelSettingsIcon /> },
+    ] : [
+      { text: "Student Details", path: "/student-details", icon: <SchoolIcon /> },
+      { text: "Create Admin", path: "/create-admin", icon: <AdminPanelSettingsIcon /> },
+    ];
+  }, [user]); // Dependency array, so menuItems only changes when the user data changes
 
   // Effect to open the dropdown when on a report page
   useEffect(() => {
@@ -55,7 +57,7 @@ const SideNavMenu = ({ open }) => {
     } else {
       setOpenDropdown(false); // Close if not on a report page
     }
-  }, [location, menuItems]);
+  }, [location, menuItems]); // Re-run this effect when menuItems changes
 
   return (
     <Drawer

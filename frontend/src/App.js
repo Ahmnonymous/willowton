@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Routes, useLocation, Navigate } from "react-router-dom";
 import { Box, CssBaseline } from "@mui/material";
 import { FontSizeProvider } from "./config/FontSizeProvider";
@@ -173,6 +173,13 @@ const LayoutHandler = () => {
             </>
           )}
 
+          {isStudent && (
+            <>
+              <Route path="/student-details" element={<StudentDetails />} />
+              <Route path="/create-admin" element={<UserCreation />} />
+            </>
+          )}
+
           {/* Report Pages */}
           <Route path="/reports/parent-report" element={<ParentReport />} />
           <Route path="/reports/student-equity" element={<StudentEquity />} />
@@ -181,7 +188,7 @@ const LayoutHandler = () => {
           <Route path="/reports/voluntary-report" element={<VoluntaryReport />} />
 
           {/* Page Not Found */}
-          <Route path="*" element={isAccessiblePage() ? <PageNotFound /> : <Navigate to="/not-found" />} />
+          <Route path="*" element={isAccessiblePage() ? <PageNotFound /> : <Navigate to="/PageNotFound" />} />
         </Routes>
       </Box>
     </ThemeProvider>

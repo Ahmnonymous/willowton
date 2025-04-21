@@ -185,12 +185,16 @@ const LayoutHandler = () => {
             </>
           )}
 
+          {isAdmin && (
+            <>
           {/* Report Pages */}
           <Route path="/reports/parent-report" element={<ParentReport />} />
           <Route path="/reports/student-equity" element={<StudentEquity />} />
           <Route path="/reports/payment-report" element={<PaymentReport />} />
           <Route path="/reports/student-report" element={<StudentReport />} />
           <Route path="/reports/voluntary-report" element={<VoluntaryReport />} />
+          </>
+          )}
 
           {/* Page Not Found */}
           <Route path="*" element={isAccessiblePage() ? <PageNotFound /> : <PageNotFound /> } />

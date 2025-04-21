@@ -18,6 +18,13 @@ const TopNavBar = ({ toggleSidebar }) => {
     }
   }, []);
 
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  // If the user is not logged in, don't render the TopNavBar
+  if (!user) {
+    return null; // Return nothing if the user is not logged in
+  }
+
   return (
     <AppBar
       position="fixed"

@@ -258,7 +258,7 @@ const WebNavBar = () => {
               to="/"  // Link to the home page
               sx={{
                 color: getButtonTextColor(location.pathname),
-                fontWeight: 600,
+                // fontWeight: 600,
                 display: 'block',
                 // fontFamily: 'Sansation Light, sans-serif',
                 textDecoration: 'none', // Remove underline from link

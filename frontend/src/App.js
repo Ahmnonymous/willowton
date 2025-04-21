@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Route, Routes, useLocation, Navigate } from "react-router-dom";
 import { Box, CssBaseline } from "@mui/material";
 import { FontSizeProvider } from "./config/FontSizeProvider";
 import { ThemeProvider } from './config/ThemeContext';
@@ -71,6 +71,18 @@ const PageTitleUpdater = () => {
 const LayoutHandler = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
+  const [user, setUser] = useState(null);  // Store user data
+  const [token, setToken] = useState(null);  // Store the token
+
+  // Get user info and token from localStorage
+  React.useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    const storedToken = localStorage.getItem("token");
+    if (storedUser && storedToken) {
+      setUser(storedUser);
+      setToken(storedToken);
+    }
+  }, []);
 
   const pageBackgroundColors = {
     '/': '#FFB612',
@@ -104,7 +116,7 @@ const LayoutHandler = () => {
   
   const isKnownRoute = validPaths.includes(location.pathname);
   const isWebPage = !isWebAppPage && !isReportPage && isKnownRoute;
-  
+
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
   return (
@@ -141,10 +153,12 @@ const LayoutHandler = () => {
           <Route path="/login-register" element={<LogReg />} />
 
           {/* Admin Pages */}
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/add-student" element={<AddStudent />} />
-          <Route path="/student-details" element={<StudentDetails />} />
-          <Route path="/create-admin" element={<UserCreation />} />
+          <Route path="/dashboard" element={user?.user_type === 'admin' ? <Dashboard /> : <Navigate to="/page-not-found" />} />
+          <Route path="/student-details" element={user?.user_type === 'admin' ? <AddStudent /> : <Navigate to="/page-not-found" />} />
+          <Route path="/create-admin" element={user?.user_type === 'admin' ? <UserCreation /> : <Navigate to="/page-not-found" />} />
+
+          {/* Student Pages */}
+          <Route path="/student-details" element={user?.user_type === 'student' ? <StudentDetails /> : <Navigate to="/page-not-found" />} />
 
           {/* Report Pages */}
           <Route path="/reports/parent-report" element={<ParentReport />} />

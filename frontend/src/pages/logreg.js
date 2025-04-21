@@ -88,9 +88,9 @@ const LoginSignup = () => {
   
         // Redirect to dashboard or student details page based on user type
         if (loginResponse.data.user.user_type === 'student') {
-          window.location.href = "/student-details";  // Redirect to student details
+          window.location.href = "/";  // Redirect to student details
         } else {
-          window.location.href = "/dashboard";  // Redirect to dashboard
+          window.location.href = "/";  // Redirect to dashboard
         }
       }
     } catch (error) {

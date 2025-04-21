@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   AppBar,
   Toolbar,
@@ -27,6 +27,7 @@ const WebNavBar = () => {
   const location = useLocation(); // To highlight current route
   const [user, setUser] = useState(null);  // Store user data
   const [token, setToken] = useState(null);  // Store the token
+  const dropdownRef = useRef(null);  // Reference for dropdown menu
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -35,6 +36,17 @@ const WebNavBar = () => {
       setUser(storedUser);
       setToken(storedToken);
     }
+  }, []);
+
+  useEffect(() => {
+    // Close the dropdown if clicked outside
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setAnchorEl(null);  // Close dropdown
+      }
+    };
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
   const toggleDrawer = (open) => {
@@ -170,7 +182,7 @@ const WebNavBar = () => {
         </Button>
       )}
       {token && (  // If the user is logged in, show the user icon with a dropdown
-        <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={handleMenuClick}>
+        <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} ref={dropdownRef} onClick={handleMenuClick}>
           <AccountCircleIcon sx={{ fontSize: 30, color: 'black', mr: 1 }} />  {/* User icon filled with black */}
           <Typography sx={{ color: 'black', fontFamily: 'Sansation Light', fontWeight: 'bold' }}>
             {user.first_name}
@@ -182,7 +194,7 @@ const WebNavBar = () => {
           >
             {/* Conditional redirection based on user type */}
             {user.user_type === 'student' ? (
-              <MenuItem component={Link} to="/student-details" onClick={handleMenuClose} sx={{ color: getButtonTextColor(location.pathname) }}>
+              <MenuItem component={Link} to="/student-details" onClick={handleMenuClose} sx={{ color: getButtonTextColor(location.pathname) }} >
                 <AccountCircleIcon sx={{ mr: 1, color: getButtonTextColor(location.pathname) }} /> Student Details
               </MenuItem>
             ) : (
@@ -214,7 +226,7 @@ const WebNavBar = () => {
       { text: 'Login/Register', link: '/login-register' }, // If not logged in, show Login/Register
     ])
   ];
-  
+
   return (
     <AppBar position="relative" sx={{ backgroundColor: 'transparent', boxShadow: 'none' }}>
       <Toolbar>

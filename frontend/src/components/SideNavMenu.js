@@ -1,9 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { Drawer, List, ListItemButton, ListItemIcon, ListItemText, Collapse } from "@mui/material";
-import { Home, Assessment, ExpandLess, ExpandMore } from "@mui/icons-material";
-import { Link, useLocation } from "react-router-dom";
-
-// Import the new icons
+import React, { useState, useEffect, useContext } from 'react';
+import { Drawer, List, ListItemButton, ListItemIcon, ListItemText, Collapse } from '@mui/material';
+import { Home, Assessment, ExpandLess, ExpandMore } from '@mui/icons-material';
+import { Link, useLocation } from 'react-router-dom';
 import LocalLibraryIcon from '@mui/icons-material/LocalLibrary';
 import FamilyRestroomIcon from '@mui/icons-material/FamilyRestroom';
 import BalanceIcon from '@mui/icons-material/Balance';
@@ -11,7 +9,6 @@ import PaymentsIcon from '@mui/icons-material/Payments';
 import AssistWalkerIcon from '@mui/icons-material/AssistWalker';
 import SchoolIcon from '@mui/icons-material/School';  // For Student Details
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'; // For Create Admin
-import { useContext } from 'react';
 import { ThemeContext } from "../config/ThemeContext"; // Import the ThemeContext
 
 const menuItems = [
@@ -34,47 +31,80 @@ const menuItems = [
 const SideNavMenu = ({ open }) => {
   const { isDarkMode } = useContext(ThemeContext); // Use theme context for dark mode
   const location = useLocation();
-  const [openDropdown, setOpenDropdown] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [user, setUser] = useState(null);  // Store user data
+  const [token, setToken] = useState(null);  // Store the token
+
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    const storedToken = localStorage.getItem("token");
+    if (storedUser && storedToken) {
+      setUser(storedUser);
+      setToken(storedToken);
+    }
+  }, []);
 
   // Effect to open the dropdown when on a report page
   useEffect(() => {
     const reportPaths = menuItems[2].subItems.map((item) => item.path); // Extract report paths
     if (reportPaths.some((path) => location.pathname.startsWith(path))) {
-      setOpenDropdown(true); // Open the dropdown if we are on a report page
+      setDrawerOpen(true); // Open the dropdown if we are on a report page
     } else {
-      setOpenDropdown(false); // Close if not on a report page
+      setDrawerOpen(false); // Close if not on a report page
     }
   }, [location]);
 
+  const toggleDrawer = (open) => {
+    setDrawerOpen(open);
+  };
+
+  const handleMenuClick = () => {
+    setDrawerOpen(!drawerOpen); // Toggle dropdown
+  };
+
+  const drawerItems = menuItems.filter(item => {
+    // Show full menu for admins and restricted items for students
+    if (user && user.user_type === 'admin') {
+      return true; // Admins get all menu items
+    } else if (user && user.user_type === 'student') {
+      // Students get only "Student Details" and "Create Admin"
+      if (item.text === 'Student Details' || item.text === 'Create Admin') {
+        return true;
+      }
+      return false;
+    }
+    return false;
+  });
+
   return (
     <Drawer
-  variant="persistent"
-  anchor="left"
-  open={open}
-  sx={{
-    width: open ? 240 : 0,
-    flexShrink: 0,
-    "& .MuiDrawer-paper": {
-      width: 220,
-      boxSizing: "border-box",
-      top: 64,  // Adjust the top value to match the height of your top navbar
-      position: 'fixed',  // Keep it fixed so it doesn't overlap with the main content
-      backgroundColor: isDarkMode ? "#1E293B" : "#F7FAFC", // Dynamic background based on theme
-      color: isDarkMode ? "#fff" : "#000", // Dynamic text color based on theme
-    },
-  }}
->
+      variant="persistent"
+      anchor="left"
+      open={open}
+      sx={{
+        width: open ? 240 : 0,
+        flexShrink: 0,
+        "& .MuiDrawer-paper": {
+          width: 240,
+          boxSizing: "border-box",
+          top: 64,  // Adjust the top value to match the height of your top navbar
+          position: 'fixed',  // Keep it fixed so it doesn't overlap with the main content
+          backgroundColor: isDarkMode ? "#1E293B" : "#F7FAFC", // Dynamic background based on theme
+          color: isDarkMode ? "#fff" : "#000", // Dynamic text color based on theme
+        },
+      }}
+    >
       <List>
-        {menuItems.map((item, index) => (
+        {drawerItems.map((item, index) => (
           <React.Fragment key={index}>
             {item.subItems ? (
               <>
-                <ListItemButton onClick={() => setOpenDropdown(!openDropdown)} sx={{ borderRadius: 2, margin: "5px", color: isDarkMode ? '#fff' : '#000' }}>
+                <ListItemButton onClick={handleMenuClick} sx={{ borderRadius: 2, margin: "5px", color: isDarkMode ? '#fff' : '#000' }}>
                   <ListItemIcon sx={{ color: isDarkMode ? '#fff' : '#000' }}>{item.icon}</ListItemIcon>
                   <ListItemText primary={item.text} />
-                  {openDropdown ? <ExpandLess /> : <ExpandMore />}
+                  {drawerOpen ? <ExpandLess /> : <ExpandMore />}
                 </ListItemButton>
-                <Collapse in={openDropdown} timeout="auto" unmountOnExit>
+                <Collapse in={drawerOpen} timeout="auto" unmountOnExit>
                   {item.subItems.map((subItem, subIndex) => (
                     <ListItemButton
                       key={subIndex}

@@ -170,17 +170,9 @@ const WebNavBar = () => {
         </Button>
       )}
       {token && (  // If the user is logged in, show the user icon with a dropdown
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <IconButton 
-            onClick={handleMenuClick} 
-            sx={{ 
-              color: 'black', 
-              mr: '-10px'  // Apply margin right
-            }}
-          >
-            <AccountCircleIcon sx={{ fontSize: 30, color: 'black' }} />  {/* User icon filled with black */}
-          </IconButton>
-          <Typography sx={{ color: 'black', fontFamily: 'Sansation Light', fontWeight: 'bold', ml: 1 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={handleMenuClick}>
+          <AccountCircleIcon sx={{ fontSize: 30, color: 'black', mr: 1 }} />  {/* User icon filled with black */}
+          <Typography sx={{ color: 'black', fontFamily: 'Sansation Light', fontWeight: 'bold' }}>
             {user.first_name}
           </Typography>
           <Menu
@@ -213,14 +205,16 @@ const WebNavBar = () => {
     { text: 'Eligibility', link: '/eligibility' },
     { text: 'POPIA', link: '/popia' },
     { text: 'Contact Us', link: '/contact-us' },
-    ...(token ? [  // If the user is logged in, add Dashboard and Log Out options
-      { text: 'Dashboard', link: '/dashboard' },
+    ...(token ? [  // If the user is logged in, add Dashboard or Student Details options based on user type
+      user.user_type === 'admin' 
+        ? { text: 'Dashboard', link: '/dashboard' }
+        : { text: 'Student Details', link: '/student-details' },
       { text: 'Log Out', link: '#', onClick: handleLogout },
     ] : [
       { text: 'Login/Register', link: '/login-register' }, // If not logged in, show Login/Register
     ])
   ];
-
+  
   return (
     <AppBar position="relative" sx={{ backgroundColor: 'transparent', boxShadow: 'none' }}>
       <Toolbar>

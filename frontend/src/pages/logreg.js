@@ -33,29 +33,29 @@ const LoginSignup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     // Validation checks only for "signup" mode
     let formValid = true;
     const newErrors = { email: "", password: "" };
-
+  
     if (authMode === "signup") {
       // Email and password validation for Register (signup)
       if (!formData.email_address) {
         newErrors.email = "Email is required";
         formValid = false;
       }
-
+  
       if (formData.password.length < 8) {
         newErrors.password = "Password must be at least 8 characters";
         formValid = false;
       }
     }
-
+  
     if (!formValid) {
       setErrors(newErrors);
       return; // Stop submission if form is invalid
     }
-
+  
     try {
       let response;
       if (authMode === "login") {
@@ -64,23 +64,38 @@ const LoginSignup = () => {
           email_address: formData.email_address,
           password: formData.password,
         });
-
+  
         // Ensure both token and user data are stored in localStorage
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("user", JSON.stringify(response.data.user)); // Store user data
-
+  
         // Redirect user to profile or dashboard after login
         window.location.href = "/";  // Change to your desired redirect path
-
+  
       } else {
         // Send signup request to backend
         response = await axios.post("https://willowtonbursary.co.za/api/users", formData);
-
-        alert("User Registered! You can now log in.");
+  
+        // Auto-login after successful registration
+        const loginResponse = await axios.post("https://willowtonbursary.co.za/api/login", {
+          email_address: formData.email_address,
+          password: formData.password,
+        });
+  
+        // Store token and user data from login
+        localStorage.setItem("token", loginResponse.data.token);
+        localStorage.setItem("user", JSON.stringify(loginResponse.data.user));
+  
+        // Redirect to dashboard or student details page based on user type
+        if (loginResponse.data.user.user_type === 'student') {
+          window.location.href = "/student-details";  // Redirect to student details
+        } else {
+          window.location.href = "/dashboard";  // Redirect to dashboard
+        }
       }
     } catch (error) {
       console.error("Error submitting form", error);
-
+  
       if (error.response?.data?.msg === "Email address is already in use") {
         setErrors((prevErrors) => ({
           ...prevErrors,
@@ -91,7 +106,7 @@ const LoginSignup = () => {
       }
     }
   };
-
+  
   return (
     <Box
       display="flex"

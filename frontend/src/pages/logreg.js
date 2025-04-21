@@ -1,39 +1,19 @@
 import React, { useState } from "react";
 import { Box, Button, TextField, Typography, ToggleButtonGroup, ToggleButton, IconButton, InputAdornment } from "@mui/material";
 import { AccountCircle, Lock, PersonAdd, Email, Visibility, VisibilityOff } from "@mui/icons-material";
-// import footerImage from '../images/footer.png';
+import axios from "axios"; // We'll use axios to make HTTP requests
+import footerImage from '../images/footer.png';
 
 const LoginSignup = () => {
   const [authMode, setAuthMode] = useState("login");
   const [showPassword, setShowPassword] = useState(false);
-
-  // Define font sizes as variables
-  const fontSizes = {
-    h4: '2.5rem',
-    h6: '2rem',
-    body1: '1rem',
-    listItemText: '1.1rem',
-    caption: '1rem',
-  };
-
-  // const textStyle = {
-  //   color: "black",
-  //   fontFamily: "Sansation Light",
-  //   fontSize: fontSizes.body1
-  // };
-
-  // const inputStyle = {
-  //   backgroundColor: 'white',
-  //   borderRadius: '2px',
-  //   '& .MuiInputBase-input': {
-  //     color: '#DE3831',
-  //     fontFamily: "Sansation Light",
-  //     fontWeight: "bolder"
-  //   },
-  //   '& .MuiOutlinedInput-root': {
-  //     borderRadius: '2px'
-  //   }
-  // };
+  const [formData, setFormData] = useState({
+    first_name: "",
+    last_name: "",
+    email_address: "",
+    password: "",
+    user_type: "student",
+  });
 
   const handleAuthToggle = (_, newAuthMode) => {
     if (newAuthMode !== null) setAuthMode(newAuthMode);
@@ -43,18 +23,66 @@ const LoginSignup = () => {
     setShowPassword((prevState) => !prevState);
   };
 
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      let response;
+      if (authMode === "login") {
+        // Send login request to backend
+        response = await axios.post("https://willowtonbursary.co.za/api/login", {
+          email_address: formData.email_address,
+          password: formData.password,
+        });
+        
+        // Store JWT token and user details in localStorage
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+
+        // Redirect user to profile or dashboard after login
+        window.location.href = "/profile";  // Change to your desired redirect path
+
+      } else {
+        // Send signup request to backend
+        response = await axios.post("https://willowtonbursary.co.za/api/users", formData);
+        
+        // Optionally, auto-login after successful registration (if desired)
+        alert("User Registered! You can now log in.");
+      }
+    } catch (error) {
+      console.error("Error submitting form", error);
+      alert("Error: " + error.response?.data?.msg || "Something went wrong");
+    }
+  };
+
   return (
-    <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" mt={5} bgcolor="#FFB612" position="relative">
+    <Box
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      justifyContent="center"
+      mt={5}
+      bgcolor="#FFB612"
+      position="relative"
+    >
       <ToggleButtonGroup
         value={authMode}
         exclusive
         onChange={handleAuthToggle}
-        sx={{ mb: 4 }}
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "center",
+        }}
       >
-        <ToggleButton value="login" sx={{ fontFamily: "Sansation Light", fontSize: fontSizes.body1 }}>
+        <ToggleButton value="login" sx={{ fontFamily: "Sansation Light", fontSize: { xs: '0.8rem', sm: '0.8rem', md: '1rem' } }}>
           <AccountCircle sx={{ mr: 1 }} /> Login
         </ToggleButton>
-        <ToggleButton value="signup" sx={{ fontFamily: "Sansation Light", fontSize: fontSizes.body1 }}>
+        <ToggleButton value="signup" sx={{ fontFamily: "Sansation Light", fontSize: { xs: '0.8rem', sm: '0.8rem', md: '1rem' } }}>
           <PersonAdd sx={{ mr: 1 }} /> Register
         </ToggleButton>
       </ToggleButtonGroup>
@@ -63,125 +91,151 @@ const LoginSignup = () => {
         display="flex"
         justifyContent="center"
         alignItems="center"
-
+        mb={4}
         sx={{
           backgroundColor: '#FFB612',
           width: '90%',
           maxWidth: '700px',
-          height: '400px',
+          height: 'auto',
           borderRadius: 2,
           position: "relative",
           padding: '20px',
         }}
       >
-        {authMode === "login" ? (
-          <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" p={3} textAlign="center" width="100%">
-            <Typography variant="h6" sx={{ fontFamily: "Sansation Light", fontSize: fontSizes.h6, color: 'black', mb: 3 }}>SET SOME GOALS</Typography>
-            <Typography variant="h6" sx={{ fontFamily: "Sansation Light", fontSize: fontSizes.h6, color: 'black', mb: 4 }}>THEN DEMOLISH THEM</Typography>
-
-            <Box width="100%" textAlign="center" maxWidth="400px">
-              <TextField
-                fullWidth
-                margin="normal"
-                placeholder="Email Address"
-                variant="outlined"
-                sx={{ fontFamily: "Sansation Light", mb: 2 }}
-                InputProps={{
-                  startAdornment: <Email sx={{ mr: 1 }} />
-                }}
-              />
-              <TextField
-                fullWidth
-                margin="normal"
-                placeholder="Password"
-                type={showPassword ? "text" : "password"}
-                variant="outlined"
-                sx={{ fontFamily: "Sansation Light", mb: 3 }}
-                InputProps={{
-                  startAdornment: <Lock sx={{ mr: 1 }} />,
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton onClick={togglePasswordVisibility}>
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />
-              <Button fullWidth variant="contained" sx={{ backgroundColor: 'black', fontFamily: "Sansation Light", mt: 2 }}>
-                LOGIN
-              </Button>
-              <Typography variant="body2" sx={{ cursor: 'pointer', fontFamily: "Sansation Light", mt: 2, color: 'black', fontWeight: 'bold' }}>
-                FORGOT PASSWORD?
+        <form onSubmit={handleSubmit}>
+          {authMode === "login" ? (
+            <>
+              <Typography variant="h6" sx={{ fontFamily: "Sansation Light", fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.8rem' }, color: 'black', mb: 3 }}>
+                SET SOME GOALS
               </Typography>
-            </Box>
-          </Box>
-        ) : (
-          <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" p={3} mt={5} textAlign="center" width="100%">
-            <Typography variant="h6" mb={3} sx={{ fontFamily: "Sansation Light", fontSize: fontSizes.h6, color: 'black' }}>SIGN UP</Typography>
+              <Typography variant="h6" sx={{ fontFamily: "Sansation Light", fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.8rem' }, color: 'black', mb: 3 }}>
+                THEN DEMOLISH THEM
+              </Typography>
 
-            <Box width="100%" textAlign="center" maxWidth="400px">
-              <TextField
-                fullWidth
-                margin="normal"
-                placeholder="First Name"
-                variant="outlined"
-                sx={{ fontFamily: "Sansation Light", mb: 2 }}
-                InputProps={{
-                  startAdornment: <AccountCircle sx={{ mr: 1 }} />
-                }}
-              />
-              <TextField
-                fullWidth
-                margin="normal"
-                placeholder="Last Name"
-                variant="outlined"
-                sx={{ fontFamily: "Sansation Light", mb: 2 }}
-                InputProps={{
-                  startAdornment: <AccountCircle sx={{ mr: 1 }} />
-                }}
-              />
-              <TextField
-                fullWidth
-                margin="normal"
-                placeholder="Email Address"
-                variant="outlined"
-                sx={{ fontFamily: "Sansation Light", mb: 2 }}
-                InputProps={{
-                  startAdornment: <Email sx={{ mr: 1 }} />
-                }}
-              />
-              <TextField
-                fullWidth
-                margin="normal"
-                placeholder="Password"
-                type="password"
-                variant="outlined"
-                sx={{ fontFamily: "Sansation Light", mb: 3 }}
-                InputProps={{
-                  startAdornment: <Lock sx={{ mr: 1 }} />
-                }}
-              />
-              <Button fullWidth variant="contained" sx={{ backgroundColor: 'black', fontFamily: "Sansation Light", mt: 2 }}>
-                SIGN UP
-              </Button>
-            </Box>
-          </Box>
-        )}
+              <Box width="100%" textAlign="center" maxWidth="400px">
+                <TextField
+                  name="email_address"
+                  fullWidth
+                  margin="normal"
+                  value={formData.email_address}
+                  onChange={handleChange}
+                  placeholder="Email Address"
+                  variant="outlined"
+                  sx={{ fontFamily: "Sansation Light", mb: 2, fontSize: { xs: '0.9rem', sm: '1rem', md: '1.2rem' } }}
+                  InputProps={{
+                    startAdornment: <Email sx={{ mr: 1 }} />,
+                  }}
+                />
+                <TextField
+                  name="password"
+                  fullWidth
+                  margin="normal"
+                  type={showPassword ? "text" : "password"}
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Password"
+                  variant="outlined"
+                  sx={{ fontFamily: "Sansation Light", mb: 3, fontSize: { xs: '0.9rem', sm: '1rem', md: '1.2rem' } }}
+                  InputProps={{
+                    startAdornment: <Lock sx={{ mr: 1 }} />,
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton onClick={togglePasswordVisibility}>
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+                <Button type="submit" fullWidth variant="contained" sx={{ backgroundColor: 'black', fontFamily: "Sansation Light", mt: 1, fontSize: { xs: '0.9rem', sm: '1rem', md: '1.2rem' } }}>
+                  LOGIN
+                </Button>
+                <Typography variant="body2" sx={{ cursor: 'pointer', fontFamily: "Sansation Light", mt: 2, color: 'black', fontWeight: 'bold', fontSize: { xs: '0.8rem', sm: '0.8rem', md: '0.8rem' } }}>
+                  FORGOT PASSWORD?
+                </Typography>
+              </Box>
+            </>
+          ) : (
+            <>
+              <Typography variant="h6" mb={2} sx={{ fontFamily: "Sansation Light", fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.8rem' }, color: 'black' }}>
+                REGISTER
+              </Typography>
+
+              <Box width="100%" textAlign="center" maxWidth="400px">
+                <TextField
+                  name="first_name"
+                  fullWidth
+                  margin="normal"
+                  value={formData.first_name}
+                  onChange={handleChange}
+                  placeholder="First Name"
+                  variant="outlined"
+                  sx={{ fontFamily: "Sansation Light", mb: 2, fontSize: { xs: '0.9rem', sm: '1rem', md: '1.2rem' } }}
+                  InputProps={{
+                    startAdornment: <AccountCircle sx={{ mr: 1 }} />,
+                  }}
+                />
+                <TextField
+                  name="last_name"
+                  fullWidth
+                  margin="normal"
+                  value={formData.last_name}
+                  onChange={handleChange}
+                  placeholder="Last Name"
+                  variant="outlined"
+                  sx={{ fontFamily: "Sansation Light", mb: 2, fontSize: { xs: '0.9rem', sm: '1rem', md: '1.2rem' } }}
+                  InputProps={{
+                    startAdornment: <AccountCircle sx={{ mr: 1 }} />,
+                  }}
+                />
+                <TextField
+                  name="email_address"
+                  fullWidth
+                  margin="normal"
+                  value={formData.email_address}
+                  onChange={handleChange}
+                  placeholder="Email Address"
+                  variant="outlined"
+                  sx={{ fontFamily: "Sansation Light", mb: 2, fontSize: { xs: '0.9rem', sm: '1rem', md: '1.2rem' } }}
+                  InputProps={{
+                    startAdornment: <Email sx={{ mr: 1 }} />,
+                  }}
+                />
+                <TextField
+                  name="password"
+                  fullWidth
+                  margin="normal"
+                  type="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Password"
+                  variant="outlined"
+                  sx={{ fontFamily: "Sansation Light", mb: 3, fontSize: { xs: '0.9rem', sm: '1rem', md: '1.2rem' } }}
+                  InputProps={{
+                    startAdornment: <Lock sx={{ mr: 1 }} />,
+                  }}
+                />
+                <Button type="submit" fullWidth variant="contained" sx={{ backgroundColor: 'black', fontFamily: "Sansation Light", mt: 1, fontSize: { xs: '0.9rem', sm: '1rem', md: '1.2rem' } }}>
+                  REGISTER
+                </Button>
+              </Box>
+            </>
+          )}
+        </form>
       </Box>
-      {/* <Box
-              component="img"
-              src={footerImage} // Replace with actual image path or URL
-              alt="Graduates"
-              sx={{ width: '100%', height: 'auto', mb: 1 }}
-            />
-            <Box sx={{ textAlign: 'center', py: 2, mt: 0, color: 'black' }}>
-              <Typography variant="caption" sx={{ color: 'white', fontFamily: 'Sansation Light, sans-serif', fontSize: fontSizes.caption }}>
-                Developed by Uchakide.co.za
-              </Typography>
-            </Box> */}
+
+      <Box
+        component="img"
+        src={footerImage}
+        alt="Graduates"
+        sx={{ width: '100%', height: 'auto', mb: 1 }}
+      />
+      <Box sx={{ textAlign: 'center', py: 2, mt: 0, color: 'black' }}>
+        <Typography variant="caption" sx={{ color: 'black', fontFamily: 'Sansation Light, sans-serif', fontSize: '1rem' }}>
+          Developed by Uchakide.co.za
+        </Typography>
+      </Box>
     </Box>
-    
   );
 };
 

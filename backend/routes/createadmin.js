@@ -1,18 +1,104 @@
+// backend/routes/createadmin.js
 const express = require("express");
-const router = express.Router();
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 const pool = require("../db");  // Assuming you're using pg for PostgreSQL
+const session = require("express-session");
+const router = express.Router();
 
-// Create user
+// Middleware to protect routes
+const verifySession = (req, res, next) => {
+  if (!req.session.user) {
+    return res.status(401).json({ msg: "No token, authorization denied" });
+  }
+  next();
+};
+
+// Create user (sign up)
 router.post("/users", async (req, res) => {
+  const { first_name, last_name, email_address, password, user_type } = req.body;
+
   try {
-    const { first_name, last_name, email_address, password, user_type } = req.body;
+    // Hash the password before storing it in the database
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
     const result = await pool.query(
       "INSERT INTO Student_portal_users (first_name, last_name, email_address, password, user_type) VALUES ($1, $2, $3, $4, $5) RETURNING *",
-      [first_name, last_name, email_address, password, user_type]
+      [first_name, last_name, email_address, hashedPassword, user_type]
     );
+
     res.json(result.rows[0]);
   } catch (error) {
     console.error("Error creating user:", error);
+    res.status(500).send("Server error");
+  }
+});
+
+// User login (with password validation and session)
+router.post("/login", async (req, res) => {
+  const { email_address, password } = req.body;
+
+  try {
+    const result = await pool.query(
+      "SELECT * FROM Student_portal_users WHERE email_address = $1",
+      [email_address]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(400).send("Invalid credentials");
+    }
+
+    const user = result.rows[0];
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(400).send("Invalid credentials");
+    }
+
+    // Save user details in session
+    req.session.user = {
+      user_id: user.user_id,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      user_type: user.user_type,
+    };
+
+    // Create a JWT token
+    const payload = {
+      user_id: user.user_id,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      email_address: user.email_address,
+      user_type: user.user_type,
+    };
+    const token = jwt.sign(payload, "yourSecretKey", { expiresIn: "1h" });
+
+    res.json({
+      message: "Login successful",
+      token,
+    });
+  } catch (error) {
+    console.error("Error logging in:", error);
+    res.status(500).send("Server error");
+  }
+});
+
+// Protected route: Get user profile
+router.get("/profile", verifySession, async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT * FROM Student_portal_users WHERE user_id = $1",
+      [req.session.user.user_id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).send("User not found");
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
     res.status(500).send("Server error");
   }
 });
@@ -45,29 +131,6 @@ router.put("/users/:id", async (req, res) => {
   }
 });
 
-// Get User
-// Get user by ID
-router.get("/users/:id", async (req, res) => {
-    const { id } = req.params;
-  
-    try {
-      const result = await pool.query(
-        "SELECT * FROM Student_portal_users WHERE user_id = $1", 
-        [id]
-      );
-  
-      if (result.rows.length > 0) {
-        res.json(result.rows[0]);
-      } else {
-        res.status(404).send("User not found");
-      }
-    } catch (error) {
-      console.error("Error fetching user by ID:", error);
-      res.status(500).send("Server error");
-    }
-  });
-
-  
 // Delete user
 router.delete("/users/:id", async (req, res) => {
   const { id } = req.params;

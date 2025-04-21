@@ -1,6 +1,7 @@
 // backend/server.js
 const express = require("express");
 const cors = require("cors");
+const session = require("express-session");  // Import session
 const studentRoutes = require("./routes/studentRoutes"); 
 const studentRoutesother = require("./routes/studentRoutes_other"); 
 const aboutMeRoutes = require("./routes/aboutmeroutes");
@@ -21,6 +22,16 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Session middleware configuration
+app.use(
+  session({
+    secret: "yourSecretKey",  // Replace this with a strong secret key
+    resave: false,            // Don't save session if not modified
+    saveUninitialized: true,  // Always create session for new users
+    cookie: { secure: false }, // Set to true if using HTTPS
+  })
+);
 
 // Use the student routes
 app.use("/api", studentRoutes); 

@@ -4,6 +4,8 @@ import MenuIcon from "@mui/icons-material/Menu";
 import PersonIcon from "@mui/icons-material/Person"; // User profile icon
 import WbSunnyIcon from "@mui/icons-material/WbSunny"; // Sun icon
 import ModeNightIcon from "@mui/icons-material/ModeNight"; // Moon icon
+import ExitToAppIcon from "@mui/icons-material/ExitToApp"; // Logout icon
+import DashboardIcon from "@mui/icons-material/Home"; // Dashboard icon
 import { ThemeContext } from "../config/ThemeContext"; // Import the ThemeContext
 
 const TopNavBar = ({ toggleSidebar }) => {
@@ -114,15 +116,17 @@ const TopNavBar = ({ toggleSidebar }) => {
             onClose={handleMenuClose}
             sx={{
               borderRadius: "0",  // Square corners for the dropdown
-              border: "2px solid black",  // Black border
-              width: "200px",
-              boxShadow: "0 4px 8px rgba(0,0,0,0.15)",
+              // border: "2px solid black",  // Black border
+              // width: "200px",
+              // boxShadow: "0 4px 8px rgba(0,0,0,0.15)",
             }}
           >
-            {/* <MenuItem sx={{ fontFamily: "Sansation Light" }} onClick={handleMenuClose}>Profile</MenuItem> */}
-            <MenuItem component="a" href="/" sx={{ fontFamily: "Sansation Light" }}>Home</MenuItem>
-            <MenuItem onClick={handleLogout} sx={{ fontFamily: "Sansation Light" }}>
-              Logout
+            {/* Menu Items with Icons */}
+            <MenuItem component="a" href="/" sx={{ padding: '10px', fontFamily: 'Sansation Light', marginTop:'-8px' }}>
+              <DashboardIcon sx={{ mr: 1 }} /> Home
+            </MenuItem>
+            <MenuItem onClick={handleLogout} sx={{ padding: '10px', fontFamily: 'Sansation Light', marginBottom:'-8px' }}>
+              <ExitToAppIcon sx={{ mr: 1 }} /> Logout
             </MenuItem>
           </Menu>
         </Box>

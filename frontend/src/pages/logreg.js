@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Box, Button, TextField, Typography, ToggleButtonGroup, ToggleButton, IconButton, InputAdornment } from "@mui/material";
 import { AccountCircle, Lock, PersonAdd, Email, Visibility, VisibilityOff } from "@mui/icons-material";
 import axios from "axios"; // Import axios for making HTTP requests
+import footerImage from '../images/footer.png';
 
 const LoginSignup = () => {
   const [authMode, setAuthMode] = useState("login");

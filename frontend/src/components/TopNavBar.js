@@ -89,6 +89,7 @@ const TopNavBar = ({ toggleSidebar }) => {
               cursor: "pointer",
               color: isDarkMode ? "#fff" : "#000", // User profile text color based on theme
             }}
+            mb={2}
             ref={dropdownRef}
             onClick={handleMenuClick}
           >

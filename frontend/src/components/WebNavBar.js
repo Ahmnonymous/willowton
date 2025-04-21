@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   AppBar,
   Toolbar,
@@ -12,16 +12,50 @@ import {
   Typography,
   Box,
   Divider,
+  Menu,
+  MenuItem,
+  Avatar,
 } from '@mui/material';
 import { Link, useLocation } from 'react-router-dom';
 import MenuIcon from '@mui/icons-material/Menu';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 
 const WebNavBar = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const location = useLocation(); // to highlight current route
+  const [anchorEl, setAnchorEl] = useState(null);  // For dropdown menu
+  const location = useLocation(); // To highlight current route
+  const [user, setUser] = useState(null);  // Store user data
+  const [token, setToken] = useState(null);  // Store the token
+
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    const storedToken = localStorage.getItem("token");
+    if (storedUser && storedToken) {
+      setUser(storedUser);
+      setToken(storedToken);
+    }
+  }, []);
 
   const toggleDrawer = (open) => {
     setDrawerOpen(open);
+  };
+
+  // Function to handle logout
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setUser(null);  // Reset user data
+    setToken(null);  // Reset token
+    window.location.href = "/";  // Redirect to home or login page
+  };
+
+  const handleMenuClick = (event) => {
+    setAnchorEl(event.currentTarget);  // Open the dropdown menu
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);  // Close the dropdown menu
   };
 
   // Function to determine button text color based on current page
@@ -37,6 +71,8 @@ const WebNavBar = () => {
         return 'black'; // Eligibility
       case '/popia':
         return 'white'; // POPIA
+      case '/logreg':
+        return 'black';  
       default:
         return 'black';
     }
@@ -54,10 +90,13 @@ const WebNavBar = () => {
         return '#FFFFFF'; // Eligibility
       case '/popia':
         return '#000000'; // POPIA
-      default:
+      case '/logreg':  
         return '#FFB612';
+      default:
+        return '#FFB612';  
     }
   };
+
   const navItems = (
     <>
       <Button
@@ -108,26 +147,50 @@ const WebNavBar = () => {
       >
         Contact Us
       </Button>
-      <Button
-        sx={{
-          color: getButtonTextColor(location.pathname),
-          backgroundColor: 'transparent',
-          border: '2px solid '+getButtonTextColor(location.pathname),
-          padding: '6px 12px',
-          borderRadius: '2px',
-          fontFamily: 'Sansation Light, sans-serif',
-          ml: 2,
-          '&:hover': {
-            backgroundColor: getButtonTextColor(location.pathname),
-            borderColor: getButtonTextbgColor(location.pathname),
-            color: getButtonTextbgColor(location.pathname),
-          },
-        }}
-        component={Link}
-        to="/login-register"
-      >
-        Login/Register
-      </Button>
+      {!token && (  // If the user is not logged in, show Login/Register button
+        <Button
+          sx={{
+            color: getButtonTextColor(location.pathname),
+            backgroundColor: 'transparent',
+            border: '2px solid '+getButtonTextColor(location.pathname),
+            padding: '6px 12px',
+            borderRadius: '2px',
+            fontFamily: 'Sansation Light, sans-serif',
+            ml: 2,
+            '&:hover': {
+              backgroundColor: getButtonTextColor(location.pathname),
+              borderColor: getButtonTextbgColor(location.pathname),
+              color: getButtonTextbgColor(location.pathname),
+            },
+          }}
+          component={Link}
+          to="/login-register"
+        >
+          Login/Register
+        </Button>
+      )}
+      {token && (  // If the user is logged in, show the user icon with a dropdown
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <IconButton onClick={handleMenuClick} sx={{ color: 'black' }}>
+            <Avatar sx={{ bgcolor: '#FFB612' }}>{user.first_name.charAt(0)}</Avatar>
+          </IconButton>
+          <Typography sx={{ color: 'black', fontFamily: 'Sansation Light', fontWeight: 'bold', ml: 1 }}>
+            {user.first_name}
+          </Typography>
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleMenuClose}
+          >
+            <MenuItem component={Link} to="/dashboard" onClick={handleMenuClose}>
+              <AccountCircleIcon sx={{ mr: 1 }} /> Dashboard
+            </MenuItem>
+            <MenuItem onClick={handleLogout}>
+              <ExitToAppIcon sx={{ mr: 1 }} /> Log Out
+            </MenuItem>
+          </Menu>
+        </Box>
+      )}
     </>
   );
 
@@ -209,14 +272,9 @@ const WebNavBar = () => {
                     fontSize: isSelected ? '1rem' : '0.8rem',
                   }}
                 >
-                  {/* <ListItemText sx={{fontSize: isSelected ? '1rem' : '0.4rem',}} primary={text} /> */}
                   <ListItemText
-                                primary={
-                                  <Typography sx={{ color: 'black', fontSize: '0.9rem', fontFamily: 'Sansation Light, sans-serif',fontWeight: isSelected ? 'bold' : 'normal', }}>
-                                    {text}
-                                  </Typography>
-                                }
-                              />
+                    primary={<Typography sx={{ color: 'black', fontSize: '0.9rem', fontFamily: 'Sansation Light, sans-serif', fontWeight: isSelected ? 'bold' : 'normal' }}>{text}</Typography>}
+                  />
                 </ListItem>
               );
             })}

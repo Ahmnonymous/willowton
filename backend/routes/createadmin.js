@@ -36,6 +36,7 @@ router.post("/users", async (req, res) => {
 });
 
 // User login (with password validation and session)
+// backend/routes/createadmin.js
 router.post("/login", async (req, res) => {
   const { email_address, password } = req.body;
 
@@ -56,14 +57,6 @@ router.post("/login", async (req, res) => {
       return res.status(400).send("Invalid credentials");
     }
 
-    // Save user details in session
-    req.session.user = {
-      user_id: user.user_id,
-      first_name: user.first_name,
-      last_name: user.last_name,
-      user_type: user.user_type,
-    };
-
     // Create a JWT token
     const payload = {
       user_id: user.user_id,
@@ -72,17 +65,33 @@ router.post("/login", async (req, res) => {
       email_address: user.email_address,
       user_type: user.user_type,
     };
-    const token = jwt.sign(payload, "yourSecretKey", { expiresIn: "1h" });
+    const token = jwt.sign(payload, "6c7b98e79cd65965905931d8ca53d41fe9c8399eeb3b5964e73a37076b2b957d140b4a9015680631529ed5222f900094dee2f3b40429a84ca26e1370babbe120", { expiresIn: "1h" });
 
+    // Save user details in session
+    req.session.user = {
+      user_id: user.user_id,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      user_type: user.user_type,
+    };
+
+    // Send both the token and user data in the response
     res.json({
       message: "Login successful",
       token,
+      user: {
+        user_id: user.user_id,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        user_type: user.user_type,
+      },
     });
   } catch (error) {
     console.error("Error logging in:", error);
     res.status(500).send("Server error");
   }
 });
+
 
 // Protected route: Get user profile
 router.get("/profile", verifySession, async (req, res) => {

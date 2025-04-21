@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { Box, Button, TextField, Typography, ToggleButtonGroup, ToggleButton, IconButton, InputAdornment } from "@mui/material";
 import { AccountCircle, Lock, PersonAdd, Email, Visibility, VisibilityOff } from "@mui/icons-material";
-import axios from "axios"; // We'll use axios to make HTTP requests
-import footerImage from '../images/footer.png';
+import axios from "axios"; // Import axios for making HTTP requests
 
 const LoginSignup = () => {
   const [authMode, setAuthMode] = useState("login");
@@ -38,10 +37,10 @@ const LoginSignup = () => {
           email_address: formData.email_address,
           password: formData.password,
         });
-        
-        // Store JWT token and user details in localStorage
+
+        // Ensure both token and user data are stored in localStorage
         localStorage.setItem("token", response.data.token);
-        localStorage.setItem("user", JSON.stringify(response.data.user));
+        localStorage.setItem("user", JSON.stringify(response.data.user)); // Store user data
 
         // Redirect user to profile or dashboard after login
         window.location.href = "/profile";  // Change to your desired redirect path
@@ -49,7 +48,7 @@ const LoginSignup = () => {
       } else {
         // Send signup request to backend
         response = await axios.post("https://willowtonbursary.co.za/api/users", formData);
-        
+
         // Optionally, auto-login after successful registration (if desired)
         alert("User Registered! You can now log in.");
       }

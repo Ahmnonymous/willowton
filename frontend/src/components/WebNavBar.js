@@ -193,8 +193,9 @@ const WebNavBar = () => {
             onClose={handleMenuClose}
             sx={{
               boxShadow: "0 4px 8px rgba(0,0,0,0.15)",
-              borderRadius: "5px",
-              marginTop: "10px",
+              borderRadius: "0",  // Removed rounded corners for square
+              marginTop: "5px",  // Reduced margin to make the dropdown appear closer
+              border: "2px solid black",  // Black border around the dropdown
               padding: "5px 0",
               width: "200px",
             }}

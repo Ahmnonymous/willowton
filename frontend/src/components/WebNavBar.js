@@ -193,7 +193,7 @@ const WebNavBar = () => {
             onClose={handleMenuClose}
             sx={{
               // boxShadow: "0 4px 8px rgba(0,0,0,0.15)",
-              // borderRadius: "0",  // Removed rounded corners for square
+              borderRadius: "0",  // Removed rounded corners for square
               // marginTop: "5px",  // Reduced margin to make the dropdown appear closer
               // border: "2px solid black",  // Black border around the dropdown
               // padding: "0",
@@ -202,15 +202,15 @@ const WebNavBar = () => {
           >
             {/* Conditional redirection based on user type */}
             {user.user_type === 'student' ? (
-              <MenuItem component={Link} to="/student-details" onClick={handleMenuClose} sx={{ color: getButtonTextColor(location.pathname), padding: '10px', fontFamily: 'Sansation Light', backgroundColor:'red' }} >
+              <MenuItem component={Link} to="/student-details" onClick={handleMenuClose} sx={{ color: getButtonTextColor(location.pathname), padding: '10px', fontFamily: 'Sansation Light', marginTop:'-8px' }} >
                 <AccountCircleIcon sx={{ mr: 1, color: getButtonTextColor(location.pathname) }} /> Student Details
               </MenuItem>
             ) : (
-              <MenuItem component={Link} to="/dashboard" onClick={handleMenuClose} sx={{ color: getButtonTextColor(location.pathname), padding: '10px', fontFamily: 'Sansation Light' }} >
+              <MenuItem component={Link} to="/dashboard" onClick={handleMenuClose} sx={{ color: getButtonTextColor(location.pathname), padding: '10px', fontFamily: 'Sansation Light', marginTop:'-8px'  }} >
                 <AccountCircleIcon sx={{ mr: 1, color: getButtonTextColor(location.pathname) }} /> Dashboard
               </MenuItem>
             )}
-            <MenuItem onClick={handleLogout} sx={{ padding: '10px', fontFamily: 'Sansation Light' }}>
+            <MenuItem onClick={handleLogout} sx={{ padding: '10px', fontFamily: 'Sansation Light' , marginBottom:'-8px' }}>
               <ExitToAppIcon sx={{ mr: 1 }} /> Log Out
             </MenuItem>
           </Menu>

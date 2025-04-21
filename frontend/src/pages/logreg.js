@@ -34,19 +34,21 @@ const LoginSignup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validation checks
+    // Validation checks only for "signup" mode
     let formValid = true;
     const newErrors = { email: "", password: "" };
 
-    if (!formData.email_address) {
-      newErrors.email = "Email is required";
-      formValid = false;
-    }
+    if (authMode === "signup") {
+      // Email and password validation for Register (signup)
+      if (!formData.email_address) {
+        newErrors.email = "Email is required";
+        formValid = false;
+      }
 
-    // Password should be at least 8 characters
-    if (formData.password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters";
-      formValid = false;
+      if (formData.password.length < 8) {
+        newErrors.password = "Password must be at least 8 characters";
+        formValid = false;
+      }
     }
 
     if (!formValid) {
@@ -74,7 +76,6 @@ const LoginSignup = () => {
         // Send signup request to backend
         response = await axios.post("https://willowtonbursary.co.za/api/users", formData);
 
-        // Optionally, auto-login after successful registration (if desired)
         alert("User Registered! You can now log in.");
       }
     } catch (error) {
@@ -137,7 +138,7 @@ const LoginSignup = () => {
         <form onSubmit={handleSubmit}>
           {authMode === "login" ? (
             <>
-              <Typography variant="h6" sx={{ fontFamily: "Sansation Light", textAlign: 'center' ,fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.8rem' }, color: 'black', mb: 3 }}>
+              <Typography variant="h6" sx={{ fontFamily: "Sansation Light", textAlign: 'center' , fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.8rem' }, color: 'black', mb: 3 }}>
                 SET SOME GOALS
               </Typography>
               <Typography variant="h6" sx={{ fontFamily: "Sansation Light", textAlign: 'center' , fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.8rem' }, color: 'black', mb: 3 }}>
@@ -157,8 +158,6 @@ const LoginSignup = () => {
                   InputProps={{
                     startAdornment: <Email sx={{ mr: 1 }} />,
                   }}
-                  error={!!errors.email}
-                  helperText={errors.email}
                 />
                 <TextField
                   name="password"
@@ -180,8 +179,6 @@ const LoginSignup = () => {
                       </InputAdornment>
                     ),
                   }}
-                  error={!!errors.password}
-                  helperText={errors.password}
                 />
                 <Button type="submit" fullWidth variant="contained" sx={{ backgroundColor: 'black', fontFamily: "Sansation Light", mt: 1, fontSize: { xs: '0.9rem', sm: '1rem', md: '1.2rem' } }}>
                   LOGIN
@@ -193,7 +190,7 @@ const LoginSignup = () => {
             </>
           ) : (
             <>
-              <Typography variant="h6" mb={2} sx={{ fontFamily: "Sansation Light", textAlign: 'center' , fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.8rem' }, color: 'black' }}>
+              <Typography variant="h6" mb={2} sx={{ fontFamily: "Sansation Light", textAlign: 'center' ,fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.8rem' }, color: 'black' }}>
                 REGISTER
               </Typography>
 

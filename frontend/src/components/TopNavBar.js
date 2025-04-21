@@ -114,6 +114,7 @@ const TopNavBar = ({ toggleSidebar }) => {
             anchorEl={anchorEl}
             open={Boolean(anchorEl)}
             onClose={handleMenuClose}
+            marginTop="5px"
             sx={{
               borderRadius: "0",  // Square corners for the dropdown
               // border: "2px solid black",  // Black border

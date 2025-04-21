@@ -193,16 +193,16 @@ const WebNavBar = () => {
             onClose={handleMenuClose}
             sx={{
               // boxShadow: "0 4px 8px rgba(0,0,0,0.15)",
-              borderRadius: "0",  // Removed rounded corners for square
-              marginTop: "5px",  // Reduced margin to make the dropdown appear closer
+              // borderRadius: "0",  // Removed rounded corners for square
+              // marginTop: "5px",  // Reduced margin to make the dropdown appear closer
               // border: "2px solid black",  // Black border around the dropdown
-              padding: "0",
-              width: "200px",
+              // padding: "0",
+              // width: "200px",
             }}
           >
             {/* Conditional redirection based on user type */}
             {user.user_type === 'student' ? (
-              <MenuItem component={Link} to="/student-details" onClick={handleMenuClose} sx={{ color: getButtonTextColor(location.pathname), padding: '10px', fontFamily: 'Sansation Light' }} >
+              <MenuItem component={Link} to="/student-details" onClick={handleMenuClose} sx={{ color: getButtonTextColor(location.pathname), padding: '10px', fontFamily: 'Sansation Light', backgroundColor:'red' }} >
                 <AccountCircleIcon sx={{ mr: 1, color: getButtonTextColor(location.pathname) }} /> Student Details
               </MenuItem>
             ) : (

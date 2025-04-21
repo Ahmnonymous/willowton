@@ -14,6 +14,10 @@ const LoginSignup = () => {
     password: "",
     user_type: "student",
   });
+  const [errors, setErrors] = useState({
+    email: "",
+    password: "",
+  });
 
   const handleAuthToggle = (_, newAuthMode) => {
     if (newAuthMode !== null) setAuthMode(newAuthMode);
@@ -29,7 +33,27 @@ const LoginSignup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
+    // Validation checks
+    let formValid = true;
+    const newErrors = { email: "", password: "" };
+
+    if (!formData.email_address) {
+      newErrors.email = "Email is required";
+      formValid = false;
+    }
+
+    // Password should be at least 8 characters
+    if (formData.password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters";
+      formValid = false;
+    }
+
+    if (!formValid) {
+      setErrors(newErrors);
+      return; // Stop submission if form is invalid
+    }
+
     try {
       let response;
       if (authMode === "login") {
@@ -38,26 +62,35 @@ const LoginSignup = () => {
           email_address: formData.email_address,
           password: formData.password,
         });
-  
+
         // Ensure both token and user data are stored in localStorage
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("user", JSON.stringify(response.data.user)); // Store user data
-  
+
         // Redirect user to profile or dashboard after login
         window.location.href = "/";  // Change to your desired redirect path
-  
+
       } else {
         // Send signup request to backend
         response = await axios.post("https://willowtonbursary.co.za/api/users", formData);
-  
+
+        // Optionally, auto-login after successful registration (if desired)
         alert("User Registered! You can now log in.");
       }
     } catch (error) {
       console.error("Error submitting form", error);
-      alert("Error: " + error.response?.data?.msg || "Something went wrong");
+
+      if (error.response?.data?.msg === "Email address is already in use") {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          email: "Email address is already in use",
+        }));
+      } else {
+        alert("Error: " + error.response?.data?.msg || "Something went wrong");
+      }
     }
   };
-  
+
   return (
     <Box
       display="flex"
@@ -124,6 +157,8 @@ const LoginSignup = () => {
                   InputProps={{
                     startAdornment: <Email sx={{ mr: 1 }} />,
                   }}
+                  error={!!errors.email}
+                  helperText={errors.email}
                 />
                 <TextField
                   name="password"
@@ -145,6 +180,8 @@ const LoginSignup = () => {
                       </InputAdornment>
                     ),
                   }}
+                  error={!!errors.password}
+                  helperText={errors.password}
                 />
                 <Button type="submit" fullWidth variant="contained" sx={{ backgroundColor: 'black', fontFamily: "Sansation Light", mt: 1, fontSize: { xs: '0.9rem', sm: '1rem', md: '1.2rem' } }}>
                   LOGIN
@@ -199,6 +236,8 @@ const LoginSignup = () => {
                   InputProps={{
                     startAdornment: <Email sx={{ mr: 1 }} />,
                   }}
+                  error={!!errors.email}
+                  helperText={errors.email}
                 />
                 <TextField
                   name="password"
@@ -213,6 +252,8 @@ const LoginSignup = () => {
                   InputProps={{
                     startAdornment: <Lock sx={{ mr: 1 }} />,
                   }}
+                  error={!!errors.password}
+                  helperText={errors.password}
                 />
                 <Button type="submit" fullWidth variant="contained" sx={{ backgroundColor: 'black', fontFamily: "Sansation Light", mt: 1, fontSize: { xs: '0.9rem', sm: '1rem', md: '1.2rem' } }}>
                   REGISTER

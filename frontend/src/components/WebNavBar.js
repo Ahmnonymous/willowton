@@ -190,12 +190,12 @@ const WebNavBar = () => {
           >
             {/* Conditional redirection based on user type */}
             {user.user_type === 'student' ? (
-              <MenuItem component={Link} to="/student-details" onClick={handleMenuClose}>
-                <AccountCircleIcon sx={{ mr: 1 }} /> Student Details
+              <MenuItem component={Link} to="/student-details" onClick={handleMenuClose} sx={{ color: getButtonTextColor(location.pathname) }}>
+                <AccountCircleIcon sx={{ mr: 1, color: getButtonTextColor(location.pathname) }} /> Student Details
               </MenuItem>
             ) : (
-              <MenuItem component={Link} to="/dashboard" onClick={handleMenuClose}>
-                <AccountCircleIcon sx={{ mr: 1 }} /> Dashboard
+              <MenuItem component={Link} to="/dashboard" onClick={handleMenuClose} sx={{ color: getButtonTextColor(location.pathname) }} >
+                <AccountCircleIcon sx={{ mr: 1, color: getButtonTextColor(location.pathname) }} /> Dashboard
               </MenuItem>
             )}
             <MenuItem onClick={handleLogout}>

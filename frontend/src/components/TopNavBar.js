@@ -1,5 +1,5 @@
-import React, { useContext, useState, useEffect } from "react";
-import { AppBar, Toolbar, Typography, IconButton, Box, Avatar } from "@mui/material";
+import React, { useContext, useState, useEffect, useRef } from "react";
+import { AppBar, Toolbar, Typography, IconButton, Box, Avatar, Menu, MenuItem } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import PersonIcon from "@mui/icons-material/Person"; // User profile icon
 import WbSunnyIcon from "@mui/icons-material/WbSunny"; // Sun icon
@@ -9,6 +9,8 @@ import { ThemeContext } from "../config/ThemeContext"; // Import the ThemeContex
 const TopNavBar = ({ toggleSidebar }) => {
   const { isDarkMode, toggleTheme } = useContext(ThemeContext); // Use context for theme toggle
   const [userName, setUserName] = useState("");
+  const [anchorEl, setAnchorEl] = useState(null); // For dropdown menu
+  const dropdownRef = useRef(null); // Reference for the dropdown menu
 
   // Fetch the logged-in user's first name from localStorage
   useEffect(() => {
@@ -25,13 +27,28 @@ const TopNavBar = ({ toggleSidebar }) => {
     return null; // Return nothing if the user is not logged in
   }
 
+  const handleMenuClick = (event) => {
+    setAnchorEl(event.currentTarget); // Open the dropdown menu
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null); // Close the dropdown menu
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setUserName(""); // Reset user data
+    window.location.href = "/"; // Redirect to home or login page
+  };
+
   return (
     <AppBar
       position="fixed"
       sx={{
         backgroundColor: isDarkMode ? "#1E293B" : "#F7FAFC", // Light background in light mode, dark in dark mode
         color: isDarkMode ? "#fff" : "#000", // Light text color in dark mode, dark text in light mode
-        height: "64px",  // Set the height of the navbar here
+        height: "64px", // Set the height of the navbar here
       }}
     >
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
@@ -62,7 +79,7 @@ const TopNavBar = ({ toggleSidebar }) => {
             )}
           </IconButton>
 
-          {/* User Profile */}
+          {/* User Profile with Dropdown */}
           <Box
             sx={{
               display: "flex",
@@ -70,6 +87,8 @@ const TopNavBar = ({ toggleSidebar }) => {
               cursor: "pointer",
               color: isDarkMode ? "#fff" : "#000", // User profile text color based on theme
             }}
+            ref={dropdownRef}
+            onClick={handleMenuClick}
           >
             <Avatar
               sx={{
@@ -87,6 +106,25 @@ const TopNavBar = ({ toggleSidebar }) => {
               {userName || "User"} {/* Display the logged-in user's first name */}
             </Typography>
           </Box>
+
+          {/* User Profile Dropdown Menu */}
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleMenuClose}
+            sx={{
+              borderRadius: "0",  // Square corners for the dropdown
+              border: "2px solid black",  // Black border
+              width: "200px",
+              boxShadow: "0 4px 8px rgba(0,0,0,0.15)",
+            }}
+          >
+            {/* <MenuItem sx={{ fontFamily: "Sansation Light" }} onClick={handleMenuClose}>Profile</MenuItem> */}
+            <MenuItem component="a" href="/" sx={{ fontFamily: "Sansation Light" }}>Home</MenuItem>
+            <MenuItem onClick={handleLogout} sx={{ fontFamily: "Sansation Light" }}>
+              Logout
+            </MenuItem>
+          </Menu>
         </Box>
       </Toolbar>
     </AppBar>

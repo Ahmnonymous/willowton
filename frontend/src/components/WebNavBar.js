@@ -171,8 +171,14 @@ const WebNavBar = () => {
       )}
       {token && (  // If the user is logged in, show the user icon with a dropdown
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <IconButton onClick={handleMenuClick} sx={{ color: 'black' }}>
-            <AccountCircleIcon sx={{ fontSize: 30, color: '#FFB612' }} />  {/* User icon */}
+          <IconButton 
+            onClick={handleMenuClick} 
+            sx={{ 
+              color: 'black', 
+              mr: '-10px'  // Apply margin right
+            }}
+          >
+            <AccountCircleIcon sx={{ fontSize: 30, color: 'black' }} />  {/* User icon filled with black */}
           </IconButton>
           <Typography sx={{ color: 'black', fontFamily: 'Sansation Light', fontWeight: 'bold', ml: 1 }}>
             {user.first_name}
@@ -182,9 +188,16 @@ const WebNavBar = () => {
             open={Boolean(anchorEl)}
             onClose={handleMenuClose}
           >
-            <MenuItem component={Link} to="/dashboard" onClick={handleMenuClose}>
-              <AccountCircleIcon sx={{ mr: 1 }} /> Dashboard
-            </MenuItem>
+            {/* Conditional redirection based on user type */}
+            {user.user_type === 'student' ? (
+              <MenuItem component={Link} to="/student-details" onClick={handleMenuClose}>
+                <AccountCircleIcon sx={{ mr: 1 }} /> Student Details
+              </MenuItem>
+            ) : (
+              <MenuItem component={Link} to="/dashboard" onClick={handleMenuClose}>
+                <AccountCircleIcon sx={{ mr: 1 }} /> Dashboard
+              </MenuItem>
+            )}
             <MenuItem onClick={handleLogout}>
               <ExitToAppIcon sx={{ mr: 1 }} /> Log Out
             </MenuItem>

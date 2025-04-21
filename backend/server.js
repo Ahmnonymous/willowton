@@ -26,7 +26,7 @@ app.use(express.json());
 // Session middleware configuration
 app.use(
   session({
-    secret: "yourSecretKey",  // Replace this with a strong secret key
+    secret: process.env.JWT_SECRET,  // Replace this with a strong secret key
     resave: false,            // Don't save session if not modified
     saveUninitialized: true,  // Always create session for new users
     cookie: { secure: false }, // Set to true if using HTTPS

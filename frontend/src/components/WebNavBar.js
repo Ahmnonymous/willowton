@@ -172,7 +172,7 @@ const WebNavBar = () => {
       {token && (  // If the user is logged in, show the user icon with a dropdown
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <IconButton onClick={handleMenuClick} sx={{ color: 'black' }}>
-            <Avatar sx={{ bgcolor: '#FFB612' }}>{user.first_name.charAt(0)}</Avatar>
+            <AccountCircleIcon sx={{ fontSize: 30, color: '#FFB612' }} />  {/* User icon */}
           </IconButton>
           <Typography sx={{ color: 'black', fontFamily: 'Sansation Light', fontWeight: 'bold', ml: 1 }}>
             {user.first_name}
@@ -200,7 +200,12 @@ const WebNavBar = () => {
     { text: 'Eligibility', link: '/eligibility' },
     { text: 'POPIA', link: '/popia' },
     { text: 'Contact Us', link: '/contact-us' },
-    { text: 'Login/Register', link: '/login-register' },
+    ...(token ? [  // If the user is logged in, add Dashboard and Log Out options
+      { text: 'Dashboard', link: '/dashboard' },
+      { text: 'Log Out', link: '#', onClick: handleLogout },
+    ] : [
+      { text: 'Login/Register', link: '/login-register' }, // If not logged in, show Login/Register
+    ])
   ];
 
   return (
@@ -253,12 +258,12 @@ const WebNavBar = () => {
           onClick={() => toggleDrawer(false)}
           onKeyDown={() => toggleDrawer(false)}
         >
-          <Typography variant="h6" sx={{ mb: 2,fontFamily: 'Sansation Light, sans-serif'  }}>
+          <Typography variant="h6" sx={{ mb: 2, fontFamily: 'Sansation Light, sans-serif' }}>
             WillowTon
           </Typography>
           <Divider />
           <List>
-            {drawerItems.map(({ text, link }) => {
+            {drawerItems.map(({ text, link, onClick }) => {
               const isSelected = location.pathname === link;
               return (
                 <ListItem
@@ -266,6 +271,7 @@ const WebNavBar = () => {
                   key={text}
                   component={Link}
                   to={link}
+                  onClick={onClick}  // Handle Log Out
                   sx={{
                     color: isSelected ? '#2d3748' : 'black',
                     fontWeight: isSelected ? 'bold' : 'normal',

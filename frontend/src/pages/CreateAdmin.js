@@ -76,7 +76,7 @@ const UserReport = () => {
       last_name: editUser ? editUser.last_name : "",
       email_address: editUser ? editUser.email_address : "",
       password: "",
-      user_type: "Admin",  // Set "Admin" as the default value for user_type
+      user_type: "admin",  // Set "Admin" as the default value for user_type
     },
     validationSchema: validationSchema,
     enableReinitialize: true, // Reinitialize when `editUser` changes

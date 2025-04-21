@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { BrowserRouter as Router, Route, Routes, useLocation, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
 import { Box, CssBaseline } from "@mui/material";
 import { FontSizeProvider } from "./config/FontSizeProvider";
 import { ThemeProvider } from './config/ThemeContext';
@@ -122,7 +122,12 @@ const LayoutHandler = () => {
       // Student has access to all web pages + web app pages (student details & create admin)
       return validPaths.includes(location.pathname) && (
         !location.pathname.startsWith("/dashboard") &&
-        !location.pathname.startsWith("/add-student")
+        !location.pathname.startsWith("/add-student") &&
+        !location.pathname.startsWith("/reports/parent-report") &&
+        !location.pathname.startsWith("/reports/student-equity") &&
+        !location.pathname.startsWith("/reports/payment-report") &&
+        !location.pathname.startsWith("/reports/student-report") &&
+        !location.pathname.startsWith("/reports/voluntary-report")
       );
     }
     return false;
@@ -188,7 +193,7 @@ const LayoutHandler = () => {
           <Route path="/reports/voluntary-report" element={<VoluntaryReport />} />
 
           {/* Page Not Found */}
-          <Route path="*" element={isAccessiblePage() ? <PageNotFound /> : <Navigate to="/PageNotFound" />} />
+          <Route path="*" element={isAccessiblePage() ? <PageNotFound /> : <PageNotFound /> } />
         </Routes>
       </Box>
     </ThemeProvider>

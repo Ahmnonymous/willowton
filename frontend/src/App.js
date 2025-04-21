@@ -33,7 +33,7 @@ import VoluntaryReport from "./pages/reports/VoluntaryReport";
 const PageTitleUpdater = () => {
   const location = useLocation();
 
-  useEffect(() => {
+  React.useEffect(() => {
     const path = location.pathname;
     let title = "React App";
     let favicon = "/favicon-light.ico";
@@ -56,7 +56,6 @@ const PageTitleUpdater = () => {
       else if (path === "/reports/voluntary-report") title = "Voluntary Report";
       else title = "Page Not Found";
     } else {
-      // Fallback title for any unknown route
       title = "Page Not Found";
     }
 
@@ -67,18 +66,11 @@ const PageTitleUpdater = () => {
   return null;
 };
 
-// Layout handler to render layout conditionally based on user type and login status
+// Layout handler to render layout conditionally
 const LayoutHandler = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (storedUser) {
-      setUser(storedUser);
-    }
-  }, []);
+  const user = JSON.parse(localStorage.getItem("user"));
 
   const pageBackgroundColors = {
     '/': '#FFB612',
@@ -91,56 +83,77 @@ const LayoutHandler = () => {
 
   const pageBackgroundColor = pageBackgroundColors[location.pathname] || null;
 
-  // Routes accessible by admin (includes both website and admin-specific pages)
-  const adminRoutes = [
+  const isWebAppPage = location.pathname.startsWith("/dashboard") ||
+                       location.pathname.startsWith("/add-student") ||
+                       location.pathname.startsWith("/student-details") ||
+                       location.pathname.startsWith("/create-admin") ||
+                       location.pathname.startsWith("/reports/student-report") ||
+                       location.pathname.startsWith("/reports/parent-report") ||
+                       location.pathname.startsWith("/reports/student-equity") ||
+                       location.pathname.startsWith("/reports/payment-report") ||
+                       location.pathname.startsWith("/reports/voluntary-report");
+
+  const isReportPage = location.pathname.startsWith("/reports");
+
+  const validPaths = [
+    "/", "/about-us", "/contact-us", "/eligibility", "/popia",
     "/dashboard", "/add-student", "/student-details", "/create-admin",
     "/reports/parent-report", "/reports/student-equity", "/reports/payment-report",
-    "/reports/student-report", "/reports/voluntary-report", 
-    "/", "/about-us", "/contact-us", "/eligibility", "/popia"
+    "/reports/student-report", "/reports/voluntary-report", "/login-register"
   ];
+  const isKnownRoute = validPaths.includes(location.pathname);
+  const isWebPage = !isWebAppPage && !isReportPage && isKnownRoute;
 
-  // Routes accessible by student (only certain pages, including website and student details)
-  const studentRoutes = [
-    "/", "/about-us", "/contact-us", "/eligibility", "/popia", "/student-details", "/create-admin"
-  ];
-
-  // Routes accessible by non-logged-in user
-  const nonLoggedInRoutes = [
-    "/", "/about-us", "/contact-us", "/eligibility", "/popia", "/login-register"
-  ];
-
-  const isStudent = user?.user_type === "student";
-  const isAdmin = user?.user_type === "admin";
   const isLoggedIn = user !== null;
+  const isAdmin = isLoggedIn && user.user_type === 'admin';
+  const isStudent = isLoggedIn && user.user_type === 'student';
 
-  // Determine if the current route is valid for the user based on their type and login status
-  let isRouteValid = false;
+  // Check if the user is allowed to access the current page
+  const isAccessiblePage = () => {
+    if (!isLoggedIn) {
+      // User is not logged in, allow access to public pages
+      return ["/", "/about-us", "/contact-us", "/eligibility", "/popia", "/login-register"].includes(location.pathname);
+    }
+    if (isAdmin) {
+      // Admin has access to all pages
+      return true;
+    }
+    if (isStudent) {
+      // Student has access to all web pages + web app pages (student details & create admin)
+      return validPaths.includes(location.pathname) && (
+        !location.pathname.startsWith("/dashboard") &&
+        !location.pathname.startsWith("/add-student")
+      );
+    }
+    return false;
+  };
 
-  if (isLoggedIn) {
-    isRouteValid = isAdmin ? adminRoutes.includes(location.pathname) : studentRoutes.includes(location.pathname);
-  } else {
-    isRouteValid = nonLoggedInRoutes.includes(location.pathname);
-  }
-
-  // If the route is invalid for the user (non-logged-in user trying to access restricted routes), redirect to Page Not Found
-  if (!isRouteValid) {
-    return <Navigate to="/page-not-found" />;
-  }
+  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
   return (
     <ThemeProvider pageBackgroundColor={pageBackgroundColor}>
       <CssBaseline />
-      {/* Render navbars conditionally based on user type */}
-      {isAdmin ? (
+
+      {/* Render navbars conditionally */}
+      {isWebAppPage || isReportPage ? (
         <>
-          <TopNavBar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+          <TopNavBar toggleSidebar={toggleSidebar} />
           <SideNavMenu open={sidebarOpen} />
         </>
-      ) : isStudent ? (
+      ) : (
         <WebNavBar />
-      ) : null}
+      )}
 
-      <Box component="main" sx={{ mt: 8, ml: sidebarOpen && isAdmin ? 30 : 0, transition: "margin 0.3s ease", p: 3 }}>
+      <Box
+        component="main"
+        sx={{
+          mt: isWebAppPage ? 8 : 0,
+          ml: sidebarOpen && isWebAppPage ? 30 : 0,
+          transition: "margin 0.3s ease",
+          p: isWebAppPage ? 3 : 0,
+        }}
+        className={isWebPage ? 'web-page' : ''}
+      >
         <Routes>
           {/* Public Pages */}
           <Route path="/" element={<Home />} />
@@ -161,18 +174,14 @@ const LayoutHandler = () => {
           )}
 
           {/* Report Pages */}
-          {isAdmin && (
-            <>
-              <Route path="/reports/parent-report" element={<ParentReport />} />
-              <Route path="/reports/student-equity" element={<StudentEquity />} />
-              <Route path="/reports/payment-report" element={<PaymentReport />} />
-              <Route path="/reports/student-report" element={<StudentReport />} />
-              <Route path="/reports/voluntary-report" element={<VoluntaryReport />} />
-            </>
-          )}
+          <Route path="/reports/parent-report" element={<ParentReport />} />
+          <Route path="/reports/student-equity" element={<StudentEquity />} />
+          <Route path="/reports/payment-report" element={<PaymentReport />} />
+          <Route path="/reports/student-report" element={<StudentReport />} />
+          <Route path="/reports/voluntary-report" element={<VoluntaryReport />} />
 
           {/* Page Not Found */}
-          <Route path="*" element={<PageNotFound />} />
+          <Route path="*" element={isAccessiblePage() ? <PageNotFound /> : <Navigate to="/not-found" />} />
         </Routes>
       </Box>
     </ThemeProvider>

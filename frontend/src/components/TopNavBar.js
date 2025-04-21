@@ -89,7 +89,6 @@ const TopNavBar = ({ toggleSidebar }) => {
               cursor: "pointer",
               color: isDarkMode ? "#fff" : "#000", // User profile text color based on theme
             }}
-            mb={2}
             ref={dropdownRef}
             onClick={handleMenuClick}
           >
@@ -115,7 +114,7 @@ const TopNavBar = ({ toggleSidebar }) => {
             anchorEl={anchorEl}
             open={Boolean(anchorEl)}
             onClose={handleMenuClose}
-            marginTop="5px"
+            mt={2}
             sx={{
               borderRadius: "0",  // Square corners for the dropdown
               // border: "2px solid black",  // Black border

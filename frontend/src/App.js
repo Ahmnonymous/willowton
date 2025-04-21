@@ -67,7 +67,7 @@ const PageTitleUpdater = () => {
   return null;
 };
 
-// Layout handler to render layout conditionally
+// Layout handler to render layout conditionally based on user type and login status
 const LayoutHandler = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
@@ -104,65 +104,43 @@ const LayoutHandler = () => {
     "/", "/about-us", "/contact-us", "/eligibility", "/popia", "/student-details", "/create-admin"
   ];
 
+  // Routes accessible by non-logged-in user
+  const nonLoggedInRoutes = [
+    "/", "/about-us", "/contact-us", "/eligibility", "/popia", "/login-register"
+  ];
+
   const isStudent = user?.user_type === "student";
   const isAdmin = user?.user_type === "admin";
+  const isLoggedIn = user !== null;
 
-  // Determine if the current route is valid for the user based on their type
-  const isRouteValid = isAdmin ? adminRoutes.includes(location.pathname) : studentRoutes.includes(location.pathname);
+  // Determine if the current route is valid for the user based on their type and login status
+  let isRouteValid = false;
 
-  // If the route is invalid for the student or non-logged-in user, redirect to Page Not Found
+  if (isLoggedIn) {
+    isRouteValid = isAdmin ? adminRoutes.includes(location.pathname) : studentRoutes.includes(location.pathname);
+  } else {
+    isRouteValid = nonLoggedInRoutes.includes(location.pathname);
+  }
+
+  // If the route is invalid for the user (non-logged-in user trying to access restricted routes), redirect to Page Not Found
   if (!isRouteValid) {
     return <Navigate to="/page-not-found" />;
   }
 
-  const isWebAppPage = location.pathname.startsWith("/dashboard") ||
-                       location.pathname.startsWith("/add-student") ||
-                       location.pathname.startsWith("/student-details") ||
-                       location.pathname.startsWith("/create-admin") ||
-                       location.pathname.startsWith("/reports/student-report") ||
-                       location.pathname.startsWith("/reports/parent-report") ||
-                       location.pathname.startsWith("/reports/student-equity") ||
-                       location.pathname.startsWith("/reports/payment-report") ||
-                       location.pathname.startsWith("/reports/voluntary-report");
-
-  const isReportPage = location.pathname.startsWith("/reports");
-
-  const validPaths = [
-    "/", "/about-us", "/contact-us", "/eligibility", "/popia",
-    "/dashboard", "/add-student", "/student-details", "/create-admin",
-    "/reports/parent-report", "/reports/student-equity", "/reports/payment-report",
-    "/reports/student-report", "/reports/voluntary-report", "/login-register"
-  ];
-  
-  const isKnownRoute = validPaths.includes(location.pathname);
-  const isWebPage = !isWebAppPage && !isReportPage && isKnownRoute;
-
-  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
-
   return (
     <ThemeProvider pageBackgroundColor={pageBackgroundColor}>
       <CssBaseline />
-
-      {/* Render navbars conditionally */}
-      {isWebAppPage || isReportPage ? (
+      {/* Render navbars conditionally based on user type */}
+      {isAdmin ? (
         <>
-          <TopNavBar toggleSidebar={toggleSidebar} />
+          <TopNavBar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
           <SideNavMenu open={sidebarOpen} />
         </>
-      ) : isWebPage ? (
+      ) : isStudent ? (
         <WebNavBar />
       ) : null}
 
-      <Box
-        component="main"
-        sx={{
-          mt: isWebAppPage ? 8 : 0,
-          ml: sidebarOpen && isWebAppPage ? 30 : 0,
-          transition: "margin 0.3s ease",
-          p: isWebAppPage ? 3 : 0,
-        }}
-        className={isWebPage ? 'web-page' : ''}
-      >
+      <Box component="main" sx={{ mt: 8, ml: sidebarOpen && isAdmin ? 30 : 0, transition: "margin 0.3s ease", p: 3 }}>
         <Routes>
           {/* Public Pages */}
           <Route path="/" element={<Home />} />

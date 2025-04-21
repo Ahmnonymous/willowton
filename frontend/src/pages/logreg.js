@@ -137,10 +137,10 @@ const LoginSignup = () => {
         <form onSubmit={handleSubmit}>
           {authMode === "login" ? (
             <>
-              <Typography variant="h6" sx={{ fontFamily: "Sansation Light", fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.8rem' }, color: 'black', mb: 3 }}>
+              <Typography variant="h6" sx={{ fontFamily: "Sansation Light", textAlign: 'center' ,fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.8rem' }, color: 'black', mb: 3 }}>
                 SET SOME GOALS
               </Typography>
-              <Typography variant="h6" sx={{ fontFamily: "Sansation Light", fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.8rem' }, color: 'black', mb: 3 }}>
+              <Typography variant="h6" sx={{ fontFamily: "Sansation Light", textAlign: 'center' , fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.8rem' }, color: 'black', mb: 3 }}>
                 THEN DEMOLISH THEM
               </Typography>
 
@@ -193,7 +193,7 @@ const LoginSignup = () => {
             </>
           ) : (
             <>
-              <Typography variant="h6" mb={2} sx={{ fontFamily: "Sansation Light", fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.8rem' }, color: 'black' }}>
+              <Typography variant="h6" mb={2} sx={{ fontFamily: "Sansation Light", textAlign: 'center' , fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.8rem' }, color: 'black' }}>
                 REGISTER
               </Typography>
 

@@ -183,8 +183,8 @@ const WebNavBar = () => {
       )}
       {token && (  // If the user is logged in, show the user icon with a dropdown
         <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} ref={dropdownRef} onClick={handleMenuClick}>
-          <AccountCircleIcon sx={{ fontSize: 30, color: 'black', mr: 1 }} />  {/* User icon filled with black */}
-          <Typography sx={{ color: 'black', fontFamily: 'Sansation Light', fontWeight: 'bold' }}>
+          <AccountCircleIcon sx={{ fontSize: 30, color: 'black', mr: 1,color: getButtonTextColor(location.pathname) }} />  {/* User icon filled with black */}
+          <Typography sx={{ color: getButtonTextColor(location.pathname), fontFamily: 'Sansation Light', fontWeight: 'bold' }}>
             {user.first_name}
           </Typography>
           {/* Bootstrap-like styled dropdown menu */}

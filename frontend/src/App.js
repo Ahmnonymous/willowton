@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
 import { Box, CssBaseline } from "@mui/material";
 import { FontSizeProvider } from "./config/FontSizeProvider";
@@ -68,9 +68,18 @@ const PageTitleUpdater = () => {
 };
 
 // Layout handler to render layout conditionally
+// Layout handler to render layout conditionally
 const LayoutHandler = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (storedUser) {
+      setUser(storedUser);
+    }
+  }, []);
 
   const pageBackgroundColors = {
     '/': '#FFB612',
@@ -82,6 +91,30 @@ const LayoutHandler = () => {
   };
 
   const pageBackgroundColor = pageBackgroundColors[location.pathname] || null;
+
+  // Routes accessible by admin (includes both website and admin-specific pages)
+  const adminRoutes = [
+    "/dashboard", "/add-student", "/student-details", "/create-admin",
+    "/reports/parent-report", "/reports/student-equity", "/reports/payment-report",
+    "/reports/student-report", "/reports/voluntary-report", 
+    "/", "/about-us", "/contact-us", "/eligibility", "/popia"
+  ];
+
+  // Routes accessible by student (only certain pages, including website and student details)
+  const studentRoutes = [
+    "/", "/about-us", "/contact-us", "/eligibility", "/popia", "/student-details", "/create-admin"
+  ];
+
+  const isStudent = user?.user_type === "student";
+  const isAdmin = user?.user_type === "admin";
+
+  // Determine if the current route is valid for the user based on their type
+  const isRouteValid = isAdmin ? adminRoutes.includes(location.pathname) : studentRoutes.includes(location.pathname);
+
+  // If the route is invalid for the student, redirect to Page Not Found
+  if (!isRouteValid) {
+    return <PageNotFound />;
+  }
 
   const isWebAppPage = location.pathname.startsWith("/dashboard") ||
                        location.pathname.startsWith("/add-student") ||
@@ -141,17 +174,25 @@ const LayoutHandler = () => {
           <Route path="/login-register" element={<LogReg />} />
 
           {/* Admin Pages */}
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/add-student" element={<AddStudent />} />
-          <Route path="/student-details" element={<StudentDetails />} />
-          <Route path="/create-admin" element={<UserCreation />} />
+          {isAdmin && (
+            <>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/add-student" element={<AddStudent />} />
+              <Route path="/student-details" element={<StudentDetails />} />
+              <Route path="/create-admin" element={<UserCreation />} />
+            </>
+          )}
 
           {/* Report Pages */}
-          <Route path="/reports/parent-report" element={<ParentReport />} />
-          <Route path="/reports/student-equity" element={<StudentEquity />} />
-          <Route path="/reports/payment-report" element={<PaymentReport />} />
-          <Route path="/reports/student-report" element={<StudentReport />} />
-          <Route path="/reports/voluntary-report" element={<VoluntaryReport />} />
+          {isAdmin && (
+            <>
+              <Route path="/reports/parent-report" element={<ParentReport />} />
+              <Route path="/reports/student-equity" element={<StudentEquity />} />
+              <Route path="/reports/payment-report" element={<PaymentReport />} />
+              <Route path="/reports/student-report" element={<StudentReport />} />
+              <Route path="/reports/voluntary-report" element={<VoluntaryReport />} />
+            </>
+          )}
 
           {/* Page Not Found */}
           <Route path="*" element={<PageNotFound />} />

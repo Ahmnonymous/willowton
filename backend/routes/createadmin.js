@@ -122,6 +122,27 @@ router.get("/profile", verifySession, async (req, res) => {
   }
 });
 
+// Get user by ID
+router.get("/users/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await pool.query(
+      "SELECT * FROM Student_portal_users WHERE user_id = $1", 
+      [id]
+    );
+
+    if (result.rows.length > 0) {
+      res.json(result.rows[0]);
+    } else {
+      res.status(404).send("User not found");
+    }
+  } catch (error) {
+    console.error("Error fetching user by ID:", error);
+    res.status(500).send("Server error");
+  }
+});
+
 // Get all users
 router.get("/users", async (req, res) => {
   try {

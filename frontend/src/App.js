@@ -139,7 +139,7 @@ const LayoutHandler = () => {
     <ThemeProvider pageBackgroundColor={pageBackgroundColor}>
       <CssBaseline />
 
-      {/* Render navbars conditionally */}
+      {/* Render navbars conditionally
       {isWebAppPage || isReportPage ? (
         <>
           <TopNavBar toggleSidebar={toggleSidebar} />
@@ -147,8 +147,17 @@ const LayoutHandler = () => {
         </>
       ) : (
         <WebNavBar />
-      )}
-
+      )} */}
+      
+      {/* Render navbars conditionally */}
+      {isWebAppPage || isReportPage ? (
+        <>
+          <TopNavBar toggleSidebar={toggleSidebar} />
+          <SideNavMenu open={sidebarOpen} />
+        </>
+      ) : isWebPage ? (
+        <WebNavBar />
+      ) : null}
       <Box
         component="main"
         sx={{
@@ -197,7 +206,8 @@ const LayoutHandler = () => {
           )}
 
           {/* Page Not Found */}
-          <Route path="*" element={isAccessiblePage() ? <PageNotFound /> : <PageNotFound /> } />
+          {/* <Route path="*" element={isAccessiblePage() ? <PageNotFound /> : <PageNotFound /> } /> */}
+          <Route path="*" element={<PageNotFound />} />
         </Routes>
       </Box>
     </ThemeProvider>

@@ -19,6 +19,16 @@ router.post("/users", async (req, res) => {
   const { first_name, last_name, email_address, password, user_type } = req.body;
 
   try {
+    // Check if the email already exists
+    const existingUser = await pool.query(
+      "SELECT * FROM Student_portal_users WHERE email_address = $1",
+      [email_address]
+    );
+
+    if (existingUser.rows.length > 0) {
+      return res.status(400).json({ msg: "Email address is already in use" });
+    }
+
     // Hash the password before storing it in the database
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -36,7 +46,6 @@ router.post("/users", async (req, res) => {
 });
 
 // User login (with password validation and session)
-// backend/routes/createadmin.js
 router.post("/login", async (req, res) => {
   const { email_address, password } = req.body;
 
@@ -65,13 +74,14 @@ router.post("/login", async (req, res) => {
       email_address: user.email_address,
       user_type: user.user_type,
     };
-    const token = jwt.sign(payload, "6c7b98e79cd65965905931d8ca53d41fe9c8399eeb3b5964e73a37076b2b957d140b4a9015680631529ed5222f900094dee2f3b40429a84ca26e1370babbe120", { expiresIn: "1h" });
+    const token = jwt.sign(payload, "6c7b98e79cd65965905931d8ca53d41fe9c8399eeb3b5964e73a37076b2b957d140b4a9015680631529ed5222f900094dee2f3b40429a84ca26e1370babbe120");
 
     // Save user details in session
     req.session.user = {
       user_id: user.user_id,
       first_name: user.first_name,
       last_name: user.last_name,
+      email_address: user.email_address,
       user_type: user.user_type,
     };
 
@@ -83,6 +93,7 @@ router.post("/login", async (req, res) => {
         user_id: user.user_id,
         first_name: user.first_name,
         last_name: user.last_name,
+        email_address: user.email_address,
         user_type: user.user_type,
       },
     });
@@ -91,7 +102,6 @@ router.post("/login", async (req, res) => {
     res.status(500).send("Server error");
   }
 });
-
 
 // Protected route: Get user profile
 router.get("/profile", verifySession, async (req, res) => {

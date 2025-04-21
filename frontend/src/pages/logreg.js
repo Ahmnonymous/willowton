@@ -29,7 +29,7 @@ const LoginSignup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
       let response;
       if (authMode === "login") {
@@ -38,19 +38,18 @@ const LoginSignup = () => {
           email_address: formData.email_address,
           password: formData.password,
         });
-
+  
         // Ensure both token and user data are stored in localStorage
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("user", JSON.stringify(response.data.user)); // Store user data
-
+  
         // Redirect user to profile or dashboard after login
-        window.location.href = "/profile";  // Change to your desired redirect path
-
+        window.location.href = "/";  // Change to your desired redirect path
+  
       } else {
         // Send signup request to backend
         response = await axios.post("https://willowtonbursary.co.za/api/users", formData);
-
-        // Optionally, auto-login after successful registration (if desired)
+  
         alert("User Registered! You can now log in.");
       }
     } catch (error) {
@@ -58,7 +57,7 @@ const LoginSignup = () => {
       alert("Error: " + error.response?.data?.msg || "Something went wrong");
     }
   };
-
+  
   return (
     <Box
       display="flex"

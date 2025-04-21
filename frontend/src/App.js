@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes, useLocation, Navigate } from "react-router-dom";
 import { Box, CssBaseline } from "@mui/material";
 import { FontSizeProvider } from "./config/FontSizeProvider";
@@ -33,7 +33,7 @@ import VoluntaryReport from "./pages/reports/VoluntaryReport";
 const PageTitleUpdater = () => {
   const location = useLocation();
 
-  React.useEffect(() => {
+  useEffect(() => {
     const path = location.pathname;
     let title = "React App";
     let favicon = "/favicon-light.ico";
@@ -66,7 +66,6 @@ const PageTitleUpdater = () => {
 
   return null;
 };
-
 
 // Layout handler to render layout conditionally
 const LayoutHandler = () => {
@@ -111,9 +110,9 @@ const LayoutHandler = () => {
   // Determine if the current route is valid for the user based on their type
   const isRouteValid = isAdmin ? adminRoutes.includes(location.pathname) : studentRoutes.includes(location.pathname);
 
-  // If the route is invalid for the student, redirect to Page Not Found
+  // If the route is invalid for the student or non-logged-in user, redirect to Page Not Found
   if (!isRouteValid) {
-    return <Navigate to="/page-not-found" />;  // Use Navigate to redirect to PageNotFound
+    return <Navigate to="/page-not-found" />;
   }
 
   const isWebAppPage = location.pathname.startsWith("/dashboard") ||
@@ -134,7 +133,7 @@ const LayoutHandler = () => {
     "/reports/parent-report", "/reports/student-equity", "/reports/payment-report",
     "/reports/student-report", "/reports/voluntary-report", "/login-register"
   ];
-
+  
   const isKnownRoute = validPaths.includes(location.pathname);
   const isWebPage = !isWebAppPage && !isReportPage && isKnownRoute;
 
@@ -201,7 +200,6 @@ const LayoutHandler = () => {
     </ThemeProvider>
   );
 };
-
 
 const App = () => {
   return (

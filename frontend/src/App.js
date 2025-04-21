@@ -1,5 +1,5 @@
 import React, { useState,useEffect } from "react";
-import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, useLocation, Navigate } from "react-router-dom";
 import { Box, CssBaseline } from "@mui/material";
 import { FontSizeProvider } from "./config/FontSizeProvider";
 import { ThemeProvider } from './config/ThemeContext';
@@ -67,7 +67,7 @@ const PageTitleUpdater = () => {
   return null;
 };
 
-// Layout handler to render layout conditionally
+
 // Layout handler to render layout conditionally
 const LayoutHandler = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -113,7 +113,7 @@ const LayoutHandler = () => {
 
   // If the route is invalid for the student, redirect to Page Not Found
   if (!isRouteValid) {
-    return <PageNotFound />;
+    return <Navigate to="/page-not-found" />;  // Use Navigate to redirect to PageNotFound
   }
 
   const isWebAppPage = location.pathname.startsWith("/dashboard") ||
@@ -134,10 +134,10 @@ const LayoutHandler = () => {
     "/reports/parent-report", "/reports/student-equity", "/reports/payment-report",
     "/reports/student-report", "/reports/voluntary-report", "/login-register"
   ];
-  
+
   const isKnownRoute = validPaths.includes(location.pathname);
   const isWebPage = !isWebAppPage && !isReportPage && isKnownRoute;
-  
+
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
   return (
@@ -201,6 +201,7 @@ const LayoutHandler = () => {
     </ThemeProvider>
   );
 };
+
 
 const App = () => {
   return (

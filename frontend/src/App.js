@@ -178,7 +178,7 @@ const LayoutHandler = () => {
           <Route path="/login-register" element={<LogReg />} />
 
           {/* Admin Pages */}
-          {isAdmin && isAccessiblePage() &&  (
+          {isAdmin && (
             <>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/add-student" element={<AddStudent />} />
@@ -187,14 +187,14 @@ const LayoutHandler = () => {
             </>
           )}
 
-          {isStudent && isAccessiblePage() &&  (
+          {isStudent && (
             <>
               <Route path="/student-details" element={<StudentDetails />} />
               <Route path="/create-admin" element={<UserCreation />} />
             </>
           )}
 
-          {isAdmin && isAccessiblePage() && (
+          {isAdmin && (
             <>
           {/* Report Pages */}
           <Route path="/reports/parent-report" element={<ParentReport />} />

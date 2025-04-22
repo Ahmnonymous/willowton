@@ -218,30 +218,73 @@ const StudentDetails = () => {
 
   const handleTabChange = (event, newValue) => setTabValue(newValue);
 
+  // const renderDrawer = () => (
+  //   <DrawerForm
+  //     open={drawerOpen}
+  //     onClose={() => setDrawerOpen(false)}
+  //     studentId={selectedStudentid}
+  //     onSave={(savedStudent) => {
+  //       fetchStudentDetails().then((updatedList) => {
+  //         if (savedStudent?.id) {
+  //           setSelectedStudentid(savedStudent.id);
+  //           setSelectedStudent(savedStudent);
+  //         } else {
+  //           if (updatedList.length > 0) {
+  //             setSelectedStudent(updatedList[0]);
+  //             setSelectedStudentid(updatedList[0].id);
+  //           } else {
+  //             setSelectedStudent(null);
+  //             setSelectedStudentid(null);
+  //           }
+  //         }
+  //       });
+  //       setDrawerOpen(false);
+  //     }}
+  //   />
+  // );
+
   const renderDrawer = () => (
     <DrawerForm
       open={drawerOpen}
       onClose={() => setDrawerOpen(false)}
       studentId={selectedStudentid}
       onSave={(savedStudent) => {
+        console.log("Saving student data...");
+  
+        // Fetch updated student details after saving
         fetchStudentDetails().then((updatedList) => {
+          console.log("Fetched updated student details after save:", updatedList);
+  
           if (savedStudent?.id) {
+            console.log("Saved student has ID:", savedStudent.id);
+  
+            // If savedStudent has an ID, update selectedStudent with the saved data
             setSelectedStudentid(savedStudent.id);
             setSelectedStudent(savedStudent);
+  
+            console.log("Updated selected student:", savedStudent);
           } else {
+            // If no savedStudent, check the updated list and set the first student (if any)
             if (updatedList.length > 0) {
+              console.log("No savedStudent, but updated list available. Setting first student:", updatedList[0]);
               setSelectedStudent(updatedList[0]);
               setSelectedStudentid(updatedList[0].id);
             } else {
+              // If the list is empty, reset the selectedStudent and selectedStudentid
+              console.log("No students found in the updated list. Resetting selected student.");
               setSelectedStudent(null);
               setSelectedStudentid(null);
             }
           }
         });
+  
+        // Close the drawer after saving
+        console.log("Closing drawer after save.");
         setDrawerOpen(false);
       }}
     />
   );
+  
 
   const tabSections = [
     { label: "Show all", key: "show_all" },

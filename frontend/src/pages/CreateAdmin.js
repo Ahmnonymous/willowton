@@ -319,7 +319,7 @@ const UserReport = () => {
                 <Grid item xs={12}>
                 <TextField
                   label="User Type"
-                  value={editUser ? editUser.user_type : "Admin"} // Default value or user type from edit
+                  value={editUser ? editUser.user_type : "admin"} // Default value or user type from edit
                   disabled // Makes the field non-editable
                   fullWidth
                   sx={{

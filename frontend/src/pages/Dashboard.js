@@ -7,22 +7,18 @@ import { useContext } from 'react';
 import { ThemeContext } from '../config/ThemeContext';
 
 const Dashboard = () => {
-  const { isDarkMode } = useContext(ThemeContext);
+  const { isDarkMode } = useContext(ThemeContext); // Use theme context
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [nationalityData, setNationalityData] = useState([]);
-  const [educationData, setEducationData] = useState([]);
-  const [currentEducationData, setCurrentEducationData] = useState([]);
-  const [raceData, setRaceData] = useState([]);
-  const [maritalData, setMaritalData] = useState([]);
-  const [employmentData, setEmploymentData] = useState([]);
-  // const [userName, setUserName] = useState("");
+  const [nationalityData, setNationalityData] = useState([]); // Nationality data
+  const [educationData, setEducationData] = useState([]); // Highest Education data
+  const [currentEducationData, setCurrentEducationData] = useState([]); // Current Education data
+  const [raceData, setRaceData] = useState([]); // Race data
+  const [maritalData, setMaritalData] = useState([]); // Marital Status data
+  const [employmentData, setEmploymentData] = useState([]); // Employment Status data
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  const userName = storedUser ? `${storedUser.first_name} ${storedUser.last_name}` : "Guest";
 
-  // Fetch the logged-in user's first name from localStorage
-  const user = JSON.parse(localStorage.getItem("user"));
-  const userName = `${user?.first_name} ${user?.last_name}`;
-  
-  // setUserName(createdBy);
   const theme = useTheme();
   // const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm')); // Detect small screen sizes (mobile)
   // const isMediumScreen = useMediaQuery(theme.breakpoints.up('sm').and(theme.breakpoints.down('md'))); // Detect medium screen sizes (tablet)
@@ -38,48 +34,107 @@ const Dashboard = () => {
     return 75; // Large screen: larger radius
   };
 
+  // Fetch dashboard data from the API
   useEffect(() => {
-    if (user) {
-      // setUserName(createdBy);  // Set the user's first name
+    const fetchDashboardData = async () => {
+      try {
+        const response = await axios.get('https://willowtonbursary.co.za/api/dashboard');
+        setDashboardData(response.data);
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      const userId = user.id;  // Get user ID from localStorage
+    const fetchNationalityData = async () => {
+      try {
+        const response = await axios.get('https://willowtonbursary.co.za/api/student-nationality-distribution');
+        const updatedData = response.data.map(item => ({
+          ...item,
+          count: Number(item.count),
+        }));
+        setNationalityData(updatedData);
+      } catch (error) {
+        console.error('Error fetching nationality data:', error);
+      }
+    };
 
-      const fetchData = async () => {
-        setLoading(true);
-        try {
-          // Fetch dashboard data based on user type
-          const response = user.user_type === 'admin'
-            ? await axios.get('https://willowtonbursary.co.za/api/dashboard')  // For admin, fetch all student data
-            : await axios.get(`https://willowtonbursary.co.za/api/student-detail/${userId}`);  // For student, fetch personal data
+    const fetchEducationData = async () => {
+      try {
+        const response = await axios.get('https://willowtonbursary.co.za/api/student-highest-education-distribution');
+        const updatedData = response.data.map(item => ({
+          ...item,
+          count: Number(item.count),
+        }));
+        setEducationData(updatedData);
+      } catch (error) {
+        console.error('Error fetching education data:', error);
+      }
+    };
 
-          setDashboardData(response.data);
+    const fetchCurrentEducationData = async () => {
+      try {
+        const response = await axios.get('https://willowtonbursary.co.za/api/student-current-education-distribution');
+        const updatedData = response.data.map(item => ({
+          ...item,
+          count: Number(item.count),
+        }));
+        setCurrentEducationData(updatedData);
+      } catch (error) {
+        console.error('Error fetching current education data:', error);
+      }
+    };
 
-          // Fetch other data (common for both admin and student)
-          const fetchNationalityData = await axios.get('https://willowtonbursary.co.za/api/student-nationality-distribution');
-          const fetchEducationData = await axios.get('https://willowtonbursary.co.za/api/student-highest-education-distribution');
-          const fetchCurrentEducationData = await axios.get('https://willowtonbursary.co.za/api/student-current-education-distribution');
-          const fetchRaceData = await axios.get('https://willowtonbursary.co.za/api/student-race-distribution');
-          const fetchMaritalData = await axios.get('https://willowtonbursary.co.za/api/student-marital-status-distribution');
-          const fetchEmploymentData = await axios.get('https://willowtonbursary.co.za/api/student-employment-status-distribution');
+    const fetchRaceData = async () => {
+      try {
+        const response = await axios.get('https://willowtonbursary.co.za/api/student-race-distribution');
+        const updatedData = response.data.map(item => ({
+          ...item,
+          count: Number(item.count),
+        }));
+        setRaceData(updatedData);
+      } catch (error) {
+        console.error('Error fetching race data:', error);
+      }
+    };
 
-          setNationalityData(fetchNationalityData.data);
-          setEducationData(fetchEducationData.data);
-          setCurrentEducationData(fetchCurrentEducationData.data);
-          setRaceData(fetchRaceData.data);
-          setMaritalData(fetchMaritalData.data);
-          setEmploymentData(fetchEmploymentData.data);
-        } catch (error) {
-          console.error('Error fetching dashboard data:', error);
-        } finally {
-          setLoading(false);
-        }
-      };
+    const fetchMaritalData = async () => {
+      try {
+        const response = await axios.get('https://willowtonbursary.co.za/api/student-marital-status-distribution');
+        const updatedData = response.data.map(item => ({
+          ...item,
+          count: Number(item.count),
+        }));
+        setMaritalData(updatedData);
+      } catch (error) {
+        console.error('Error fetching marital data:', error);
+      }
+    };
 
-      fetchData();
-    }
-  }, [user]);
+    const fetchEmploymentData = async () => {
+      try {
+        const response = await axios.get('https://willowtonbursary.co.za/api/student-employment-status-distribution');
+        const updatedData = response.data.map(item => ({
+          ...item,
+          count: Number(item.count),
+        }));
+        setEmploymentData(updatedData);
+      } catch (error) {
+        console.error('Error fetching employment data:', error);
+      }
+    };
 
-  // Handle loading state
+    // Fetch data for all categories
+    fetchDashboardData();
+    fetchNationalityData();
+    fetchEducationData();
+    fetchCurrentEducationData();
+    fetchRaceData();
+    fetchMaritalData();
+    fetchEmploymentData();
+  }, []);
+
   if (loading) {
     return <CircularProgress />;
   }
@@ -91,14 +146,13 @@ const Dashboard = () => {
     '#8B0000', '#FF4500', '#00FA9A', '#D3D3D3'
   ];
 
-
   return (
     <Box sx={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC', padding: '1px' }}>
       {/* Header Section */}
       <Box sx={{ backgroundColor: isDarkMode ? '#1E293B' : '#E1F5FE', padding: '20px', borderRadius: '8px', marginBottom: '20px', border: '1px solid #ccc' }}>
         <Typography variant="h4" sx={{ fontWeight: 'bold', color: isDarkMode ? 'white' : 'black' }}>Dashboard</Typography>
         <Typography variant="body1" sx={{ color: isDarkMode ? 'white' : 'black', marginTop: 1 }}>
-          Welcome, {userName || "User"}! 👋
+          Welcome, {userName}! 👋
         </Typography>
       </Box>
       

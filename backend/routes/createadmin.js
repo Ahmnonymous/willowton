@@ -157,12 +157,12 @@ router.get("/users", async (req, res) => {
 // Update user
 router.put("/users/:id", async (req, res) => {
   const { id } = req.params;
-  const { first_name, last_name, email_address, password, user_type } = req.body;
+  const { first_name, last_name, email_address, password } = req.body;
 
   try {
     const result = await pool.query(
-      "UPDATE Student_portal_users SET first_name = $1, last_name = $2, email_address = $3, password = $4, user_type = $5 WHERE user_id = $6 RETURNING *",
-      [first_name, last_name, email_address, password, user_type, id]
+      "UPDATE Student_portal_users SET first_name = $1, last_name = $2, email_address = $3, password = $4 WHERE user_id = $6 RETURNING *",
+      [first_name, last_name, email_address, password, id]
     );
     res.json(result.rows[0]);
   } catch (error) {

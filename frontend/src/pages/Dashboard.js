@@ -26,9 +26,9 @@ const Dashboard = () => {
   
   // Dynamically set the radius based on screen size
   const getOuterRadius = () => {
-    if (isSmallScreen) return 50; // Small screen: smaller radius
-    if (isMediumScreen) return 70; // Medium screen: medium radius
-    return 80; // Large screen: larger radius
+    if (isSmallScreen) return 55; // Small screen: smaller radius
+    if (isMediumScreen) return 65; // Medium screen: medium radius
+    return 75; // Large screen: larger radius
   };
 
   // Fetch dashboard data from the API

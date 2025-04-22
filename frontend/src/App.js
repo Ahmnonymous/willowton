@@ -150,7 +150,16 @@ const LayoutHandler = () => {
       )} */}
       
       {/* Render navbars conditionally */}
-      {isWebAppPage || isReportPage ? (
+      {/* {isWebAppPage || isReportPage ? (
+        <>
+          <TopNavBar toggleSidebar={toggleSidebar} />
+          <SideNavMenu open={sidebarOpen} />
+        </>
+      ) : isWebPage ? (
+        <WebNavBar />
+      ) : null} */}
+
+      {isLoggedIn && (isAdmin || isStudent) && (isWebAppPage || isReportPage) ? (
         <>
           <TopNavBar toggleSidebar={toggleSidebar} />
           <SideNavMenu open={sidebarOpen} />
@@ -158,6 +167,7 @@ const LayoutHandler = () => {
       ) : isWebPage ? (
         <WebNavBar />
       ) : null}
+
       <Box
         component="main"
         sx={{

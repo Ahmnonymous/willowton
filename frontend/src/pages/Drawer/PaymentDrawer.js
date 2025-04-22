@@ -25,11 +25,16 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
 
   const [formData, setFormData] = useState({});
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
+  
   // Check for larger or smaller screen size
   const isLargeScreen = useMediaQuery("(min-width:600px)");
 
   // Drawer width based on screen size
   const drawerWidth = isLargeScreen ? 500 : 330;
+
+  // Get the first name and last name from localStorage (assuming the user object is stored there)
+  const user = JSON.parse(localStorage.getItem("user"));
+  const createdBy = user.first_name + ' ' + user.last_name; // Concatenate first name and last name
 
   useEffect(() => {
     if (!open) return;
@@ -43,7 +48,7 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
         Payments_ET_Number: "",
         Payments_Attachment_Name: "",
         Proof_of_Payment: null,
-        Payment_Created_By: "",
+        Payment_Created_By: createdBy,  // Set created_by field to first and last name of logged-in user
         Student_Details_Portal_id: studentId
       });
     } else {
@@ -58,13 +63,13 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
             Payments_ET_Number: data.payments_et_number || "",
             Payments_Attachment_Name: data.payments_attachment_name || "",
             Proof_of_Payment: null,
-            Payment_Created_By: data.payment_created_by || "",
+            Payment_Created_By: data.payment_created_by || createdBy,  // Ensure `created_by` is set
             id: data.id,
             Student_Details_Portal_id: data.student_details_portal_id || studentId
           });
         });
     }
-  }, [open, recordId, studentId]);
+  }, [open, recordId, studentId, createdBy]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -221,6 +226,7 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
               <TextField
                 label="Date"
                 name="Payments_Date"
+                type="date"
                 fullWidth
                 value={formData.Payments_Date || ""}
                 onChange={handleChange}

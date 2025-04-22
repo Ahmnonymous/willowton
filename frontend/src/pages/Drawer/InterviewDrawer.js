@@ -30,6 +30,9 @@ const InterviewDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
   // Drawer width based on screen size
   const drawerWidth = isLargeScreen ? 500 : 330;
 
+  // Get the first name and last name from localStorage (assuming the user object is stored there)
+  const user = JSON.parse(localStorage.getItem("user"));
+  const createdBy = user.first_name + ' ' + user.last_name; // Concatenate first name and last name
 
   const questions = [
     "Briefly describe the applicant's family & social financial conditions?",
@@ -89,7 +92,7 @@ const InterviewDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
         Interview_Q22: '',
         Interview_Q23: '',
         Interview_Q24: '',
-        Interview_Created_By: '',
+        Interview_Created_By: createdBy,  // Set created_by field to first and last name of logged-in user
         Date_Stamp: '',
         Student_Details_Portal_id: studentId
       });
@@ -124,14 +127,14 @@ const InterviewDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
             Interview_Q22: data.interview_q22 || '',
             Interview_Q23: data.interview_q23 || '',
             Interview_Q24: data.interview_q24 || '',
-            Interview_Created_By: data.interview_created_by || '',
+            Interview_Created_By: data.interview_created_by || createdBy,  // Ensure `created_by` is set
             Date_Stamp: data.date_stamp || '',
             id: data.id,
             Student_Details_Portal_id: data.student_details_portal_id || studentId
           });
         });
     }
-  }, [open, recordId, studentId]);
+  }, [open, recordId, studentId, createdBy]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -263,24 +266,7 @@ const InterviewDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
                 </Grid>
               );
             })}
-            <Grid item xs={12}>
-              <TextField
-                label="Created By"
-                name="Interview_Created_By"
-                fullWidth
-                value={formData.Interview_Created_By || ""}
-                onChange={handleChange}
-                sx={{
-                  backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                  color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                  borderRadius: '8px',
-                  '& .MuiInputBase-input': {
-                    color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                  }
-                }}
-                InputLabelProps={{ style: { color: isDarkMode ? '#F7FAFC' : '#1E293B' } }}
-              />
-            </Grid>
+            {/* Interview_Created_By field is not rendered here */}
           </Grid>
         </Box>
 

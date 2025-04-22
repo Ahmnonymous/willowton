@@ -36,7 +36,7 @@ const validationSchema = yup.object({
     .string()
     .email("Invalid email address")
     .required("Email is required"),
-  password: yup.string().min(6, "Password should be at least 6 characters").required("Password is required"),
+  password: yup.string().min(8, "Password should be at least 8 characters").required("Password is required"),
   user_type: yup.string().required("Please select user type"),
 });
 
@@ -62,7 +62,13 @@ const UserReport = () => {
       const apiUrl = userType === "admin" ? "https://willowtonbursary.co.za/api/users" : `https://willowtonbursary.co.za/api/users/${JSON.parse(localStorage.getItem("user")).user_id}`;
       const response = await fetch(apiUrl);
       const data = await response.json();
-      setUsers(data);
+      
+      // Ensure data is an array before setting it
+      if (Array.isArray(data)) {
+        setUsers(data);
+      } else {
+        console.error("Fetched data is not an array", data);
+      }
     };
     fetchUsers();
   }, [userType]);
@@ -191,7 +197,7 @@ const UserReport = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {users.map((user) => (
+                {Array.isArray(users) && users.map((user) => (
                   <TableRow key={user.user_id}>
                     <TableCell sx={{ padding: "5px" }}>
                       <Button

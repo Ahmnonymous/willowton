@@ -155,21 +155,57 @@ router.get("/users", async (req, res) => {
 });
 
 // Update user
+// router.put("/users/:id", async (req, res) => {
+//   const { id } = req.params;
+//   const { first_name, last_name, email_address, password } = req.body;
+
+//   try {
+//     const result = await pool.query(
+//       "UPDATE Student_portal_users SET first_name = $1, last_name = $2, email_address = $3, password = $4 WHERE user_id = $5 RETURNING *",
+//       [first_name, last_name, email_address, password, id]
+//     );
+//     res.json(result.rows[0]);
+//   } catch (error) {
+//     console.error("Error updating user:", error);
+//     res.status(500).send("Server error");
+//   }
+// });
+
+// Update user
 router.put("/users/:id", async (req, res) => {
   const { id } = req.params;
   const { first_name, last_name, email_address, password } = req.body;
 
   try {
+    // Check if password was provided for updating
+    let hashedPassword = null;
+
+    if (password) {
+      // Hash the new password if provided
+      const salt = await bcrypt.genSalt(10);
+      hashedPassword = await bcrypt.hash(password, salt);
+    }
+
+    // Update user information
     const result = await pool.query(
       "UPDATE Student_portal_users SET first_name = $1, last_name = $2, email_address = $3, password = $4 WHERE user_id = $5 RETURNING *",
-      [first_name, last_name, email_address, password, id]
+      [
+        first_name,
+        last_name,
+        email_address,
+        hashedPassword || undefined, // Only update password if provided
+        id
+      ]
     );
+
+    // Send back the updated user information
     res.json(result.rows[0]);
   } catch (error) {
     console.error("Error updating user:", error);
     res.status(500).send("Server error");
   }
 });
+
 
 // Delete user
 router.delete("/users/:id", async (req, res) => {

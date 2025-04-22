@@ -66,7 +66,7 @@ const PageTitleUpdater = () => {
   return null;
 };
 
-// Remove the isAccessiblePage function entirely
+// Layout handler to render layout conditionally
 const LayoutHandler = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
@@ -108,11 +108,46 @@ const LayoutHandler = () => {
   const isAdmin = isLoggedIn && user.user_type === 'admin';
   const isStudent = isLoggedIn && user.user_type === 'student';
 
+  // Check if the user is allowed to access the current page
+  const isAccessiblePage = () => {
+    if (!isLoggedIn) {
+      // User is not logged in, allow access to public pages
+      return ["/", "/about-us", "/contact-us", "/eligibility", "/popia", "/login-register"].includes(location.pathname);
+    }
+    if (isAdmin) {
+      // Admin has access to all pages
+      return true;
+    }
+    if (isStudent) {
+      // Student has access to all web pages + web app pages (student details & create admin)
+      return validPaths.includes(location.pathname) && (
+        !location.pathname.startsWith("/dashboard") &&
+        !location.pathname.startsWith("/add-student") &&
+        !location.pathname.startsWith("/reports/parent-report") &&
+        !location.pathname.startsWith("/reports/student-equity") &&
+        !location.pathname.startsWith("/reports/payment-report") &&
+        !location.pathname.startsWith("/reports/student-report") &&
+        !location.pathname.startsWith("/reports/voluntary-report")
+      );
+    }
+    return false;
+  };
+
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
   return (
     <ThemeProvider pageBackgroundColor={pageBackgroundColor}>
       <CssBaseline />
+
+      {/* Render navbars conditionally
+      {isWebAppPage || isReportPage ? (
+        <>
+          <TopNavBar toggleSidebar={toggleSidebar} />
+          <SideNavMenu open={sidebarOpen} />
+        </>
+      ) : (
+        <WebNavBar />
+      )} */}
       
       {/* Render navbars conditionally */}
       {isWebAppPage || isReportPage ? (
@@ -123,7 +158,6 @@ const LayoutHandler = () => {
       ) : isWebPage ? (
         <WebNavBar />
       ) : null}
-
       <Box
         component="main"
         sx={{
@@ -144,7 +178,7 @@ const LayoutHandler = () => {
           <Route path="/login-register" element={<LogReg />} />
 
           {/* Admin Pages */}
-          {isAdmin && (
+          {isAdmin && isAccessiblePage() &&  (
             <>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/add-student" element={<AddStudent />} />
@@ -153,25 +187,26 @@ const LayoutHandler = () => {
             </>
           )}
 
-          {isStudent && (
+          {isStudent && isAccessiblePage() &&  (
             <>
               <Route path="/student-details" element={<StudentDetails />} />
               <Route path="/create-admin" element={<UserCreation />} />
             </>
           )}
 
-          {isAdmin && (
+          {isAdmin && isAccessiblePage() && (
             <>
-              {/* Report Pages */}
-              <Route path="/reports/parent-report" element={<ParentReport />} />
-              <Route path="/reports/student-equity" element={<StudentEquity />} />
-              <Route path="/reports/payment-report" element={<PaymentReport />} />
-              <Route path="/reports/student-report" element={<StudentReport />} />
-              <Route path="/reports/voluntary-report" element={<VoluntaryReport />} />
-            </>
+          {/* Report Pages */}
+          <Route path="/reports/parent-report" element={<ParentReport />} />
+          <Route path="/reports/student-equity" element={<StudentEquity />} />
+          <Route path="/reports/payment-report" element={<PaymentReport />} />
+          <Route path="/reports/student-report" element={<StudentReport />} />
+          <Route path="/reports/voluntary-report" element={<VoluntaryReport />} />
+          </>
           )}
 
           {/* Page Not Found */}
+          {/* <Route path="*" element={isAccessiblePage() ? <PageNotFound /> : <PageNotFound /> } /> */}
           <Route path="*" element={<PageNotFound />} />
         </Routes>
       </Box>

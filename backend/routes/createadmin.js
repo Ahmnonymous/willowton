@@ -46,6 +46,7 @@ router.post("/users", async (req, res) => {
 });
 
 // User login (with password validation and session)
+// User login (with password validation and session)
 router.post("/login", async (req, res) => {
   const { email_address, password } = req.body;
 
@@ -55,15 +56,17 @@ router.post("/login", async (req, res) => {
       [email_address]
     );
 
+    // Check if user exists
     if (result.rows.length === 0) {
-      return res.status(400).send("Invalid credentials");
+      return res.status(400).json({ msg: "User not found" }); // Return user not found error
     }
 
     const user = result.rows[0];
     const isMatch = await bcrypt.compare(password, user.password);
 
+    // Check if password matches
     if (!isMatch) {
-      return res.status(400).send("Invalid credentials");
+      return res.status(400).json({ msg: "Incorrect password" }); // Return incorrect password error
     }
 
     // Create a JWT token
@@ -128,7 +131,7 @@ router.get("/users/:id", async (req, res) => {
 
   try {
     const result = await pool.query(
-      "SELECT * FROM Student_portal_users WHERE user_id = $1", 
+      "SELECT * FROM Student_portal_users WHERE user_id = $1",
       [id]
     );
 
@@ -154,22 +157,6 @@ router.get("/users", async (req, res) => {
   }
 });
 
-// Update user
-// router.put("/users/:id", async (req, res) => {
-//   const { id } = req.params;
-//   const { first_name, last_name, email_address, password } = req.body;
-
-//   try {
-//     const result = await pool.query(
-//       "UPDATE Student_portal_users SET first_name = $1, last_name = $2, email_address = $3, password = $4 WHERE user_id = $5 RETURNING *",
-//       [first_name, last_name, email_address, password, id]
-//     );
-//     res.json(result.rows[0]);
-//   } catch (error) {
-//     console.error("Error updating user:", error);
-//     res.status(500).send("Server error");
-//   }
-// });
 
 // Update user
 router.put("/users/:id", async (req, res) => {

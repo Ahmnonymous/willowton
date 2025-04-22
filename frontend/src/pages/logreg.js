@@ -71,13 +71,13 @@ const LoginSignup = () => {
         if (response.data.msg === "User not found") {
           setErrors({
             email: "User does not exist",
-            password: "", // Password error should be cleared
+            password: "", // Clear password error
           });
           return; // Stop further processing if user is not found
         } else if (response.data.msg === "Incorrect password") {
           setErrors({
-            email: "", // Clear email error if the password is incorrect
-            password: "Incorrect password",
+            email: "", // Clear email error
+            password: "Incorrect password. Please try again.", // Show password error
           });
           return; // Stop further processing if password is incorrect
         }
@@ -215,6 +215,8 @@ const LoginSignup = () => {
                       </InputAdornment>
                     ),
                   }}
+                  error={!!errors.password}
+                  helperText={errors.password}
                 />
                 <Button type="submit" fullWidth variant="contained" sx={{ backgroundColor: 'black', fontFamily: "Sansation Light", mt: 1, fontSize: { xs: '0.9rem', sm: '1rem', md: '1.2rem' } }}>
                   LOGIN

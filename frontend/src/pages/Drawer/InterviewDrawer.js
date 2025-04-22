@@ -18,7 +18,6 @@ import SaveIcon from '@mui/icons-material/Save';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { ThemeContext } from '../../config/ThemeContext'; // Import ThemeContext
-// import { create } from '@mui/material/styles/createTransitions';
 
 const InterviewDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
   const { isDarkMode } = useContext(ThemeContext);  // Access theme context
@@ -35,7 +34,6 @@ const InterviewDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
   const user = JSON.parse(localStorage.getItem("user"));
   // const createdBy = user.first_name + ' ' + user.last_name; // Concatenate first name and last name
   const createdBy = `${user?.first_name} ${user?.last_name}`;
-  console.log('Hi :'+createdBy);
 
   const questions = [
     "Briefly describe the applicant's family & social financial conditions?",
@@ -137,7 +135,7 @@ const InterviewDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
           });
         });
     }
-  }, [open, recordId, studentId]);
+  }, [open, recordId, studentId, createdBy]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

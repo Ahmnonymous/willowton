@@ -34,7 +34,8 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
 
   // Get the first name and last name from localStorage (assuming the user object is stored there)
   const user = JSON.parse(localStorage.getItem("user"));
-  const createdBy = user.first_name + ' ' + user.last_name; // Concatenate first name and last name
+  // const createdBy = user.first_name + ' ' + user.last_name; // Concatenate first name and last name
+  const createdBy = `${user?.first_name} ${user?.last_name}`;
 
   useEffect(() => {
     if (!open) return;

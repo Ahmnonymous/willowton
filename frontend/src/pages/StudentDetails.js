@@ -250,29 +250,29 @@ const StudentDetails = () => {
       onClose={() => setDrawerOpen(false)}
       studentId={selectedStudentid}
       onSave={(savedStudent) => {
-        // console.log("Saving student data...");
+        console.log("Saving student data...");
   
         // Fetch updated student details after saving
         fetchStudentDetails().then((updatedList) => {
-          // console.log("Fetched updated student details after save:", updatedList);
+          console.log("Fetched updated student details after save");
   
           if (savedStudent?.id) {
-            // console.log("Saved student has ID:", savedStudent.id);
+            console.log("Saved student has ID");
   
             // If savedStudent has an ID, update selectedStudent with the saved data
             setSelectedStudentid(savedStudent.id);
             setSelectedStudent(savedStudent);
   
-            // console.log("Updated selected student:", savedStudent);
+            console.log("Updated selected student");
           } else {
             // If no savedStudent, check the updated list and set the first student (if any)
             if (updatedList.length > 0) {
-              // console.log("No savedStudent, but updated list available. Setting first student:", updatedList[0]);
+              console.log("No savedStudent, but updated list available. Setting first student");
               setSelectedStudent(updatedList[0]);
               setSelectedStudentid(updatedList[0].id);
             } else {
               // If the list is empty, reset the selectedStudent and selectedStudentid
-              // console.log("No students found in the updated list. Resetting selected student.");
+              console.log("No students found in the updated list. Resetting selected student.");
               setSelectedStudent(null);
               setSelectedStudentid(null);
             }

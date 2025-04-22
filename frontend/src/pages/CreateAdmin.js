@@ -46,22 +46,26 @@ const UserReport = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editUser, setEditUser] = useState(null);
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
-  
+
   // Check for larger or smaller screen size
   const isLargeScreen = useMediaQuery("(min-width:600px)");
 
   // Drawer width based on screen size
   const drawerWidth = isLargeScreen ? 500 : 330;
 
+  // Get user type from localStorage
+  const userType = JSON.parse(localStorage.getItem("user"))?.user_type;
+
   // Fetch users data
   useEffect(() => {
     const fetchUsers = async () => {
-      const response = await fetch("https://willowtonbursary.co.za/api/users");
+      const apiUrl = userType === "admin" ? "https://willowtonbursary.co.za/api/users" : `https://willowtonbursary.co.za/api/users/${JSON.parse(localStorage.getItem("user")).user_id}`;
+      const response = await fetch(apiUrl);
       const data = await response.json();
       setUsers(data);
     };
     fetchUsers();
-  }, []);
+  }, [userType]);
 
   // Fetch user by ID for editing
   const fetchUserById = async (id) => {
@@ -93,7 +97,7 @@ const UserReport = () => {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(values),
           });
-  
+
       if (response.ok) {
         const data = await response.json();
         setUsers((prevUsers) =>
@@ -107,7 +111,7 @@ const UserReport = () => {
       }
     },
   });
-  
+
   const handleCreateClick = () => {
     setEditUser(null); // Clear any selected user for new creation
     setDrawerOpen(true); // Open the drawer for creating new user
@@ -143,9 +147,6 @@ const UserReport = () => {
   const handleCloseDrawer = () => {
     setDrawerOpen(false);
   };
-
-  // Get user type from localStorage
-  const userType = JSON.parse(localStorage.getItem("user"))?.user_type;
 
   return (
     <Box sx={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC', minHeight: '100vh' }}>
@@ -297,7 +298,7 @@ const UserReport = () => {
                 <Grid item xs={12}>
                 <TextField
                   label="User Type"
-                  value="Admin" // Default value
+                  value={editUser ? editUser.user_type : "Admin"} // Default value or user type from edit
                   disabled // Makes the field non-editable
                   fullWidth
                   sx={{
@@ -316,7 +317,6 @@ const UserReport = () => {
                     '& .MuiInputBase-input.Mui-disabled': {
                       WebkitTextFillColor: isDarkMode ? 'white' : '#1E293B',  // Text color inside the input field when disabled
                     },
-                    display: 'none'
                   }}
                   InputLabelProps={{
                     style: { color: isDarkMode ? '#ffffff' : '#000000' }
@@ -341,7 +341,7 @@ const UserReport = () => {
               >
                 Close
               </Button>
-              {editUser && (
+              {editUser && userType !== "student" && (  // Hide delete for student
                 <Button
                   onClick={handleDeleteClick}
                   startIcon={<DeleteIcon />}

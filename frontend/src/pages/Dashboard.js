@@ -17,8 +17,12 @@ const Dashboard = () => {
   const [maritalData, setMaritalData] = useState([]); // Marital Status data
   const [employmentData, setEmploymentData] = useState([]); // Employment Status data
   const theme = useTheme();
+  // const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm')); // Detect small screen sizes (mobile)
+  // const isMediumScreen = useMediaQuery(theme.breakpoints.up('sm').and(theme.breakpoints.down('md'))); // Detect medium screen sizes (tablet)
+  
+  // Detect screen sizes
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm')); // Detect small screen sizes (mobile)
-  const isMediumScreen = useMediaQuery(theme.breakpoints.up('sm').and(theme.breakpoints.down('md'))); // Detect medium screen sizes (tablet)
+  const isMediumScreen = useMediaQuery(theme.breakpoints.between('sm', 'md')); // Detect medium screen sizes (tablet)
   
   // Dynamically set the radius based on screen size
   const getOuterRadius = () => {

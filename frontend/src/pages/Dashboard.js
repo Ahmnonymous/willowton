@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Card, CardContent, Typography, Grid, CircularProgress, Box } from '@mui/material';
+import { Card, CardContent, Typography, Grid, CircularProgress, Box , useTheme, useMediaQuery } from '@mui/material';
 import { People, Payment, VolunteerActivism, Work } from '@mui/icons-material';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts'; // Using Recharts for Pie Chart
 import { useContext } from 'react';
@@ -16,6 +16,16 @@ const Dashboard = () => {
   const [raceData, setRaceData] = useState([]); // Race data
   const [maritalData, setMaritalData] = useState([]); // Marital Status data
   const [employmentData, setEmploymentData] = useState([]); // Employment Status data
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm')); // Detect small screen sizes (mobile)
+  const isMediumScreen = useMediaQuery(theme.breakpoints.up('sm').and(theme.breakpoints.down('md'))); // Detect medium screen sizes (tablet)
+  
+  // Dynamically set the radius based on screen size
+  const getOuterRadius = () => {
+    if (isSmallScreen) return 50; // Small screen: smaller radius
+    if (isMediumScreen) return 70; // Medium screen: medium radius
+    return 80; // Large screen: larger radius
+  };
 
   // Fetch dashboard data from the API
   useEffect(() => {
@@ -123,7 +133,11 @@ const Dashboard = () => {
   }
 
   // Define chart colors
-  const COLORS = ['#4B8BBE', '#F79C42', '#61C0BF', '#F04E23'];
+  const COLORS = [
+    '#4B8BBE', '#F79C42', '#61C0BF', '#F04E23', '#7B68EE', '#90EE90', '#FF6347', '#FFD700',
+    '#20B2AA', '#F08080', '#8A2BE2', '#32CD32', '#FF8C00', '#D2691E', '#98FB98', '#DC143C',
+    '#8B0000', '#FF4500', '#00FA9A', '#D3D3D3'
+  ];
 
   return (
     <Box sx={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC', padding: '1px' }}>
@@ -203,7 +217,7 @@ const Dashboard = () => {
               <Typography variant="h6" sx={{ color: isDarkMode ? '#FFFFFF' : '#000000' }}>Nationalities</Typography>
               <ResponsiveContainer width="100%" height={200}>
                 <PieChart>
-                  <Pie data={nationalityData} dataKey="count" nameKey="student_nationality" cx="50%" cy="50%" outerRadius={80} fill="#82ca9d">
+                  <Pie data={nationalityData} dataKey="count" nameKey="student_nationality" cx="50%" cy="50%" outerRadius={getOuterRadius()} fill="#82ca9d">
                     {nationalityData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
@@ -234,7 +248,7 @@ const Dashboard = () => {
               <Typography variant="h6" sx={{ color: isDarkMode ? '#FFFFFF' : '#000000' }}>Current Education</Typography>
               <ResponsiveContainer width="100%" height={200}>
                 <PieChart>
-                  <Pie data={currentEducationData} dataKey="count" nameKey="student_type" cx="50%" cy="50%" outerRadius={80} fill="#82ca9d">
+                  <Pie data={currentEducationData} dataKey="count" nameKey="student_type" cx="50%" cy="50%" outerRadius={getOuterRadius()} fill="#82ca9d">
                     {currentEducationData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
@@ -264,7 +278,7 @@ const Dashboard = () => {
               <Typography variant="h6" sx={{ color: isDarkMode ? '#FFFFFF' : '#000000' }}>Highest Education</Typography>
               <ResponsiveContainer width="100%" height={200}>
                 <PieChart>
-                  <Pie data={educationData} dataKey="count" nameKey="student_highest_education" cx="50%" cy="50%" outerRadius={80} fill="#82ca9d">
+                  <Pie data={educationData} dataKey="count" nameKey="student_highest_education" cx="50%" cy="50%" outerRadius={getOuterRadius()} fill="#82ca9d">
                     {educationData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
@@ -295,7 +309,7 @@ const Dashboard = () => {
               <Typography variant="h6" sx={{ color: isDarkMode ? '#FFFFFF' : '#000000' }}>Race</Typography>
               <ResponsiveContainer width="100%" height={200}>
                 <PieChart>
-                  <Pie data={raceData} dataKey="count" nameKey="student_race" cx="50%" cy="50%" outerRadius={80} fill="#82ca9d">
+                  <Pie data={raceData} dataKey="count" nameKey="student_race" cx="50%" cy="50%" outerRadius={getOuterRadius()} fill="#82ca9d">
                     {raceData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
@@ -326,7 +340,7 @@ const Dashboard = () => {
               <Typography variant="h6" sx={{ color: isDarkMode ? '#FFFFFF' : '#000000' }}>Marital Status</Typography>
               <ResponsiveContainer width="100%" height={200}>
                 <PieChart>
-                  <Pie data={maritalData} dataKey="count" nameKey="student_marital_status" cx="50%" cy="50%" outerRadius={80} fill="#82ca9d">
+                  <Pie data={maritalData} dataKey="count" nameKey="student_marital_status" cx="50%" cy="50%" outerRadius={getOuterRadius()} fill="#82ca9d">
                     {maritalData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
@@ -357,7 +371,7 @@ const Dashboard = () => {
               <Typography variant="h6" sx={{ color: isDarkMode ? '#FFFFFF' : '#000000' }}>Employment Status</Typography>
               <ResponsiveContainer width="100%" height={200}>
                 <PieChart>
-                  <Pie data={employmentData} dataKey="count" nameKey="student_employment_status" cx="50%" cy="50%" outerRadius={80} fill="#82ca9d">
+                  <Pie data={employmentData} dataKey="count" nameKey="student_employment_status" cx="50%" cy="50%" outerRadius={getOuterRadius()} fill="#82ca9d">
                     {employmentData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}

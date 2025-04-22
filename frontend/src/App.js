@@ -206,8 +206,8 @@ const LayoutHandler = () => {
           )}
 
           {/* Page Not Found */}
-          {/* <Route path="*" element={isAccessiblePage() ? <PageNotFound /> : <PageNotFound /> } /> */}
-          <Route path="*" element={<PageNotFound />} />
+          <Route path="*" element={isAccessiblePage() ? <PageNotFound /> : <PageNotFound /> } />
+          {/* <Route path="*" element={<PageNotFound />} /> */}
         </Routes>
       </Box>
     </ThemeProvider>

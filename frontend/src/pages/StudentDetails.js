@@ -90,10 +90,12 @@ const StudentDetails = () => {
       }
   
       const data = await response.json();
+      if(data){
       setStudentDetails(data);  // Set the student details state
       setSelectedStudent(data);
       setSelectedStudentid(data.id);
-
+      }
+      console.log(data);
       return data;
   
     } catch (error) {

@@ -70,7 +70,8 @@ router.get("/student-detail/:id", async (req, res) => {
       student.student_dob = formatDate(student.student_dob);  // Format DOB field
       res.json(student);
     } else {
-      res.status(404).json({ error: "Student not found" });
+      // res.status(404).json({  });
+      null;
     }
   } catch (error) {
     console.error("Error fetching student details:", error);

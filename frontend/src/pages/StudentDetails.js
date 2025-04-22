@@ -90,7 +90,10 @@ const StudentDetails = () => {
       }
   
       const data = await response.json();
-      setStudentDetails(data);  // Set the student details state
+      // setStudentDetails(data);  // Set the student details state
+      setSelectedStudent(data);
+      setSelectedStudentid(data.id);
+
       return data;
   
     } catch (error) {

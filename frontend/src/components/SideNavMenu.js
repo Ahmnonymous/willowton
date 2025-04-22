@@ -10,7 +10,7 @@ import BalanceIcon from '@mui/icons-material/Balance';
 import PaymentsIcon from '@mui/icons-material/Payments';
 import AssistWalkerIcon from '@mui/icons-material/AssistWalker';
 import SchoolIcon from '@mui/icons-material/School';  // For Student Details
-import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'; // For Create Admin
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'; // For User Information
 import { useContext } from 'react';
 import { ThemeContext } from "../config/ThemeContext"; // Import the ThemeContext
 
@@ -42,10 +42,10 @@ const SideNavMenu = ({ open }) => {
           { text: "Voluntary Service", path: "/reports/voluntary-report", icon: <AssistWalkerIcon /> },
         ],
       },
-      { text: "Create Admin", path: "/create-admin", icon: <AdminPanelSettingsIcon /> },
+      { text: "User Information", path: "/user-info", icon: <AdminPanelSettingsIcon /> },
     ] : [
       { text: "Student Details", path: "/student-details", icon: <SchoolIcon /> },
-      { text: "Create Admin", path: "/create-admin", icon: <AdminPanelSettingsIcon /> },
+      { text: "User Information", path: "/user-info", icon: <AdminPanelSettingsIcon /> },
     ];
   }, [user]); // Dependency array, so menuItems only changes when the user data changes
 

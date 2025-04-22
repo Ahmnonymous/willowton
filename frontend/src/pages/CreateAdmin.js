@@ -46,6 +46,7 @@ const UserReport = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editUser, setEditUser] = useState(null);
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
+  
   // Check for larger or smaller screen size
   const isLargeScreen = useMediaQuery("(min-width:600px)");
 
@@ -143,28 +144,35 @@ const UserReport = () => {
     setDrawerOpen(false);
   };
 
+  // Get user type from localStorage
+  const userType = JSON.parse(localStorage.getItem("user"))?.user_type;
+
   return (
     <Box sx={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC', minHeight: '100vh' }}>
       {/* Header Section with Button */}
       <Box sx={{ border: '1px solid #ccc', padding: "12px", backgroundColor: isDarkMode ? '#1E293B' : '#e1f5fe', borderRadius: "8px", marginBottom: "12px", display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h6" sx={{ fontWeight: "bold", color: isDarkMode ? '#F7FAFC' : '#1E293B' }}>Create Admin</Typography>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleCreateClick}
-          fontSize="small"
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            backgroundColor: isDarkMode ? 'white' : 'black',//'#1E293B',
-            color: isDarkMode ? 'black' : 'white',//'#fff',
-            padding: "2px 6px",
-            textTransform: "none",
-          }}
-        >
-          <AddIcon sx={{ marginRight: 1, fontSize: 15 }} />
-          Create
-        </Button>
+        <Typography variant="h6" sx={{ fontWeight: "bold", color: isDarkMode ? '#F7FAFC' : '#1E293B' }}>User Information</Typography>
+        
+        {/* Show create button only for admins */}
+        {userType === "admin" && (
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleCreateClick}
+            fontSize="small"
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              backgroundColor: isDarkMode ? 'white' : 'black',
+              color: isDarkMode ? 'black' : 'white',
+              padding: "2px 6px",
+              textTransform: "none",
+            }}
+          >
+            <AddIcon sx={{ marginRight: 1, fontSize: 15 }} />
+            Create
+          </Button>
+        )}
       </Box>
 
       {/* User Table */}
@@ -313,7 +321,7 @@ const UserReport = () => {
                   InputLabelProps={{
                     style: { color: isDarkMode ? '#ffffff' : '#000000' }
                   }}
-                />
+                /> 
 
                 </Grid>
               </Grid>

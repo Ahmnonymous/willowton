@@ -45,7 +45,7 @@ const PageTitleUpdater = () => {
     else if (path === "/popia") title = "POPIA";
     else if (path === "/dashboard") title = "Dashboard";
     else if (path === "/student-details") title = "Student Details";
-    else if (path === "/create-admin") title = "Create Admin";
+    else if (path === "/user-info") title = "User Information";
     else if (path === "/add-student") title = "Add Student";
     else if (path === "/login-register") title = "Login/Register";
     else if (path.startsWith("/reports")) {
@@ -86,7 +86,7 @@ const LayoutHandler = () => {
   const isWebAppPage = location.pathname.startsWith("/dashboard") ||
                        location.pathname.startsWith("/add-student") ||
                        location.pathname.startsWith("/student-details") ||
-                       location.pathname.startsWith("/create-admin") ||
+                       location.pathname.startsWith("/user-info") ||
                        location.pathname.startsWith("/reports/student-report") ||
                        location.pathname.startsWith("/reports/parent-report") ||
                        location.pathname.startsWith("/reports/student-equity") ||
@@ -97,7 +97,7 @@ const LayoutHandler = () => {
 
   const validPaths = [
     "/", "/about-us", "/contact-us", "/eligibility", "/popia",
-    "/dashboard", "/add-student", "/student-details", "/create-admin",
+    "/dashboard", "/add-student", "/student-details", "/user-info",
     "/reports/parent-report", "/reports/student-equity", "/reports/payment-report",
     "/reports/student-report", "/reports/voluntary-report", "/login-register"
   ];
@@ -119,7 +119,7 @@ const LayoutHandler = () => {
       return true;
     }
     if (isStudent) {
-      // Student has access to all web pages + web app pages (student details & create admin)
+      // Student has access to all web pages + web app pages (student details & User Information)
       return validPaths.includes(location.pathname) && (
         !location.pathname.startsWith("/dashboard") &&
         !location.pathname.startsWith("/add-student") &&
@@ -203,14 +203,14 @@ const LayoutHandler = () => {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/add-student" element={<AddStudent />} />
               <Route path="/student-details" element={<StudentDetails />} />
-              <Route path="/create-admin" element={<UserCreation />} />
+              <Route path="/user-info" element={<UserCreation />} />
             </>
           )}
 
           {isStudent && (
             <>
               <Route path="/student-details" element={<StudentDetails />} />
-              <Route path="/create-admin" element={<UserCreation />} />
+              <Route path="/user-info" element={<UserCreation />} />
             </>
           )}
 

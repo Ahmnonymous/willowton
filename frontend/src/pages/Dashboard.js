@@ -20,6 +20,7 @@ const Dashboard = () => {
 
   // Fetch the logged-in user's first name from localStorage
   const user = JSON.parse(localStorage.getItem("user"));
+  const createdBy = `${user?.first_name} ${user?.last_name}`;
   const theme = useTheme();
   // const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm')); // Detect small screen sizes (mobile)
   // const isMediumScreen = useMediaQuery(theme.breakpoints.up('sm').and(theme.breakpoints.down('md'))); // Detect medium screen sizes (tablet)
@@ -37,7 +38,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (user) {
-      setUserName(user.first_name + ' ' + user.last_name);  // Set the user's first name
+      setUserName(createdBy);  // Set the user's first name
 
       const userId = user.id;  // Get user ID from localStorage
 
@@ -74,7 +75,7 @@ const Dashboard = () => {
 
       fetchData();
     }
-  }, [user]);
+  }, [user,createdBy]);
 
   // Handle loading state
   if (loading) {

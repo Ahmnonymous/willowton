@@ -105,6 +105,7 @@ const StudentDetails = () => {
   }, []);  
 
   const isStudentWithNoData = isStudent && !selectedStudent;
+  const isUserWithData = (isAdmin || isStudent) && selectedStudent;
 
   const fetchAboutMe = async (studentId) => {
     try {
@@ -607,6 +608,8 @@ const StudentDetails = () => {
     <Paper sx={{ border: '1px solid #ccc', backgroundColor: isDarkMode ? '#1e293b' : 'white', color: pageStyle.color }}>
       <Box sx={{ backgroundColor: isDarkMode ? '#1e293b' : '#e1f5fe', borderBottom: isDarkMode ? '1px solid white' : '1px solid #ccc', padding: "6px", display: 'flex', justifyContent: 'space-between' }}>
         <Typography variant="h6" sx={{ fontWeight: "bold", color: isDarkMode ? 'white' : '#1e293b', marginLeft: 1 }}>Student Details Portal</Typography>
+      
+      {isUserWithData && (  
         <Button
           variant="contained"
           onClick={() => {
@@ -624,8 +627,9 @@ const StudentDetails = () => {
           }}
         >
           <EditIcon sx={{ marginRight: 1, fontSize: 'small' }} />
-          Edit
+          Edit 
         </Button>
+      )}
       </Box>
 
       {selectedStudent ? (

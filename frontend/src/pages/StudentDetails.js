@@ -106,6 +106,7 @@ const StudentDetails = () => {
 
   const isStudentWithNoData = isStudent && !selectedStudent;
   const isUserWithData = (isAdmin || isStudent) && selectedStudent;
+  const isSelectedStudent = selectedStudent;
 
   const fetchAboutMe = async (studentId) => {
     try {
@@ -249,29 +250,29 @@ const StudentDetails = () => {
       onClose={() => setDrawerOpen(false)}
       studentId={selectedStudentid}
       onSave={(savedStudent) => {
-        console.log("Saving student data...");
+        // console.log("Saving student data...");
   
         // Fetch updated student details after saving
         fetchStudentDetails().then((updatedList) => {
-          console.log("Fetched updated student details after save:", updatedList);
+          // console.log("Fetched updated student details after save:", updatedList);
   
           if (savedStudent?.id) {
-            console.log("Saved student has ID:", savedStudent.id);
+            // console.log("Saved student has ID:", savedStudent.id);
   
             // If savedStudent has an ID, update selectedStudent with the saved data
             setSelectedStudentid(savedStudent.id);
             setSelectedStudent(savedStudent);
   
-            console.log("Updated selected student:", savedStudent);
+            // console.log("Updated selected student:", savedStudent);
           } else {
             // If no savedStudent, check the updated list and set the first student (if any)
             if (updatedList.length > 0) {
-              console.log("No savedStudent, but updated list available. Setting first student:", updatedList[0]);
+              // console.log("No savedStudent, but updated list available. Setting first student:", updatedList[0]);
               setSelectedStudent(updatedList[0]);
               setSelectedStudentid(updatedList[0].id);
             } else {
               // If the list is empty, reset the selectedStudent and selectedStudentid
-              console.log("No students found in the updated list. Resetting selected student.");
+              // console.log("No students found in the updated list. Resetting selected student.");
               setSelectedStudent(null);
               setSelectedStudentid(null);
             }
@@ -372,13 +373,14 @@ const StudentDetails = () => {
     const isInterview = sectionKey === "interviews";
 
     return (
+      
       <Box sx={{ padding: 0, border: '1px solid #ccc', marginBottom: 2, backgroundColor: isDarkMode ? '#1e293b' : 'white', color: pageStyle.color }}>
         <Box sx={{ padding: 1,display: 'flex', alignItems: 'center', marginBottom: 0.5, borderBottom: 1, borderBottomColor: '#ccc', height: 40,backgroundColor: isDarkMode ? '#1e293b' : '#e1f5fe' }}>
           <Typography variant="h6" sx={{ fontWeight: 'bold', marginLeft: 1 }}>
             {capitalizeWords(sectionKey === "expenses-summary" ? "financial-details" : sectionKey)}
           </Typography>
 
-          {(isAboutMe || isParents || isUniversityDetails || isAttachments || isExpenses 
+          { isSelectedStudent && (isAboutMe || isParents || isUniversityDetails || isAttachments || isExpenses 
           || isAssetsLiabilities || isAcademicResults || isVoluntaryServices || isPayments || isInterview) && (
             <Button
               sx={{ marginLeft: 'auto', color: isDarkMode ? 'white': 'black' }}
@@ -525,6 +527,7 @@ const StudentDetails = () => {
           </Table>
         )}
       </Box>
+    // )};
     );
   };
 

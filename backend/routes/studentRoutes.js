@@ -58,6 +58,26 @@ router.get("/student-details/:id", async (req, res) => {
   }
 });
 
+// Route to get student details by ID
+router.get("/student-detail/:id", async (req, res) => {
+  try {
+    const { id } = req.params;  // Get the student ID from the request parameters
+    const result = await pool.query("SELECT * FROM Student_Details_Portal WHERE user_id = $1", [id]);
+
+    // Format the dob field before sending response
+    if (result.rows.length > 0) {
+      const student = result.rows[0];
+      student.student_dob = formatDate(student.student_dob);  // Format DOB field
+      res.json(student);
+    } else {
+      res.status(404).json({ error: "Student not found" });
+    }
+  } catch (error) {
+    console.error("Error fetching student details:", error);
+    res.status(500).json({ error: "Failed to fetch student details" });
+  }
+});
+
 // Route to create a new student (POST request)
 router.post("/student-details/insert", async (req, res) => {
   try {

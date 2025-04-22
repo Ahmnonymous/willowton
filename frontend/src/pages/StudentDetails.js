@@ -73,15 +73,31 @@ const StudentDetails = () => {
 
   const fetchStudentDetails = useCallback(async () => {
     try {
-      const response = await fetch("https://willowtonbursary.co.za/api/student-details");
+      const user = JSON.parse(localStorage.getItem("user"));  // Get the user object from local storage
+      const userId = user?.id;  // Get the user ID from the logged-in user
+  
+      // If user is an admin, fetch all student details
+      let response;
+      if (user?.user_type === 'admin') {
+        response = await fetch("https://willowtonbursary.co.za/api/student-details");
+      } 
+      // If user is a student, fetch their specific student details
+      else if (user?.user_type === 'student' && userId) {
+        response = await fetch(`https://willowtonbursary.co.za/api/student-detail/${userId}`);
+      } else {
+        console.error("User type is neither admin nor student or user ID is missing");
+        return [];
+      }
+  
       const data = await response.json();
-      setStudentDetails(data);
+      setStudentDetails(data);  // Set the student details state
       return data;
+  
     } catch (error) {
       console.error("Error fetching student details:", error);
       return [];
     }
-  }, []);
+  }, []);  
 
   const fetchAboutMe = async (studentId) => {
     try {

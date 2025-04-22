@@ -60,6 +60,11 @@ const StudentDetails = () => {
   const [interviewDrawerOpen, setInterviewDrawerOpen] = useState(false);
   const [editingInterviewId, setEditingInterviewId] = useState(null);
 
+  // Add this to the top of your StudentDetails component
+  const user = JSON.parse(localStorage.getItem("user"));
+  const isAdmin = user?.user_type === 'admin';
+  const isStudent = user?.user_type === 'student';
+
   // Define background and text colors based on theme
   const pageStyle = {
     backgroundColor: isDarkMode ? '#1e293b' : '#e1f5fe',
@@ -493,135 +498,129 @@ const StudentDetails = () => {
       </Box>
 
       <Grid container spacing={3}>
-        {/* Sidebar */}
-        <Grid item xs={12} sm={3} md={2}>
-          <Paper sx={{ border: '1px solid #ccc', backgroundColor:  isDarkMode ? '#1e293b' : 'white' , color: pageStyle.color }}>
-            <Box sx={{ backgroundColor: isDarkMode ? '#1e293b' : '#e1f5fe', padding: "6px", borderBottom: isDarkMode ? '1px solid white' : '1px solid #ccc' }}>
-              <Typography variant="h6" sx={{ fontWeight: "bold",color: isDarkMode ? 'white': '#1e293b', marginLeft: 1 }}>Search</Typography>
-            </Box>
-            <Box sx={{ padding: 2 }}>
-            <TextField
-              label="Search"
-              variant="outlined"
-              fullWidth
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              sx={{
-                mb: 1,
-                borderRadius: 1,
-                // Adjusting background color based on dark mode
-                '& .MuiOutlinedInput-root': {
-                  backgroundColor: isDarkMode ? '#1e293b' : 'white', // White background for dark mode
-                  '& fieldset': {
-                    borderColor: isDarkMode ? 'white' : '#1e293b',  // Border color based on dark mode
-                  },
-                  '&:hover fieldset': {
-                    borderColor: isDarkMode ? 'white' : '#1e293b',  // Border color on hover
-                  },
-                  '&.Mui-focused fieldset': {
-                    borderColor: isDarkMode ? 'white' : '#1e293b',  // Border color when focused
-                  },
+  {/* Sidebar */}
+  {isAdmin && (
+    <Grid item xs={12} sm={3} md={2}>
+      <Paper sx={{ border: '1px solid #ccc', backgroundColor: isDarkMode ? '#1e293b' : 'white' , color: pageStyle.color }}>
+        <Box sx={{ backgroundColor: isDarkMode ? '#1e293b' : '#e1f5fe', padding: "6px", borderBottom: isDarkMode ? '1px solid white' : '1px solid #ccc' }}>
+          <Typography variant="h6" sx={{ fontWeight: "bold",color: isDarkMode ? 'white': '#1e293b', marginLeft: 1 }}>Search</Typography>
+        </Box>
+        <Box sx={{ padding: 2 }}>
+          <TextField
+            label="Search"
+            variant="outlined"
+            fullWidth
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            sx={{
+              mb: 1,
+              borderRadius: 1,
+              '& .MuiOutlinedInput-root': {
+                backgroundColor: isDarkMode ? '#1e293b' : 'white',
+                '& fieldset': {
+                  borderColor: isDarkMode ? 'white' : '#1e293b',
                 },
-                '& .MuiInputBase-input': {
-                  color: isDarkMode ? 'white' : '#1e293b',  // Text color inside the input field
+                '&:hover fieldset': {
+                  borderColor: isDarkMode ? 'white' : '#1e293b',
                 },
-                '& .MuiInputBase-input::placeholder': {
-                  color: isDarkMode ? '#B0B0B0' : '#666',  // Placeholder color
-                }
-              }}
-              placeholder="Search"
-              InputLabelProps={ { style: {color:isDarkMode ? '#ffffff' : '#000000'} } }
-              inputProps={{
-                'aria-label': 'Search',  // Accessibility label for search input
-              }}
-            />
+                '&.Mui-focused fieldset': {
+                  borderColor: isDarkMode ? 'white' : '#1e293b',
+                },
+              },
+              '& .MuiInputBase-input': {
+                color: isDarkMode ? 'white' : '#1e293b',
+              },
+              '& .MuiInputBase-input::placeholder': {
+                color: isDarkMode ? '#B0B0B0' : '#666',
+              }
+            }}
+            placeholder="Search"
+            InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+          />
+          <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+            {studentDetails
+              .filter((s) =>
+                s.student_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                s.student_surname.toLowerCase().includes(searchQuery.toLowerCase())
+              )
+              .map((student, idx) => (
+                <Card
+                  key={idx}
+                  sx={{
+                    mb: 0.5,
+                    boxShadow: 0,
+                    height: 55,
+                    cursor: "pointer",
+                    backgroundColor: selectedStudent?.id === student.id ? (isDarkMode ? 'white' : '#1e293b') : 'transparent',
+                    color: selectedStudent?.id === student.id ? (isDarkMode ? '#1e293b' : 'white') : "inherit",
+                    "&:hover": {
+                      backgroundColor: isDarkMode ? 'white' : '#1e293b',
+                      color: isDarkMode ? '#1e293b' : 'white',
+                    }
+                  }}
+                  onClick={() => {
+                    setSelectedStudent(student);
+                    setSelectedStudentid(student.id);
+                  }}
+                >
+                  <CardContent sx={{ padding: "10px" }}>
+                    <Typography variant="body1" sx={{ fontWeight: "bold" }}>{student.student_name}</Typography>
+                    <Typography variant="body2">{student.student_surname}</Typography>
+                  </CardContent>
+                </Card>
+              ))}
+          </div>
+        </Box>
+      </Paper>
+    </Grid>
+  )}
 
-              <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
-                {studentDetails
-                  .filter((s) =>
-                    s.student_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    s.student_surname.toLowerCase().includes(searchQuery.toLowerCase())
-                  )
-                  .map((student, idx) => (
-                    <Card
-                      key={idx}
-                      sx={{
-                        mb: 0.5,
-                        boxShadow: 0,
-                        height: 55,
-                        cursor: "pointer",
-                        backgroundColor: selectedStudent?.id === student.id ? isDarkMode ? 'white' : '#1e293b' : 'transparent',
-                        color: selectedStudent?.id === student.id ? isDarkMode ? '#1e293b' : 'white' : "inherit",
-                        "&:hover": {
-                          backgroundColor : isDarkMode ? 'white' : '#1e293b',
-                          color: isDarkMode ? '#1e293b' : 'white',
-                        }
-                      }}
-                      onClick={() => {
-                        setSelectedStudent(student);
-                        setSelectedStudentid(student.id);
-                      }}
-                    >
-                      <CardContent sx={{ padding: "10px" }}>
-                        <Typography variant="body1" sx={{ fontWeight: "bold" }}>{student.student_name}</Typography>
-                        <Typography variant="body2">{student.student_surname}</Typography>
-                      </CardContent>
-                    </Card>
-                  ))}
-              </div>
-            </Box>
-          </Paper>
-        </Grid>
+  {/* Right Panel */}
+  <Grid item xs={12} sm={9} md={isStudent ? 12 : 10}>
+    <Paper sx={{ border: '1px solid #ccc', backgroundColor: isDarkMode ? '#1e293b' : 'white', color: pageStyle.color }}>
+      <Box sx={{ backgroundColor: isDarkMode ? '#1e293b' : '#e1f5fe', borderBottom: isDarkMode ? '1px solid white' : '1px solid #ccc', padding: "6px", display: 'flex', justifyContent: 'space-between' }}>
+        <Typography variant="h6" sx={{ fontWeight: "bold", color: isDarkMode ? 'white' : '#1e293b', marginLeft: 1 }}>Student Details Portal</Typography>
+        <Button
+          variant="contained"
+          onClick={() => {
+            setDrawerOpen(false);
+            setTimeout(() => setDrawerOpen(true), 50);
+            setSelectedStudentid(selectedStudent?.id);
+          }}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            backgroundColor: isDarkMode ? 'white' : 'black',
+            color: isDarkMode ? 'black' : 'white',
+            padding: '2px 6px',
+            textTransform: 'none',
+          }}
+        >
+          <EditIcon sx={{ marginRight: 1, fontSize: 'small' }} />
+          Edit
+        </Button>
+      </Box>
 
-        {/* Right Panel */}
-        <Grid item xs={12} sm={9} md={10}>
-          {/* <Paper sx={{ border: '1px solid #ccc', backgroundColor: pageStyle.backgroundColor, color: pageStyle.color }}>
-            <Box sx={{ backgroundColor: "#1E293B", padding: "6px", display: 'flex', justifyContent: 'space-between' }}>*/}
-            <Paper sx={{ border: '1px solid #ccc', backgroundColor:  isDarkMode ? '#1e293b' : 'white' , color: pageStyle.color }}> 
-            <Box sx={{ backgroundColor: isDarkMode ? '#1e293b' : '#e1f5fe', borderBottom: isDarkMode ? '1px solid white' : '1px solid #ccc',padding: "6px", display: 'flex', justifyContent: 'space-between' }}>
-                        
-              <Typography variant="h6" sx={{ fontWeight: "bold",color: isDarkMode ? 'white': '#1e293b', marginLeft: 1 }}>Student Details Portal</Typography>
-              <Button
-                variant="contained"
-                onClick={() => {
-                  setDrawerOpen(false);
-                  setTimeout(() => setDrawerOpen(true), 50);
-                  setSelectedStudentid(selectedStudent?.id);
-                }}
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  backgroundColor: isDarkMode ? 'white' : 'black',
-                  color: isDarkMode ? 'black':'white',
-                  padding: '2px 6px',
-                  textTransform: 'none',
-                }}
-              >
-                <EditIcon sx={{ marginRight: 1, fontSize: 'small' }} />
-                Edit
-              </Button>
-            </Box>
-
-            {selectedStudent ? (
-              <Box sx={{ padding: 1.5 }}>
-                <Grid container spacing={1}>
-                  {Object.entries(selectedStudent).map(([key, value], i) => (
-                    key !== "id" && (
-                      <React.Fragment key={i}>
-                        <Grid item xs={6} sx={{ borderBottom: '1px solid #ccc', pb: '6px' }}>
-                          <Typography variant="body1"><strong>{capitalizeWords(key.replace(/_/g, " "))}</strong></Typography>
-                        </Grid>
-                        <Grid item xs={6} sx={{ borderBottom: '1px solid #ccc', pb: '6px' }}>
-                          <Typography variant="body1">{value}</Typography>
-                          </Grid>
-                        </React.Fragment>
-                    )
-                  ))}
-                </Grid>
-              </Box>
-            ) : (
-              <Typography variant="body1" sx={{ m: 2, fontWeight: 'bold' }}>No Record Selected</Typography>
-            )}
+      {selectedStudent ? (
+        <Box sx={{ padding: 1.5 }}>
+          <Grid container spacing={1}>
+            {Object.entries(selectedStudent).map(([key, value], i) => (
+              key !== "id" && (
+                <React.Fragment key={i}>
+                  <Grid item xs={6} sx={{ borderBottom: '1px solid #ccc', pb: '6px' }}>
+                    <Typography variant="body1"><strong>{capitalizeWords(key.replace(/_/g, " "))}</strong></Typography>
+                  </Grid>
+                  <Grid item xs={6} sx={{ borderBottom: '1px solid #ccc', pb: '6px' }}>
+                    <Typography variant="body1">{value}</Typography>
+                  </Grid>
+                </React.Fragment>
+              )
+            ))}
+          </Grid>
+        </Box>
+      ) : (
+        <Typography variant="body1" sx={{ m: 2, fontWeight: 'bold' }}>No Record Selected</Typography>
+      )}
 
             <Box sx={{ p: 1, overflowX: 'auto' }}>
               <Tabs

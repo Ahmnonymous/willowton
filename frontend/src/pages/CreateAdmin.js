@@ -36,7 +36,7 @@ const validationSchema = yup.object({
     .string()
     .email("Invalid email address")
     .required("Email is required"),
-  password: yup.string().min(8, "Password should be at least 8 characters").required("Password is required"),
+  password: yup.string().min(6, "Password should be at least 6 characters").required("Password is required"),
   user_type: yup.string().required("Please select user type"),
 });
 
@@ -59,15 +59,30 @@ const UserReport = () => {
   // Fetch users data
   useEffect(() => {
     const fetchUsers = async () => {
-      const apiUrl = userType === "admin" ? "https://willowtonbursary.co.za/api/users" : `https://willowtonbursary.co.za/api/users/${JSON.parse(localStorage.getItem("user")).user_id}`;
-      const response = await fetch(apiUrl);
-      const data = await response.json();
-      
-      // Ensure data is an array before setting it
-      if (Array.isArray(data)) {
-        setUsers(data);
-      } else {
-        console.error("Fetched data is not an array", data);
+      let apiUrl = "";
+      if (userType === "admin") {
+        apiUrl = "https://willowtonbursary.co.za/api/users";
+      } else if (userType === "student") {
+        const userId = JSON.parse(localStorage.getItem("user"))?.user_id;
+        apiUrl = `https://willowtonbursary.co.za/api/users/${userId}`;
+      }
+      try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+
+        // If userType is student, we are getting a single object, otherwise it's an array
+        if (userType === "admin") {
+          if (Array.isArray(data)) {
+            setUsers(data);
+          } else {
+            console.error("Fetched data is not an array");
+          }
+        } else if (userType === "student") {
+          // For student, data is an object
+          setUsers([data]);  // Wrap the single object into an array
+        }
+      } catch (error) {
+        console.error("Error fetching users:", error);
       }
     };
     fetchUsers();

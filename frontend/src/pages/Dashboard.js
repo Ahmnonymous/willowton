@@ -16,11 +16,13 @@ const Dashboard = () => {
   const [raceData, setRaceData] = useState([]);
   const [maritalData, setMaritalData] = useState([]);
   const [employmentData, setEmploymentData] = useState([]);
-  const [userName, setUserName] = useState("");
+  // const [userName, setUserName] = useState("");
 
   // Fetch the logged-in user's first name from localStorage
   const user = JSON.parse(localStorage.getItem("user"));
-  const createdBy = `${user?.first_name} ${user?.last_name}`;
+  const userName = `${user?.first_name} ${user?.last_name}`;
+  
+  // setUserName(createdBy);
   const theme = useTheme();
   // const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm')); // Detect small screen sizes (mobile)
   // const isMediumScreen = useMediaQuery(theme.breakpoints.up('sm').and(theme.breakpoints.down('md'))); // Detect medium screen sizes (tablet)
@@ -38,7 +40,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (user) {
-      setUserName(createdBy);  // Set the user's first name
+      // setUserName(createdBy);  // Set the user's first name
 
       const userId = user.id;  // Get user ID from localStorage
 
@@ -75,7 +77,7 @@ const Dashboard = () => {
 
       fetchData();
     }
-  }, [user,createdBy]);
+  }, [user]);
 
   // Handle loading state
   if (loading) {

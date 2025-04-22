@@ -161,7 +161,7 @@ router.put("/users/:id", async (req, res) => {
 
   try {
     const result = await pool.query(
-      "UPDATE Student_portal_users SET first_name = $1, last_name = $2, email_address = $3, password = $4 WHERE user_id = $6 RETURNING *",
+      "UPDATE Student_portal_users SET first_name = $1, last_name = $2, email_address = $3, password = $4 WHERE user_id = $5 RETURNING *",
       [first_name, last_name, email_address, password, id]
     );
     res.json(result.rows[0]);

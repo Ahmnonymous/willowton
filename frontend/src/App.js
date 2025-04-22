@@ -168,13 +168,23 @@ const LayoutHandler = () => {
         <WebNavBar />
       ) : null}
 
-      <Box
+      {/* <Box
         component="main"
         sx={{
           mt: isWebAppPage ? 8 : 0,
           ml: sidebarOpen && isWebAppPage ? 30 : 0,
           transition: "margin 0.3s ease",
           p: isWebAppPage ? 3 : 0,
+        }}
+        className={isWebPage ? 'web-page' : ''}
+      > */}
+      <Box
+        component="main"
+        sx={{
+          mt: (isLoggedIn && (isAdmin || isStudent)) && (isWebAppPage || isReportPage) ? 8 : 0,  // Adjust margin-top for authorized users
+          ml: sidebarOpen && (isWebAppPage || isReportPage) && (isAdmin || isStudent) ? 30 : 0, // Adjust margin-left for sidebar for authorized users
+          transition: "margin 0.3s ease",
+          p: (isLoggedIn && (isAdmin || isStudent)) && (isWebAppPage || isReportPage) ? 3 : 0, // Adjust padding for authorized users
         }}
         className={isWebPage ? 'web-page' : ''}
       >

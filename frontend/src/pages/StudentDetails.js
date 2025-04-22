@@ -243,7 +243,6 @@ const StudentDetails = () => {
   //     }}
   //   />
   // );
-
   const renderDrawer = () => (
     <DrawerForm
       open={drawerOpen}
@@ -281,6 +280,30 @@ const StudentDetails = () => {
   
         // Close the drawer after saving
         console.log("Closing drawer after save.");
+        setDrawerOpen(false);
+      }}
+      onDelete={() => {
+        console.log("Deleting student...");
+  
+        // Fetch updated student details after deleting
+        fetchStudentDetails().then((updatedList) => {
+          console.log("Fetched updated student details after delete");
+  
+          if (updatedList.length > 0) {
+            // Set the first student from the updated list as selectedStudent
+            console.log("Updated list available. Setting first student.");
+            setSelectedStudent(updatedList[0]);
+            setSelectedStudentid(updatedList[0].id);
+          } else {
+            // No students left, reset selectedStudent and selectedStudentid
+            console.log("No students found in the updated list after deletion. Resetting selected student.");
+            setSelectedStudent(null);
+            setSelectedStudentid(null);
+          }
+        });
+  
+        // Close the drawer after deletion
+        console.log("Closing drawer after delete.");
         setDrawerOpen(false);
       }}
     />

@@ -90,7 +90,7 @@ const StudentDetails = () => {
       }
   
       const data = await response.json();
-      // setStudentDetails(data);  // Set the student details state
+      setStudentDetails(data);  // Set the student details state
       setSelectedStudent(data);
       setSelectedStudentid(data.id);
 
@@ -101,6 +101,8 @@ const StudentDetails = () => {
       return [];
     }
   }, []);  
+
+  const isStudentWithNoData = isStudent && !selectedStudent;
 
   const fetchAboutMe = async (studentId) => {
     try {
@@ -496,25 +498,29 @@ const StudentDetails = () => {
       {/* style={{ backgroundColor: pageStyle.backgroundColor, color: pageStyle.color }}> */}
       <Box sx={{ padding: "12px", backgroundColor: isDarkMode ? '#1e293b' : '#e1f5fe' , borderRadius: "8px", marginBottom: "12px", display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid #ccc' }}>
         <Typography variant="h6" sx={{ fontWeight: "bold", color: isDarkMode ? 'white' : 'black' }}>Student Details</Typography>
-        <Button
-          variant="contained"
-          onClick={() => {
-            setSelectedStudentid(null);
-            setDrawerOpen(true);
-          }}
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            backgroundColor: isDarkMode ? 'white' : 'black',
-            color: isDarkMode ? 'black':'white',
-            padding: '2px 6px',
-            textTransform: 'none',
-          }}
-        >
-          <AddIcon sx={{ marginRight: 1, fontSize: 'small' }} />
-          Create
-        </Button>
+
+        {isStudentWithNoData && (
+          <Button
+            variant="contained"
+            onClick={() => {
+              setSelectedStudentid(null);
+              setDrawerOpen(true);
+            }}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: isDarkMode ? 'white' : 'black',
+              color: isDarkMode ? 'black' : 'white',
+              padding: '2px 6px',
+              textTransform: 'none',
+            }}
+          >
+            <AddIcon sx={{ marginRight: 1, fontSize: 'small' }} />
+            Create
+          </Button>
+        )}
       </Box>
+
 
       <Grid container spacing={3}>
   {/* Sidebar */}
@@ -624,7 +630,7 @@ const StudentDetails = () => {
         <Box sx={{ padding: 1.5 }}>
           <Grid container spacing={1}>
             {Object.entries(selectedStudent).map(([key, value], i) => (
-              key !== "id" && (
+              key !== "id" && key !== "user_id" && (
                 <React.Fragment key={i}>
                   <Grid item xs={6} sx={{ borderBottom: '1px solid #ccc', pb: '6px' }}>
                     <Typography variant="body1"><strong>{capitalizeWords(key.replace(/_/g, " "))}</strong></Typography>

@@ -145,22 +145,29 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave }) => {
   };
 
   const handleSave = async () => {
+    const user = JSON.parse(localStorage.getItem("user"));  // Get user data from localStorage
+    const userId = user?.user_id; // Get the user_id from the logged-in user
+  
     const url = studentId
-      ? `https://willowtonbursary.co.za/api/student-details/update/${studentId}`
-      : `https://willowtonbursary.co.za/api/student-details/insert`;
-    const method = studentId ? "PUT" : "POST";
-
+      ? `https://willowtonbursary.co.za/api/student-details/update/${studentId}`  // URL for updating the student
+      : `https://willowtonbursary.co.za/api/student-details/insert`;  // URL for inserting a new student
+  
+    const method = studentId ? "PUT" : "POST";  // Use PUT for update and POST for insert
+  
+    // If creating a new student, add user_id to the formData
+    const dataToSend = studentId ? formData : { ...formData, user_id: userId }; 
+  
     try {
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(dataToSend),  // Send the appropriate data for insert or update
       });
-
+  
       if (response.ok) {
         const savedStudent = await response.json();
-        onSave(savedStudent);
-        onClose();
+        onSave(savedStudent);  // Callback to parent to handle after saving
+        onClose();  // Close the drawer after saving
       } else {
         console.error("Failed to save data");
       }
@@ -168,7 +175,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave }) => {
       console.error("Error saving student data:", error);
     }
   };
-
+  
   const handleDeleteClick = () => {
     setDeleteConfirmationOpen(true); // Open the dialog
   };
@@ -261,7 +268,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave }) => {
               }
 
               // Exclude `student_date_stamp` and `id`
-              if (key === "student_date_stamp" || key === "id") return null;
+              if (key === "student_date_stamp" || key === "id"  || key === "user_id") return null;
 
               let label = key.replace(/_/g, " ").toLowerCase();
               label = label

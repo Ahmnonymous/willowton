@@ -117,6 +117,7 @@ router.post("/student-details/insert", async (req, res) => {
       student_emergency_contact_number,
       student_emergency_contact_relationship,
       student_emergency_contact_address,
+      user_id,
     } = req.body;
 
     // Handle null values for student_dob and student_number_of_siblings
@@ -133,10 +134,10 @@ router.post("/student-details/insert", async (req, res) => {
         student_company_of_employment, student_current_salary, student_number_of_siblings, student_siblings_bursary,
         student_willow_relationship, student_relationship_type, student_employee_name, student_employee_designation,
         student_employee_branch, student_employee_number, student_emergency_contact_name, student_emergency_contact_number,
-        student_emergency_contact_relationship, student_emergency_contact_address
+        student_emergency_contact_relationship, student_emergency_contact_address,user_id
       ) VALUES (
         $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25,
-        $26, $27, $28, $29, $30, $31, $32, $33, $34, $35
+        $26, $27, $28, $29, $30, $31, $32, $33, $34, $35, $36
       ) RETURNING id`,
       [
         student_name,
@@ -174,6 +175,7 @@ router.post("/student-details/insert", async (req, res) => {
         student_emergency_contact_number,
         student_emergency_contact_relationship,
         student_emergency_contact_address,
+        user_id,
       ]
     );
     // res.status(201).json({ message: "Student created successfully", id: result.rows[0].id });

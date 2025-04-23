@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Button, TextField, Typography, ToggleButtonGroup, ToggleButton, IconButton, InputAdornment } from "@mui/material";
+import { Box, Button, TextField, Typography, ToggleButtonGroup, ToggleButton, IconButton, InputAdornment, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
 import { AccountCircle, Lock, PersonAdd, Email, Visibility, VisibilityOff } from "@mui/icons-material";
 import axios from "axios"; // Import axios for making HTTP requests
 import footerImage from '../images/footer.png';
@@ -19,6 +19,11 @@ const LoginSignup = () => {
     password: "",
   });
 
+  const [openForgotPassword, setOpenForgotPassword] = useState(false);  // For controlling the popup state
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");  // To store the email for password reset
+  const [forgotPasswordError, setForgotPasswordError] = useState("");  // To display error in the popup
+  const [forgotPasswordSuccess, setForgotPasswordSuccess] = useState("");  // For success message in popup
+
   const handleAuthToggle = (_, newAuthMode) => {
     if (newAuthMode !== null) setAuthMode(newAuthMode);
   };
@@ -29,6 +34,31 @@ const LoginSignup = () => {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleForgotPasswordChange = (e) => {
+    setForgotPasswordEmail(e.target.value);
+    setForgotPasswordError("");  // Clear the error message when the user starts typing
+  };
+
+  const handleForgotPasswordSubmit = async () => {
+    try {
+      // Fetch all users from the API
+      const response = await axios.get("https://willowtonbursary.co.za/api/users");
+      const users = response.data;
+      const userExists = users.some(user => user.email_address === forgotPasswordEmail);
+
+      if (!userExists) {
+        setForgotPasswordError("Email does not exist.");
+        setForgotPasswordSuccess("");
+      } else {
+        setForgotPasswordSuccess("Password reset email has been sent.");
+        setForgotPasswordError("");
+        setTimeout(() => setOpenForgotPassword(false), 3000);  // Close popup after success
+      }
+    } catch (error) {
+      setForgotPasswordError("An error occurred. Please try again.");
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -125,13 +155,14 @@ const LoginSignup = () => {
       }
     }
   };
-  
+
   return (
     <Box
       display="flex"
       flexDirection="column"
       alignItems="center"
       justifyContent="center"
+      minHeight="80vh"
       mt={5}
       bgcolor="#FFB612"
       position="relative"
@@ -172,10 +203,10 @@ const LoginSignup = () => {
         <form onSubmit={handleSubmit}>
           {authMode === "login" ? (
             <>
-              <Typography variant="h6" sx={{ fontFamily: "Sansation Light", textAlign: 'center' , fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.8rem' }, color: 'black', mb: 3 }}>
+              <Typography variant="h6" sx={{ fontFamily: "Sansation Light", textAlign: 'center', fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.8rem' }, color: 'black', mb: 3 }}>
                 SET SOME GOALS
               </Typography>
-              <Typography variant="h6" sx={{ fontFamily: "Sansation Light", textAlign: 'center' , fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.8rem' }, color: 'black', mb: 3 }}>
+              <Typography variant="h6" sx={{ fontFamily: "Sansation Light", textAlign: 'center', fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.8rem' }, color: 'black', mb: 3 }}>
                 THEN DEMOLISH THEM
               </Typography>
 
@@ -221,14 +252,18 @@ const LoginSignup = () => {
                 <Button type="submit" fullWidth variant="contained" sx={{ backgroundColor: 'black', fontFamily: "Sansation Light", mt: 1, fontSize: { xs: '0.9rem', sm: '1rem', md: '1.2rem' } }}>
                   LOGIN
                 </Button>
-                <Typography variant="body2" sx={{ cursor: 'pointer', fontFamily: "Sansation Light", mt: 2, color: 'black', fontWeight: 'bold', fontSize: { xs: '0.8rem', sm: '0.8rem', md: '0.8rem' } }}>
+                <Typography
+                  variant="body2"
+                  sx={{ cursor: 'pointer', fontFamily: "Sansation Light", mt: 2, color: 'black', fontWeight: 'bold', fontSize: { xs: '0.8rem', sm: '0.8rem', md: '0.8rem' } }}
+                  onClick={() => setOpenForgotPassword(true)}
+                >
                   FORGOT PASSWORD?
                 </Typography>
               </Box>
             </>
           ) : (
             <>
-              <Typography variant="h6" mb={2} sx={{ fontFamily: "Sansation Light", textAlign: 'center' ,fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.8rem' }, color: 'black' }}>
+              <Typography variant="h6" mb={2} sx={{ fontFamily: "Sansation Light", textAlign: 'center', fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.8rem' }, color: 'black' }}>
                 REGISTER
               </Typography>
 
@@ -298,7 +333,53 @@ const LoginSignup = () => {
           )}
         </form>
       </Box>
+{/* Forgot Password Popup */}
+<Dialog 
+  open={openForgotPassword} 
+  onClose={() => setOpenForgotPassword(false)} 
+  sx={{ 
+    '& .MuiDialog-paper': { 
+      maxWidth: '300px',          // Set max width to 600px for a wider dialog
+      width: '100%',              // Make it responsive to full screen width
+      margin: 'auto',             // Center the dialog horizontally and vertically
+      padding: '5px',            // Add some padding inside the dialog for better spacing
+    } 
+  }}
+>
+  <DialogTitle>
+    <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ padding: '5px 10px' }}>
+      <Typography variant="h6">Forgot Password</Typography>
+      <IconButton onClick={() => setOpenForgotPassword(false)}>
+        &times;
+      </IconButton>
+    </Box>
+  </DialogTitle>
+  <DialogContent sx={{ padding: '0px 20px 0px 20px' }}>
+    <TextField
+      fullWidth
+      variant="outlined"
+      value={forgotPasswordEmail}
+      onChange={handleForgotPasswordChange}
+      placeholder="Enter your email address"
+      error={!!forgotPasswordError}
+      helperText={forgotPasswordError || forgotPasswordSuccess}
+      sx={{ marginBottom: '10px' }}
+    />
+  </DialogContent>
+  <DialogActions sx={{ padding: '5px 20px 20px 20px' }}>
+    <Button 
+      onClick={handleForgotPasswordSubmit} 
+      fullWidth 
+      variant="contained" 
+      sx={{ backgroundColor: 'black', fontFamily: "Sansation Light", padding: '10px' }}
+    >
+      Request Password
+    </Button>
+  </DialogActions>
+</Dialog>
 
+
+      {/* { Footer start } */}
       <Box
         component="img"
         src={footerImage}
@@ -310,6 +391,8 @@ const LoginSignup = () => {
           Developed by Uchakide.co.za
         </Typography>
       </Box>
+      {/* { Footer end } */}
+
     </Box>
   );
 };

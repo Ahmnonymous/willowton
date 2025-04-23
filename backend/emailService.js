@@ -3,9 +3,9 @@ const nodemailer = require('nodemailer');
 
 // Set up SES SMTP transport
 const transporter = nodemailer.createTransport({
-  host: 'email.af-south-1.amazonaws.com', // SES SMTP endpoint for South Africa
-  port: 587,
-  secure: false,
+  host: 'email-smtp.us-east-1.amazonaws.com', // SES SMTP endpoint for South Africa
+  port: 465,
+  secure: true,
   auth: {
     user: process.env.SES_SMTP_USERNAME, // SES SMTP username
     pass: process.env.SES_SMTP_PASSWORD, // SES SMTP password

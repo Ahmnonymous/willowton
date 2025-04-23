@@ -8,7 +8,7 @@ const SendEmail = () => {
 
   const sendEmail = async () => {
     try {
-      const response = await fetch('http://willowtonbursary.co.za/api/send-email', {
+      const response = await fetch('https://willowtonbursary.co.za/api/send-email', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -21,6 +21,7 @@ import AddStudent from "./pages/AddStudent";
 import StudentDetails from "./pages/StudentDetails";
 import UserCreation from "./pages/CreateAdmin";
 import LogReg from "./pages/logreg";
+import SendEmail from "./components/SendEmail";
 
 // Import Reports
 import ParentReport from "./pages/reports/ParentReport";
@@ -48,6 +49,7 @@ const PageTitleUpdater = () => {
     else if (path === "/user-info") title = "User Information";
     else if (path === "/add-student") title = "Add Student";
     else if (path === "/login-register") title = "Login/Register";
+    else if (path === "/send-email") title = "Send Email";
     else if (path.startsWith("/reports")) {
       if (path === "/reports/parent-report") title = "Parent Report";
       else if (path === "/reports/student-equity") title = "Student Equity Report";
@@ -99,7 +101,7 @@ const LayoutHandler = () => {
     "/", "/about-us", "/contact-us", "/eligibility", "/popia",
     "/dashboard", "/add-student", "/student-details", "/user-info",
     "/reports/parent-report", "/reports/student-equity", "/reports/payment-report",
-    "/reports/student-report", "/reports/voluntary-report", "/login-register"
+    "/reports/student-report", "/reports/voluntary-report", "/login-register", "/send-email"
   ];
   const isKnownRoute = validPaths.includes(location.pathname);
   const isWebPage = !isWebAppPage && !isReportPage && isKnownRoute;
@@ -112,7 +114,7 @@ const LayoutHandler = () => {
   const isAccessiblePage = () => {
     if (!isLoggedIn) {
       // User is not logged in, allow access to public pages
-      return ["/", "/about-us", "/contact-us", "/eligibility", "/popia", "/login-register"].includes(location.pathname);
+      return ["/", "/about-us", "/contact-us", "/eligibility", "/popia", "/login-register","/send-email"].includes(location.pathname);
     }
     if (isAdmin) {
       // Admin has access to all pages
@@ -196,6 +198,7 @@ const LayoutHandler = () => {
           <Route path="/eligibility" element={<Eligibility />} />
           <Route path="/popia" element={<POPIA />} />
           <Route path="/login-register" element={<LogReg />} />
+          <Route path="/send-email" element={<SendEmail />} />
 
           {/* Admin Pages */}
           {isAdmin && (

@@ -17,6 +17,7 @@ const interviewroutes = require("./routes/interviewroutes");
 const reportroutes = require("./routes/reportroutes");
 const dashboardroutes = require("./routes/dashboardroutes");
 const createadmin = require("./routes/createadmin");
+const emailRoutes = require('./routes/emailRoutes');
 const app = express();
 
 // Middleware
@@ -49,6 +50,7 @@ app.use("/api", interviewroutes);
 app.use("/api", reportroutes);
 app.use("/api", dashboardroutes);
 app.use("/api", createadmin);
+app.use("/api", emailRoutes);
 
 // Start the server
 const PORT = process.env.PORT || 5000;

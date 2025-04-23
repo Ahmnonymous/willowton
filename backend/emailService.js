@@ -13,13 +13,13 @@ const transporter = nodemailer.createTransport({
 });
 
 // Function to send email
-const sendEmail = async (to, subject, text, attachments) => {
+const sendEmail = async (to, subject, text) => {
   const mailOptions = {
     from: 'communication@willowtonbursary.co.za', // Your verified SES email
     to: to,
     subject: subject,
     text: text,
-    attachments: attachments, // Optional: Array of attachment objects
+    // attachments: attachments, // Optional: Array of attachment objects
   };
 
   try {

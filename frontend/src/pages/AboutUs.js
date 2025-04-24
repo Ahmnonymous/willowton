@@ -14,8 +14,21 @@ const AboutUsPage = () => {
   };
 
   return (
-    <div>
-      <Container sx={{ py: 4, mb: -1 }}>
+    <Box
+      display="flex"
+      flexDirection="column"
+      minHeight="100vh" // Ensures the parent takes at least the full screen height
+    >
+      <Container
+        sx={{
+          py: 4,
+          mb: -1,
+          maxWidth: 'none', // Removes the max-width constraint
+          '@media (min-width:1200px)': {
+            maxWidth: '100%', // Ensures the container spans the full width on larger screens
+          },
+        }}
+      >
         <Typography variant="h1" sx={{ color: "white", textAlign: 'center', mb: 4, fontSize: fontSizes.h1, fontFamily: 'Sansation Light, sans-serif' }}>
           BIG GOALS BIG DREAMS WE GOT YOU
         </Typography>
@@ -94,18 +107,21 @@ const AboutUsPage = () => {
         </Box>
       </Container>
 
-      <Box
-        component="img"
-        src={footerImage} // Replace with actual image path or URL
-        alt="Graduates"
-        sx={{ width: '100%', height: 'auto', mb: 1 }}
-      />
-      <Box sx={{ textAlign: 'center', py: 2, mt: 0, color: 'black' }}>
-        <Typography variant="caption" sx={{ color: 'white', fontFamily: 'Sansation Light, sans-serif', fontSize: fontSizes.caption }}>
-          Developed by Uchakide.co.za
-        </Typography>
+      {/* Footer Section */}
+      <Box sx={{ marginTop: 'auto' }}>
+        <Box
+          component="img"
+          src={footerImage}
+          alt="footer"
+          sx={{ width: '100%', height: 'auto', mb: 1 }}
+        />
+        <Box sx={{ textAlign: 'center', py: 2, mt: 0, color: 'black' }}>
+          <Typography variant="caption" sx={{ color: 'white', fontFamily: 'Sansation Light, sans-serif', fontSize: fontSizes.caption }}>
+            Developed by Uchakide.co.za
+          </Typography>
+        </Box>
       </Box>
-    </div>
+    </Box>
   );
 };
 

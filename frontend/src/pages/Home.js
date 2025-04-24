@@ -14,8 +14,21 @@ const HomePage = () => {
   };
 
   return (
-    <div>
-      <Container sx={{ py: 4, mb: -1 }}>
+    <Box
+      display="flex"
+      flexDirection="column"
+      minHeight="100vh"  // Ensures the parent takes at least the full screen height
+    >
+      <Container
+        sx={{
+          py: 4,
+          mb: -1,
+          maxWidth: 'none', // Removes the max-width constraint
+          '@media (min-width:1200px)': {
+            maxWidth: '100%', // Ensures the container spans the full width on larger screens
+          },
+        }}
+      >
         <Typography variant="h1" sx={{ textAlign: 'center', mb: 1, fontSize: fontSizes.h1, color: 'black', fontFamily: 'Sansation Light, sans-serif' }}>
           "No country can really develop unless its citizens are educated"
         </Typography>
@@ -27,7 +40,15 @@ const HomePage = () => {
           component="img"
           src={backgroundImage}
           alt="Graduates"
-          sx={{ width: '100%', height: 'auto', borderRadius: 1, mb: 2 }}
+          sx={{
+            display: 'block',
+            marginLeft: 'auto',
+            marginRight: 'auto',
+            width: '90%',         // Adjust width to 80% or any value you prefer
+            height: 'auto',       // Maintain the aspect ratio
+            maxWidth: '800px',    // Limit the image size for large screens
+            mb: 2,                // Margin bottom for spacing
+          }}
         />
 
         <Typography variant="h6" sx={{ mb: 3, color: 'black', textAlign: 'center', fontFamily: 'Sansation Light, sans-serif', fontSize: fontSizes.h6 }}>
@@ -81,18 +102,21 @@ const HomePage = () => {
         </List>
       </Container>
 
-      <Box
-        component="img"
-        src={footerImage}
-        alt="footer"
-        sx={{ width: '100%', height: 'auto', mb: 1 }}
-      />
-      <Box sx={{ textAlign: 'center', py: 2, mt: 0, color: 'black' }}>
-        <Typography variant="caption" sx={{ color: '#000', fontFamily: 'Sansation Light, sans-serif', fontSize: fontSizes.caption }}>
-          Developed by Uchakide.co.za
-        </Typography>
+      {/* Footer Section */}
+      <Box sx={{ marginTop: 'auto' }}>  {/* This will push the footer to the bottom */}
+        <Box
+          component="img"
+          src={footerImage}
+          alt="footer"
+          sx={{ width: '100%', height: 'auto', mb: 1 }}
+        />
+        <Box sx={{ textAlign: 'center', py: 2, mt: 0, color: 'black' }}>
+          <Typography variant="caption" sx={{ color: '#000', fontFamily: 'Sansation Light, sans-serif', fontSize: fontSizes.caption }}>
+            Developed by Uchakide.co.za
+          </Typography>
+        </Box>
       </Box>
-    </div>
+    </Box>
   );
 };
 

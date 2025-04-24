@@ -15,8 +15,21 @@ const POPIA = () => {
   const textStyle = { color: "white", fontFamily: "Sansation Light", fontSize: fontSizes.body1 };
 
   return (
-    <div>
-      <Container sx={{ py: 4, mb: 2 }}>
+    <Box
+      display="flex"
+      flexDirection="column"
+      minHeight="100vh" // Ensures the parent takes at least the full screen height
+    >
+      <Container
+        sx={{
+          py: 4,
+          mb: 2,
+          maxWidth: 'none', // Removes the max-width constraint
+          '@media (min-width:1200px)': {
+            maxWidth: '100%', // Ensures the container spans the full width on larger screens
+          },
+        }}
+      >
         <Typography variant="h4" align="center" gutterBottom sx={{ ...textStyle, fontWeight: "bold", fontSize: fontSizes.h4, mb: 4 }}>
           POPIA
         </Typography>
@@ -55,7 +68,7 @@ const POPIA = () => {
           ))}
         </Box>
 
-        <Typography sx={{ ...textStyle, marginTop: '10px', marginBottom: '10px',mb: 1 }}>
+        <Typography sx={{ ...textStyle, marginTop: '10px', marginBottom: '10px', mb: 1 }}>
           We collect this information to:
         </Typography>
         <Box
@@ -198,7 +211,7 @@ const POPIA = () => {
           We may update this privacy notice to reflect changes in our practices or legal requirements. If you are dissatisfied with our response, you have the right to lodge a complaint with:
         </Typography>
 
-        <Typography variant="h6" fontStyle='italic' gutterBottom sx={{ ...textStyle,fontSize: fontSizes.h6, marginTop: '20px' }}>
+        <Typography variant="h6" fontStyle='italic' gutterBottom sx={{ ...textStyle, fontSize: fontSizes.h6, marginTop: '20px' }}>
           The Information Regulator
         </Typography>
         <Typography  variant="body1" paragraph sx={textStyle}>
@@ -209,19 +222,21 @@ const POPIA = () => {
 
       </Container>
 
-      <Box
-        component="img"
-        src={footerImage}
-        alt="Graduates"
-        sx={{ width: '100%', height: 'auto', mb: 1 }}
-      />
-      <Box sx={{ textAlign: 'center', py: 2, mt: 0, color: 'black' }}>
-        <Typography variant="caption" sx={{ color: 'white', fontFamily: 'Sansation Light, sans-serif', fontSize: fontSizes.caption }}>
-          Developed by Uchakide.co.za
-        </Typography>
+      {/* Footer Section */}
+      <Box sx={{ marginTop: 'auto' }}>
+        <Box
+          component="img"
+          src={footerImage}
+          alt="footer"
+          sx={{ width: '100%', height: 'auto', mb: 1 }}
+        />
+        <Box sx={{ textAlign: 'center', py: 2, mt: 0, color: 'black' }}>
+          <Typography variant="caption" sx={{ color: 'white', fontFamily: 'Sansation Light, sans-serif', fontSize: fontSizes.caption }}>
+            Developed by Uchakide.co.za
+          </Typography>
+        </Box>
       </Box>
-
-    </div>
+    </Box>
   );
 };
 

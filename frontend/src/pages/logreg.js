@@ -116,8 +116,12 @@ const LoginSignup = () => {
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("user", JSON.stringify(response.data.user)); // Store user data
   
-        // Redirect user to profile or dashboard after login
-        window.location.href = "/";  // Change to your desired redirect path
+        // Redirect user to profile or dashboard based on user type
+        if (response.data.user.user_type === 'student') {
+          window.location.href = "/student-details";  // Redirect to student details
+        } else if (response.data.user.user_type === 'admin') {
+          window.location.href = "/dashboard";  // Redirect to admin dashboard
+        }
       } else {
         // Send signup request to backend
         response = await axios.post("https://willowtonbursary.co.za/api/users", formData);
@@ -134,9 +138,9 @@ const LoginSignup = () => {
   
         // Redirect to dashboard or student details page based on user type
         if (loginResponse.data.user.user_type === 'student') {
-          window.location.href = "/";  // Redirect to student details
-        } else {
-          window.location.href = "/";  // Redirect to dashboard
+          window.location.href = "/student-details";  // Redirect to student details
+        } else if (loginResponse.data.user.user_type === 'admin') {
+          window.location.href = "/dashboard";  // Redirect to admin dashboard
         }
       }
     } catch (error) {
@@ -155,14 +159,15 @@ const LoginSignup = () => {
       }
     }
   };
+  
 
   return (
     <Box
       display="flex"
       flexDirection="column"
       alignItems="center"
-      justifyContent="center"
-      minHeight="80vh"
+      justifyContent="space-between" // Ensures the content stretches and footer stays at the bottom
+      minHeight="100vh" // Ensures that the parent takes at least the full screen height
       mt={5}
       bgcolor="#FFB612"
       position="relative"
@@ -333,68 +338,69 @@ const LoginSignup = () => {
           )}
         </form>
       </Box>
-{/* Forgot Password Popup */}
-<Dialog 
-  open={openForgotPassword} 
-  onClose={() => setOpenForgotPassword(false)} 
-  sx={{ 
-    '& .MuiDialog-paper': { 
-      maxWidth: '300px',          // Set max width to 600px for a wider dialog
-      width: '100%',              // Make it responsive to full screen width
-      margin: 'auto',             // Center the dialog horizontally and vertically
-      padding: '5px',            // Add some padding inside the dialog for better spacing
-    } 
-  }}
->
-  <DialogTitle>
-    <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ padding: '5px 10px' }}>
-      <Typography variant="h6">Forgot Password</Typography>
-      <IconButton onClick={() => setOpenForgotPassword(false)}>
-        &times;
-      </IconButton>
-    </Box>
-  </DialogTitle>
-  <DialogContent sx={{ padding: '0px 20px 0px 20px' }}>
-    <TextField
-      fullWidth
-      variant="outlined"
-      value={forgotPasswordEmail}
-      onChange={handleForgotPasswordChange}
-      placeholder="Enter your email address"
-      error={!!forgotPasswordError}
-      helperText={forgotPasswordError || forgotPasswordSuccess}
-      sx={{ marginBottom: '10px' }}
-    />
-  </DialogContent>
-  <DialogActions sx={{ padding: '5px 20px 20px 20px' }}>
-    <Button 
-      onClick={handleForgotPasswordSubmit} 
-      fullWidth 
-      variant="contained" 
-      sx={{ backgroundColor: 'black', fontFamily: "Sansation Light", padding: '10px' }}
-    >
-      Request Password
-    </Button>
-  </DialogActions>
-</Dialog>
+      
+      {/* Forgot Password Popup */}
+      <Dialog 
+        open={openForgotPassword} 
+        onClose={() => setOpenForgotPassword(false)} 
+        sx={{ 
+          '& .MuiDialog-paper': { 
+            maxWidth: '300px',          // Set max width to 600px for a wider dialog
+            width: '100%',              // Make it responsive to full screen width
+            margin: 'auto',             // Center the dialog horizontally and vertically
+            padding: '5px',            // Add some padding inside the dialog for better spacing
+          } 
+        }}
+      >
+        <DialogTitle>
+          <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ padding: '5px 10px' }}>
+            <Typography variant="h6">Forgot Password</Typography>
+            <IconButton onClick={() => setOpenForgotPassword(false)}>
+              &times;
+            </IconButton>
+          </Box>
+        </DialogTitle>
+        <DialogContent sx={{ padding: '0px 20px 0px 20px' }}>
+          <TextField
+            fullWidth
+            variant="outlined"
+            value={forgotPasswordEmail}
+            onChange={handleForgotPasswordChange}
+            placeholder="Enter your email address"
+            error={!!forgotPasswordError}
+            helperText={forgotPasswordError || forgotPasswordSuccess}
+            sx={{ marginBottom: '10px' }}
+          />
+        </DialogContent>
+        <DialogActions sx={{ padding: '5px 20px 20px 20px' }}>
+          <Button 
+            onClick={handleForgotPasswordSubmit} 
+            fullWidth 
+            variant="contained" 
+            sx={{ backgroundColor: 'black', fontFamily: "Sansation Light", padding: '10px' }}
+          >
+            Request Password
+          </Button>
+        </DialogActions>
+      </Dialog>
 
-
-      {/* { Footer start } */}
+      {/* Footer */}
       <Box
         component="img"
         src={footerImage}
-        alt="Graduates"
-        sx={{ width: '100%', height: 'auto', mb: 1 }}
+        alt="footer"
+        sx={{ width: '100%', height: 'auto', mt: 'auto', mb: 1 }}
       />
       <Box sx={{ textAlign: 'center', py: 2, mt: 0, color: 'black' }}>
         <Typography variant="caption" sx={{ color: 'black', fontFamily: 'Sansation Light, sans-serif', fontSize: '1rem' }}>
           Developed by Uchakide.co.za
         </Typography>
       </Box>
-      {/* { Footer end } */}
-
     </Box>
   );
 };
 
 export default LoginSignup;
+
+
+

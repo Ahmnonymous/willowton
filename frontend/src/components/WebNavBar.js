@@ -238,7 +238,12 @@ const WebNavBar = () => {
   return (
     <AppBar position="relative" sx={{ backgroundColor: 'transparent', boxShadow: 'none' }}>
       <Toolbar>
-        <Container sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+        <Container sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%',
+          maxWidth: 'none', // Removes the max-width constraint
+          '@media (min-width:1200px)': {
+            maxWidth: '100%', // Ensures the container spans the full width on larger screens
+          },
+         }}>
           {/* Left side: Hamburger + WillowTon */}
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             {/* Hamburger (only on XS) */}

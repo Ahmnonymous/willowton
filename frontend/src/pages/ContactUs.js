@@ -32,8 +32,21 @@ const ContactUs = () => {
   };
 
   return (
-    <div>
-      <Container sx={{ py: 4, mb: 0 }}>
+    <Box
+      display="flex"
+      flexDirection="column"
+      minHeight="100vh" // Ensures the parent takes at least the full screen height
+    >
+      <Container
+        sx={{
+          py: 4,
+          mb: 0,
+          maxWidth: 'none', // Removes the max-width constraint
+          '@media (min-width:1200px)': {
+            maxWidth: '100%', // Ensures the container spans the full width on larger screens
+          },
+        }}
+      >
         <Typography
           variant="h4"
           align="center"
@@ -152,8 +165,8 @@ const ContactUs = () => {
           <Grid item xs={12} md={4} textAlign="center">
             <Typography variant="h6" fontWeight={'bold'} sx={{ fontFamily: "Sansation Light" }}>ON</Typography>
             <Typography sx={{ ...textStyle }}>Phone: (+27) 31 309 6786</Typography>
-            <Typography sx={{ ...textStyle }}>Name: Razia Hamid</Typography>
-            <Typography sx={{ ...textStyle }}>Mail: Razia.Hamid@Sanzaf.org.za</Typography>
+            <Typography sx={{ ...textStyle }}>Name: Humza Mthembu</Typography>
+            <Typography sx={{ ...textStyle }}>Mail: humza.mthembu@sanzaf.org.za</Typography>
           </Grid>
           <Grid item xs={12} md={4} textAlign="center">
             <Typography sx={{ fontFamily: "Sansation Light" }} fontWeight={'bold'} variant="h6">DURING</Typography>
@@ -163,18 +176,21 @@ const ContactUs = () => {
         </Grid>
       </Box>
 
-      <Box
-        component="img"
-        src={footerImage} // Replace with actual image path or URL
-        alt="Graduates"
-        sx={{ width: '100%', height: 'auto', mb: 1 }}
-      />
-      <Box sx={{ textAlign: 'center', py: 2, mt: 0, color: 'black' }}>
-        <Typography variant="caption" sx={{ color: 'white', fontFamily: 'Sansation Light, sans-serif', fontSize: fontSizes.caption }}>
-          Developed by Uchakide.co.za
-        </Typography>
+      {/* Footer Section */}
+      <Box sx={{ marginTop: 'auto' }}>
+        <Box
+          component="img"
+          src={footerImage}
+          alt="Graduates"
+          sx={{ width: '100%', height: 'auto', mb: 1 }}
+        />
+        <Box sx={{ textAlign: 'center', py: 2, mt: 0, color: 'black' }}>
+          <Typography variant="caption" sx={{ color: 'white', fontFamily: 'Sansation Light, sans-serif', fontSize: fontSizes.caption }}>
+            Developed by Uchakide.co.za
+          </Typography>
+        </Box>
       </Box>
-    </div>
+    </Box>
   );
 };
 

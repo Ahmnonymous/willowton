@@ -36,8 +36,8 @@ const PageTitleUpdater = () => {
 
   React.useEffect(() => {
     const path = location.pathname;
-    let title = "React App";
-    let favicon = "/favicon-light.ico";
+    let title = "WillowTon";
+    // let favicon = "./willowton_icon.ico";
 
     if (path === "/") title = "Home";
     else if (path === "/about-us") title = "About Us";
@@ -62,7 +62,7 @@ const PageTitleUpdater = () => {
     }
 
     document.title = title;
-    document.querySelector('link[rel="icon"]').href = favicon;
+    // document.querySelector('link[rel="icon"]').href = favicon;
   }, [location]);
 
   return null;
@@ -141,26 +141,6 @@ const LayoutHandler = () => {
     <ThemeProvider pageBackgroundColor={pageBackgroundColor}>
       <CssBaseline />
 
-      {/* Render navbars conditionally
-      {isWebAppPage || isReportPage ? (
-        <>
-          <TopNavBar toggleSidebar={toggleSidebar} />
-          <SideNavMenu open={sidebarOpen} />
-        </>
-      ) : (
-        <WebNavBar />
-      )} */}
-      
-      {/* Render navbars conditionally */}
-      {/* {isWebAppPage || isReportPage ? (
-        <>
-          <TopNavBar toggleSidebar={toggleSidebar} />
-          <SideNavMenu open={sidebarOpen} />
-        </>
-      ) : isWebPage ? (
-        <WebNavBar />
-      ) : null} */}
-
       {isLoggedIn && (isAdmin || isStudent) && (isWebAppPage || isReportPage) ? (
         <>
           <TopNavBar toggleSidebar={toggleSidebar} />
@@ -170,16 +150,6 @@ const LayoutHandler = () => {
         <WebNavBar />
       ) : null}
 
-      {/* <Box
-        component="main"
-        sx={{
-          mt: isWebAppPage ? 8 : 0,
-          ml: sidebarOpen && isWebAppPage ? 30 : 0,
-          transition: "margin 0.3s ease",
-          p: isWebAppPage ? 3 : 0,
-        }}
-        className={isWebPage ? 'web-page' : ''}
-      > */}
       <Box
         component="main"
         sx={{
@@ -190,6 +160,7 @@ const LayoutHandler = () => {
         }}
         className={isWebPage ? 'web-page' : ''}
       >
+
         <Routes>
           {/* Public Pages */}
           <Route path="/" element={<Home />} />

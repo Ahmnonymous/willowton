@@ -16,7 +16,16 @@ const EligibilityPage = () => {
 
   return (
     <div>
-      <Container sx={{ py: 4, mb: -1 }}>
+      <Container
+        sx={{
+          py: 4,
+          mb: -1,
+          maxWidth: 'none', // Removes the max-width constraint
+          '@media (min-width:1200px)': {
+            maxWidth: '100%', // Ensures the container spans the full width on larger screens
+          },
+        }}
+      >
         <Typography variant="h4" align="center" gutterBottom sx={{ ...textStyle,mb: 4, fontWeight: "bold", fontSize: fontSizes.h4 }}>
           Eligibility Requirements
         </Typography>

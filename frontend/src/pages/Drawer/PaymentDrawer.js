@@ -237,7 +237,8 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
             <Grid item xs={12}>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DatePicker
-              wrapperClassName="datepicker" 
+              wrapperClassName={"datepicker"}
+              className={"datepicker"}
               label="Payments Date"
               value={selectedDate}
               onChange={handleDateChange}

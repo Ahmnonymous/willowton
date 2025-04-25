@@ -54,8 +54,8 @@ router.get("/academic-results/view/:id", async (req, res) => {
 
 router.post("/academic-results/insert", upload.single("Results_Attachment"), async (req, res) => {
   const { Results_Module, Results_Percentage, Student_Details_Portal_id } = req.body;
-  const fileBuffer = req.file?.buffer || null;
-  const fileName = req.file?.originalname || null;
+  const fileBuffer = req.file ? req.file.buffer : null;
+  const fileName = req.file ? req.file.originalname : null;
 
   try {
     const result = await pool.query(
@@ -73,8 +73,10 @@ router.post("/academic-results/insert", upload.single("Results_Attachment"), asy
 
 router.put("/academic-results/update/:id", upload.single("Results_Attachment"), async (req, res) => {
   const { Results_Module, Results_Percentage } = req.body;
-  const fileBuffer = req.file?.buffer;
-  const fileName = req.file?.originalname;
+  // const fileBuffer = req.file?.buffer;
+  // const fileName = req.file?.originalname;
+  const fileBuffer = req.file ? req.file.buffer : null;
+  const fileName = req.file ? req.file.originalname : null;
 
   try {
     let query, values;

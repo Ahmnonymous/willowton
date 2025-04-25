@@ -61,8 +61,8 @@ router.post("/voluntary-service/insert", upload.single("Proof_of_Service"), asyn
     Student_Details_Portal_id
   } = req.body;
 
-  const fileBuffer = req.file.buffer || null;
-  const fileName = req.file?.originalname || null;
+  const fileBuffer = req.file ? req.file.buffer : null;
+  const fileName = req.file ? req.file.originalname : null;
 
   try {
     const result = await pool.query(

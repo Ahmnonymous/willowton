@@ -31,7 +31,7 @@ import {
 } from "../../components/lov"; // Import LOVs
 import { ThemeContext } from '../../config/ThemeContext';  // Import ThemeContext
 
-const StudentDetailDrawer = ({ open, onClose, studentId, onSave }) => {
+const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => {
   const { isDarkMode } = useContext(ThemeContext);  // Access theme context
   // Check for larger or smaller screen size
   const isLargeScreen = useMediaQuery("(min-width:600px)");
@@ -180,19 +180,46 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave }) => {
     setDeleteConfirmationOpen(true); // Open the dialog
   };
 
+  // const handleDeleteConfirm = async () => {
+  //   if (!studentId) return;
+
+  //   try {
+  //     const response = await fetch(
+  //       `https://willowtonbursary.co.za/api/student-details/delete/${studentId}`,
+  //       { method: "DELETE" }
+  //     );
+
+  //     if (response.ok) {
+  //       onSave(null);
+  //       onClose();
+  //       setDeleteConfirmationOpen(false); // Close the confirmation dialog
+  //     } else {
+  //       console.error("Failed to delete student");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error deleting student:", error);
+  //   }
+  // };
+
   const handleDeleteConfirm = async () => {
     if (!studentId) return;
-
+  
     try {
       const response = await fetch(
         `https://willowtonbursary.co.za/api/student-details/delete/${studentId}`,
         { method: "DELETE" }
       );
-
+  
       if (response.ok) {
-        onSave(null);
+        // Inform parent component that the student was deleted by passing `null` as the saved student
+        // onSave(null); // This will update the student data in the parent component
+        onDelete(studentId);
+  
+        // Close the drawer
         onClose();
-        setDeleteConfirmationOpen(false); // Close the confirmation dialog
+  
+        // Close the confirmation dialog
+        setDeleteConfirmationOpen(false);
       } else {
         console.error("Failed to delete student");
       }
@@ -201,6 +228,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave }) => {
     }
   };
 
+  
   const handleDeleteCancel = () => {
     setDeleteConfirmationOpen(false); // Close the confirmation dialog
   };

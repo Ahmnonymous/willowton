@@ -27,7 +27,7 @@ import ExpenseDetailsDrawer from './Drawer/ExpenseDetailsDrawer';
 import AssetsLiabilitiesDrawer from './Drawer/AssetsLiabilitiesDrawer';
 import AcademicResultsDrawer from './Drawer/AcademicResultsDrawer';
 import VoluntaryServiceDrawer from './Drawer/VoluntaryServiceDrawer';
-import PaymentDrawer from './Drawer/PaymentDrawer';  
+import PaymentDrawer from './Drawer/PaymentDrawer';
 import InterviewDrawer from './Drawer/InterviewDrawer';
 import { ThemeContext } from '../config/ThemeContext'; // Import ThemeContext
 
@@ -75,12 +75,12 @@ const StudentDetails = () => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));  // Get the user object from local storage
       const userId = user.user_id;  // Get the user ID from the logged-in user
-  
+
       // If user is an admin, fetch all student details
       let response;
       if (user.user_type === 'admin') {
         response = await fetch("https://willowtonbursary.co.za/api/student-details");
-      } 
+      }
       // If user is a student, fetch their specific student details
       else if (user.user_type === 'student' && userId) {
         response = await fetch(`https://willowtonbursary.co.za/api/student-detail/${userId}`);
@@ -88,21 +88,21 @@ const StudentDetails = () => {
         console.error("User type is neither admin nor student or user ID is missing");
         return [];
       }
-  
+
       const data = await response.json();
-      if(data){
-      setStudentDetails(data);  // Set the student details state
-      setSelectedStudent(data);
-      setSelectedStudentid(data.id);
+      if (data) {
+        setStudentDetails(data);  // Set the student details state
+        setSelectedStudent(data);
+        setSelectedStudentid(data.id);
       }
       // console.log(data);
       return data;
-  
+
     } catch (error) {
       console.error("Error fetching student details:", error);
       return [];
     }
-  }, []);  
+  }, []);
 
   const isStudentWithNoData = isStudent && !selectedStudent;
   const isUserWithData = (isAdmin || isStudent) && selectedStudent;
@@ -219,95 +219,6 @@ const StudentDetails = () => {
 
   const handleTabChange = (event, newValue) => setTabValue(newValue);
 
-  // const renderDrawer = () => (
-  //   <DrawerForm
-  //     open={drawerOpen}
-  //     onClose={() => setDrawerOpen(false)}
-  //     studentId={selectedStudentid}
-  //     onSave={(savedStudent) => {
-  //       fetchStudentDetails().then((updatedList) => {
-  //         if (savedStudent?.id) {
-  //           setSelectedStudentid(savedStudent.id);
-  //           setSelectedStudent(savedStudent);
-  //         } else {
-  //           if (updatedList.length > 0) {
-  //             setSelectedStudent(updatedList[0]);
-  //             setSelectedStudentid(updatedList[0].id);
-  //           } else {
-  //             setSelectedStudent(null);
-  //             setSelectedStudentid(null);
-  //           }
-  //         }
-  //       });
-  //       setDrawerOpen(false);
-  //     }}
-  //   />
-  // );
-  // const renderDrawer = () => (
-  //   <DrawerForm
-  //     open={drawerOpen}
-  //     onClose={() => setDrawerOpen(false)}
-  //     studentId={selectedStudentid}
-  //     onSave={(savedStudent) => {
-  //       console.log("Saving student data...");
-  
-  //       // Fetch updated student details after saving
-  //       fetchStudentDetails().then((updatedList) => {
-  //         console.log("Fetched updated student details after save");
-  
-  //         if (savedStudent?.id) {
-  //           console.log("Saved student has ID");
-  
-  //           // If savedStudent has an ID, update selectedStudent with the saved data
-  //           setSelectedStudentid(savedStudent.id);
-  //           setSelectedStudent(savedStudent);
-  
-  //           console.log("Updated selected student");
-  //         } else {
-  //           // If no savedStudent, check the updated list and set the first student (if any)
-  //           if (updatedList.length > 0) {
-  //             console.log("No savedStudent, but updated list available. Setting first student");
-  //             setSelectedStudent(updatedList[0]);
-  //             setSelectedStudentid(updatedList[0].id);
-  //           } else {
-  //             // If the list is empty, reset the selectedStudent and selectedStudentid
-  //             console.log("No students found in the updated list. Resetting selected student.");
-  //             setSelectedStudent(null);
-  //             setSelectedStudentid(null);
-  //           }
-  //         }
-  //       });
-  
-  //       // Close the drawer after saving
-  //       console.log("Closing drawer after save.");
-  //       setDrawerOpen(false);
-  //     }}
-  //     onDelete={() => {
-  //       console.log("Deleting student...");
-  
-  //       // Fetch updated student details after deleting
-  //       fetchStudentDetails().then((updatedList) => {
-  //         console.log("Fetched updated student details after delete");
-  
-  //         if (updatedList.length > 0) {
-  //           // Set the first student from the updated list as selectedStudent
-  //           console.log("Updated list available. Setting first student.");
-  //           setSelectedStudent(updatedList[0]);
-  //           setSelectedStudentid(updatedList[0].id);
-  //         } else {
-  //           // No students left, reset selectedStudent and selectedStudentid
-  //           console.log("No students found in the updated list after deletion. Resetting selected student.");
-  //           setSelectedStudent(null);
-  //           setSelectedStudentid(null);
-  //         }
-  //       });
-  
-  //       // Close the drawer after deletion
-  //       console.log("Closing drawer after delete.");
-  //       setDrawerOpen(false);
-  //     }}
-  //   />
-  // );
   const renderDrawer = () => (
     <DrawerForm
       open={drawerOpen}
@@ -315,18 +226,18 @@ const StudentDetails = () => {
       studentId={selectedStudentid}
       onSave={(savedStudent) => {
         console.log("Saving student data...");
-  
+
         // Fetch updated student details after saving
         fetchStudentDetails().then((updatedList) => {
           console.log("Fetched updated student details after save");
-  
+
           if (savedStudent?.id) {
             console.log("Saved student has ID");
-  
+
             // If savedStudent has an ID, update selectedStudent with the saved data
             setSelectedStudentid(savedStudent.id);
             setSelectedStudent(savedStudent);
-  
+
             console.log("Updated selected student");
           } else {
             // If no savedStudent, check the updated list and set the first student (if any)
@@ -342,18 +253,18 @@ const StudentDetails = () => {
             }
           }
         });
-  
+
         // Close the drawer after saving
         console.log("Closing drawer after save.");
         setDrawerOpen(false);
       }}
       onDelete={() => {
         console.log("Deleting student...");
-  
-        // Here, we perform the delete logic and then fetch the updated student list
+
+        // Fetch updated student details after deleting
         fetchStudentDetails().then((updatedList) => {
           console.log("Fetched updated student details after delete");
-  
+
           if (updatedList.length > 0) {
             // Set the first student from the updated list as selectedStudent
             console.log("Updated list available. Setting first student.");
@@ -366,15 +277,13 @@ const StudentDetails = () => {
             setSelectedStudentid(null);
           }
         });
-  
+
         // Close the drawer after deletion
         console.log("Closing drawer after delete.");
         setDrawerOpen(false);
       }}
     />
   );
-  
-  
 
   const tabSections = [
     { label: "Show all", key: "show_all" },
@@ -452,7 +361,7 @@ const StudentDetails = () => {
 
     const isAboutMe = sectionKey === "about-me";
     const isParents = sectionKey === "parents-details";
-    const isUniversityDetails = sectionKey === "university-details";  
+    const isUniversityDetails = sectionKey === "university-details";
     const isAttachments = sectionKey === "attachments";
     const isExpenses = sectionKey === "expenses-summary";
     const isAssetsLiabilities = sectionKey === "assets-liabilities";
@@ -462,63 +371,63 @@ const StudentDetails = () => {
     const isInterview = sectionKey === "interviews";
 
     return (
-      
+
       <Box sx={{ padding: 0, border: '1px solid #ccc', marginBottom: 2, backgroundColor: isDarkMode ? '#1e293b' : 'white', color: pageStyle.color }}>
-        <Box sx={{ padding: 1,display: 'flex', alignItems: 'center', marginBottom: 0.5, borderBottom: 1, borderBottomColor: '#ccc', height: 40,backgroundColor: isDarkMode ? '#1e293b' : '#e1f5fe' }}>
+        <Box sx={{ padding: 1, display: 'flex', alignItems: 'center', marginBottom: 0.5, borderBottom: 1, borderBottomColor: '#ccc', height: 40, backgroundColor: isDarkMode ? '#1e293b' : '#e1f5fe' }}>
           <Typography variant="h6" sx={{ fontWeight: 'bold', marginLeft: 1 }}>
             {capitalizeWords(sectionKey === "expenses-summary" ? "financial-details" : sectionKey)}
           </Typography>
 
-          { isSelectedStudent && (isAboutMe || isParents || isUniversityDetails || isAttachments || isExpenses 
-          || isAssetsLiabilities || isAcademicResults || isVoluntaryServices || isPayments || isInterview) && (
-            <Button
-              sx={{ marginLeft: 'auto', color: isDarkMode ? 'white': 'black' }}
-              onClick={() => {
-                if (isAboutMe) {
-                  setEditingAboutMeId(null);
-                  setAboutMeDrawerOpen(true);
-                }
-                if (isParents) {
-                  setEditingParentId(null);
-                  setParentsDrawerOpen(true);
-                }
-                if (isUniversityDetails) {
-                  setEditingUniversityId(null);  // Reset the ID for university details
-                  setUniversityDetailsDrawerOpen(true);  // Open the university details drawer
-                }
-                if (isAttachments) {
-                  setEditingAttachmentId(null);
-                  setAttachmentsDrawerOpen(true);
-                }     
-                if (isExpenses) {
-                  setEditingExpenseDetailsId(null);
-                  setExpensesSummaryDrawerOpen(true);
-                }     
-                if (isAssetsLiabilities) {
-                  setEditingAssetLiabilityId(null);
-                  setAssetsLiabilitiesDrawerOpen(true);
-                }    
-                if (isAcademicResults) {
-                  setEditingAcademicResultId(null);
-                  setAcademicResultsDrawerOpen(true);
-                }        
-                if (isVoluntaryServices) {
-                  setEditingVoluntaryServiceId(null);
-                  setVoluntaryServiceDrawerOpen(true);
-                }        
-                if (isPayments) {
-                  setEditingPaymentId(null);
-                  setPaymentDrawerOpen(true);
-                }    
-                if (isInterview) {
-                  setEditingInterviewId(null);
-                  setInterviewDrawerOpen(true);
-                }         
-              }}
-            >
-              <AddIcon fontSize="small" />
-            </Button>
-          )}
+          {isSelectedStudent && (isAboutMe || isParents || isUniversityDetails || isAttachments || isExpenses
+            || isAssetsLiabilities || isAcademicResults || isVoluntaryServices || isPayments || isInterview) && (
+              <Button
+                sx={{ marginLeft: 'auto', color: isDarkMode ? 'white' : 'black' }}
+                onClick={() => {
+                  if (isAboutMe) {
+                    setEditingAboutMeId(null);
+                    setAboutMeDrawerOpen(true);
+                  }
+                  if (isParents) {
+                    setEditingParentId(null);
+                    setParentsDrawerOpen(true);
+                  }
+                  if (isUniversityDetails) {
+                    setEditingUniversityId(null);  // Reset the ID for university details
+                    setUniversityDetailsDrawerOpen(true);  // Open the university details drawer
+                  }
+                  if (isAttachments) {
+                    setEditingAttachmentId(null);
+                    setAttachmentsDrawerOpen(true);
+                  }
+                  if (isExpenses) {
+                    setEditingExpenseDetailsId(null);
+                    setExpensesSummaryDrawerOpen(true);
+                  }
+                  if (isAssetsLiabilities) {
+                    setEditingAssetLiabilityId(null);
+                    setAssetsLiabilitiesDrawerOpen(true);
+                  }
+                  if (isAcademicResults) {
+                    setEditingAcademicResultId(null);
+                    setAcademicResultsDrawerOpen(true);
+                  }
+                  if (isVoluntaryServices) {
+                    setEditingVoluntaryServiceId(null);
+                    setVoluntaryServiceDrawerOpen(true);
+                  }
+                  if (isPayments) {
+                    setEditingPaymentId(null);
+                    setPaymentDrawerOpen(true);
+                  }
+                  if (isInterview) {
+                    setEditingInterviewId(null);
+                    setInterviewDrawerOpen(true);
+                  }
+                }}
+              >
+                <AddIcon fontSize="small" />
+              </Button>
+            )}
         </Box>
 
         {data.length > 0 && (
@@ -529,16 +438,16 @@ const StudentDetails = () => {
                 {Object.keys(data[0])
                   .filter(field => field !== "id" && field !== "student_details_portal_id")
                   .map((field, idx) => (
-                    <TableCell key={idx} 
-                    sx={{
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      maxWidth: 300,
-                      fontWeight: 'bold',
-                      textTransform: 'capitalize',
-                      color: isDarkMode ? 'white': 'black'
-                    }}>
+                    <TableCell key={idx}
+                      sx={{
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        maxWidth: 300,
+                        fontWeight: 'bold',
+                        textTransform: 'capitalize',
+                        color: isDarkMode ? 'white' : 'black'
+                      }}>
                       {capitalizeWords(field.replace(/_/g, " "))}
                     </TableCell>
                   ))}
@@ -548,63 +457,63 @@ const StudentDetails = () => {
               {data.map((row, i) => (
                 <TableRow key={i}>
                   <TableCell sx={{ width: '50px' }}>
-                    {(isAboutMe || isParents || isUniversityDetails || isAttachments || isExpenses 
-                    || isAssetsLiabilities || isAcademicResults || isVoluntaryServices || isPayments || isInterview) && (
-                      <EditIcon
-                        sx={{ cursor: 'pointer', fontSize: 'large',color: isDarkMode ? 'white': 'black' }}
-                        onClick={() => {
-                          if (isAboutMe) {
-                            setEditingAboutMeId(row.id);
-                            setAboutMeDrawerOpen(true);
-                          }
-                          if (isParents) {
-                            setEditingParentId(row.id);
-                            setParentsDrawerOpen(true);
-                          }
-                          if (isUniversityDetails) {
-                            setEditingUniversityId(row.id);  // Set the university ID for editing
-                            setUniversityDetailsDrawerOpen(true);  // Open the university details drawer
-                          }
-                          if (isAttachments) {
-                            setEditingAttachmentId(row.id);
-                            setAttachmentsDrawerOpen(true);
-                          }    
-                          if (isExpenses) {
-                            setEditingExpenseDetailsId(row.id);
-                            setExpensesSummaryDrawerOpen(true);
-                          }  
-                          if (isAssetsLiabilities) {
-                            setEditingAssetLiabilityId(row.id);
-                            setAssetsLiabilitiesDrawerOpen(true);
-                          }          
-                          if (isAcademicResults) {
-                            setEditingAcademicResultId(row.id);
-                            setAcademicResultsDrawerOpen(true);
-                          }    
-                          if (isVoluntaryServices) {
-                            setEditingVoluntaryServiceId(row.id);
-                            setVoluntaryServiceDrawerOpen(true);
-                          }   
-                          if (isPayments) {
-                            setEditingPaymentId(row.id);
-                            setPaymentDrawerOpen(true);
-                          }           
-                          if (isInterview) {
-                            setEditingInterviewId(row.id);
-                            setInterviewDrawerOpen(true);
-                          }                                                 
-                        }}
-                      />
-                    )}
+                    {(isAboutMe || isParents || isUniversityDetails || isAttachments || isExpenses
+                      || isAssetsLiabilities || isAcademicResults || isVoluntaryServices || isPayments || isInterview) && (
+                        <EditIcon
+                          sx={{ cursor: 'pointer', fontSize: 'large', color: isDarkMode ? 'white' : 'black' }}
+                          onClick={() => {
+                            if (isAboutMe) {
+                              setEditingAboutMeId(row.id);
+                              setAboutMeDrawerOpen(true);
+                            }
+                            if (isParents) {
+                              setEditingParentId(row.id);
+                              setParentsDrawerOpen(true);
+                            }
+                            if (isUniversityDetails) {
+                              setEditingUniversityId(row.id);  // Set the university ID for editing
+                              setUniversityDetailsDrawerOpen(true);  // Open the university details drawer
+                            }
+                            if (isAttachments) {
+                              setEditingAttachmentId(row.id);
+                              setAttachmentsDrawerOpen(true);
+                            }
+                            if (isExpenses) {
+                              setEditingExpenseDetailsId(row.id);
+                              setExpensesSummaryDrawerOpen(true);
+                            }
+                            if (isAssetsLiabilities) {
+                              setEditingAssetLiabilityId(row.id);
+                              setAssetsLiabilitiesDrawerOpen(true);
+                            }
+                            if (isAcademicResults) {
+                              setEditingAcademicResultId(row.id);
+                              setAcademicResultsDrawerOpen(true);
+                            }
+                            if (isVoluntaryServices) {
+                              setEditingVoluntaryServiceId(row.id);
+                              setVoluntaryServiceDrawerOpen(true);
+                            }
+                            if (isPayments) {
+                              setEditingPaymentId(row.id);
+                              setPaymentDrawerOpen(true);
+                            }
+                            if (isInterview) {
+                              setEditingInterviewId(row.id);
+                              setInterviewDrawerOpen(true);
+                            }
+                          }}
+                        />
+                      )}
                   </TableCell>
                   {Object.entries(row).map(([key, val], j) =>
                     key !== "id" && key !== "student_details_portal_id" && (
-                      <TableCell key={j} sx={{ color: isDarkMode ? 'white': 'black' }}>
+                      <TableCell key={j} sx={{ color: isDarkMode ? 'white' : 'black' }}>
                         {typeof val === 'object' && val !== null
                           ? (key.toLowerCase().includes("attachment") || key.toLowerCase().includes("proof_of_service")
-                          || key.toLowerCase().includes("proof_of_payment")
-                          ? "📎 File attached"
-                          : JSON.stringify(val))
+                            || key.toLowerCase().includes("proof_of_payment")
+                            ? "📎 File attached"
+                            : JSON.stringify(val))
                           : val
                         }
                       </TableCell>
@@ -616,7 +525,7 @@ const StudentDetails = () => {
           </Table>
         )}
       </Box>
-    // )};
+      // )};
     );
   };
 
@@ -632,9 +541,9 @@ const StudentDetails = () => {
   };
 
   return (
-    <div> 
+    <div>
       {/* style={{ backgroundColor: pageStyle.backgroundColor, color: pageStyle.color }}> */}
-      <Box sx={{ padding: "12px", backgroundColor: isDarkMode ? '#1e293b' : '#e1f5fe' , borderRadius: "8px", marginBottom: "12px", display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid #ccc' }}>
+      <Box sx={{ padding: "12px", backgroundColor: isDarkMode ? '#1e293b' : '#e1f5fe', borderRadius: "8px", marginBottom: "12px", display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid #ccc' }}>
         <Typography variant="h6" sx={{ fontWeight: "bold", color: isDarkMode ? 'white' : 'black' }}>Student Details</Typography>
 
         {isStudentWithNoData && (
@@ -661,132 +570,132 @@ const StudentDetails = () => {
 
 
       <Grid container spacing={3}>
-  {/* Sidebar */}
-  {isAdmin && (
-    <Grid item xs={12} sm={3} md={2}>
-      <Paper sx={{ border: '1px solid #ccc', backgroundColor: isDarkMode ? '#1e293b' : 'white' , color: pageStyle.color }}>
-        <Box sx={{ backgroundColor: isDarkMode ? '#1e293b' : '#e1f5fe', padding: "6px", borderBottom: isDarkMode ? '1px solid white' : '1px solid #ccc' }}>
-          <Typography variant="h6" sx={{ fontWeight: "bold",color: isDarkMode ? 'white': '#1e293b', marginLeft: 1 }}>Search</Typography>
-        </Box>
-        <Box sx={{ padding: 2 }}>
-          <TextField
-            label="Search"
-            variant="outlined"
-            fullWidth
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            sx={{
-              mb: 1,
-              borderRadius: 1,
-              '& .MuiOutlinedInput-root': {
-                backgroundColor: isDarkMode ? '#1e293b' : 'white',
-                '& fieldset': {
-                  borderColor: isDarkMode ? 'white' : '#1e293b',
-                },
-                '&:hover fieldset': {
-                  borderColor: isDarkMode ? 'white' : '#1e293b',
-                },
-                '&.Mui-focused fieldset': {
-                  borderColor: isDarkMode ? 'white' : '#1e293b',
-                },
-              },
-              '& .MuiInputBase-input': {
-                color: isDarkMode ? 'white' : '#1e293b',
-              },
-              '& .MuiInputBase-input::placeholder': {
-                color: isDarkMode ? '#B0B0B0' : '#666',
-              }
-            }}
-            placeholder="Search"
-            InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-          />
-          <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
-            {studentDetails
-              .filter((s) =>
-                s.student_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                s.student_surname.toLowerCase().includes(searchQuery.toLowerCase())
-              )
-              .map((student, idx) => (
-                <Card
-                  key={idx}
+        {/* Sidebar */}
+        {isAdmin && (
+          <Grid item xs={12} sm={3} md={2}>
+            <Paper sx={{ border: '1px solid #ccc', backgroundColor: isDarkMode ? '#1e293b' : 'white', color: pageStyle.color }}>
+              <Box sx={{ backgroundColor: isDarkMode ? '#1e293b' : '#e1f5fe', padding: "6px", borderBottom: isDarkMode ? '1px solid white' : '1px solid #ccc' }}>
+                <Typography variant="h6" sx={{ fontWeight: "bold", color: isDarkMode ? 'white' : '#1e293b', marginLeft: 1 }}>Search</Typography>
+              </Box>
+              <Box sx={{ padding: 2 }}>
+                <TextField
+                  label="Search"
+                  variant="outlined"
+                  fullWidth
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   sx={{
-                    mb: 0.5,
-                    boxShadow: 0,
-                    height: 55,
-                    cursor: "pointer",
-                    backgroundColor: selectedStudent?.id === student.id ? (isDarkMode ? 'white' : '#1e293b') : 'transparent',
-                    color: selectedStudent?.id === student.id ? (isDarkMode ? '#1e293b' : 'white') : "inherit",
-                    "&:hover": {
-                      backgroundColor: isDarkMode ? 'white' : '#1e293b',
-                      color: isDarkMode ? '#1e293b' : 'white',
+                    mb: 1,
+                    borderRadius: 1,
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: isDarkMode ? '#1e293b' : 'white',
+                      '& fieldset': {
+                        borderColor: isDarkMode ? 'white' : '#1e293b',
+                      },
+                      '&:hover fieldset': {
+                        borderColor: isDarkMode ? 'white' : '#1e293b',
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: isDarkMode ? 'white' : '#1e293b',
+                      },
+                    },
+                    '& .MuiInputBase-input': {
+                      color: isDarkMode ? 'white' : '#1e293b',
+                    },
+                    '& .MuiInputBase-input::placeholder': {
+                      color: isDarkMode ? '#B0B0B0' : '#666',
                     }
                   }}
+                  placeholder="Search"
+                  InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                />
+                <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                  {studentDetails
+                    .filter((s) =>
+                      s.student_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                      s.student_surname.toLowerCase().includes(searchQuery.toLowerCase())
+                    )
+                    .map((student, idx) => (
+                      <Card
+                        key={idx}
+                        sx={{
+                          mb: 0.5,
+                          boxShadow: 0,
+                          height: 55,
+                          cursor: "pointer",
+                          backgroundColor: selectedStudent?.id === student.id ? (isDarkMode ? 'white' : '#1e293b') : 'transparent',
+                          color: selectedStudent?.id === student.id ? (isDarkMode ? '#1e293b' : 'white') : "inherit",
+                          "&:hover": {
+                            backgroundColor: isDarkMode ? 'white' : '#1e293b',
+                            color: isDarkMode ? '#1e293b' : 'white',
+                          }
+                        }}
+                        onClick={() => {
+                          setSelectedStudent(student);
+                          setSelectedStudentid(student.id);
+                        }}
+                      >
+                        <CardContent sx={{ padding: "10px" }}>
+                          <Typography variant="body1" sx={{ fontWeight: "bold" }}>{student.student_name}</Typography>
+                          <Typography variant="body2">{student.student_surname}</Typography>
+                        </CardContent>
+                      </Card>
+                    ))}
+                </div>
+              </Box>
+            </Paper>
+          </Grid>
+        )}
+
+        {/* Right Panel */}
+        <Grid item xs={12} sm={9} md={isStudent ? 12 : 10}>
+          <Paper sx={{ border: '1px solid #ccc', backgroundColor: isDarkMode ? '#1e293b' : 'white', color: pageStyle.color }}>
+            <Box sx={{ backgroundColor: isDarkMode ? '#1e293b' : '#e1f5fe', borderBottom: isDarkMode ? '1px solid white' : '1px solid #ccc', padding: "6px", display: 'flex', justifyContent: 'space-between' }}>
+              <Typography variant="h6" sx={{ fontWeight: "bold", color: isDarkMode ? 'white' : '#1e293b', marginLeft: 1 }}>Student Details Portal</Typography>
+
+              {isUserWithData && (
+                <Button
+                  variant="contained"
                   onClick={() => {
-                    setSelectedStudent(student);
-                    setSelectedStudentid(student.id);
+                    setDrawerOpen(false);
+                    setTimeout(() => setDrawerOpen(true), 50);
+                    setSelectedStudentid(selectedStudent?.id);
+                  }}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    backgroundColor: isDarkMode ? 'white' : 'black',
+                    color: isDarkMode ? 'black' : 'white',
+                    padding: '2px 6px',
+                    textTransform: 'none',
                   }}
                 >
-                  <CardContent sx={{ padding: "10px" }}>
-                    <Typography variant="body1" sx={{ fontWeight: "bold" }}>{student.student_name}</Typography>
-                    <Typography variant="body2">{student.student_surname}</Typography>
-                  </CardContent>
-                </Card>
-              ))}
-          </div>
-        </Box>
-      </Paper>
-    </Grid>
-  )}
+                  <EditIcon sx={{ marginRight: 1, fontSize: 'small' }} />
+                  Edit
+                </Button>
+              )}
+            </Box>
 
-  {/* Right Panel */}
-  <Grid item xs={12} sm={9} md={isStudent ? 12 : 10}>
-    <Paper sx={{ border: '1px solid #ccc', backgroundColor: isDarkMode ? '#1e293b' : 'white', color: pageStyle.color }}>
-      <Box sx={{ backgroundColor: isDarkMode ? '#1e293b' : '#e1f5fe', borderBottom: isDarkMode ? '1px solid white' : '1px solid #ccc', padding: "6px", display: 'flex', justifyContent: 'space-between' }}>
-        <Typography variant="h6" sx={{ fontWeight: "bold", color: isDarkMode ? 'white' : '#1e293b', marginLeft: 1 }}>Student Details Portal</Typography>
-      
-      {isUserWithData && (  
-        <Button
-          variant="contained"
-          onClick={() => {
-            setDrawerOpen(false);
-            setTimeout(() => setDrawerOpen(true), 50);
-            setSelectedStudentid(selectedStudent?.id);
-          }}
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            backgroundColor: isDarkMode ? 'white' : 'black',
-            color: isDarkMode ? 'black' : 'white',
-            padding: '2px 6px',
-            textTransform: 'none',
-          }}
-        >
-          <EditIcon sx={{ marginRight: 1, fontSize: 'small' }} />
-          Edit 
-        </Button>
-      )}
-      </Box>
-
-      {selectedStudent ? (
-        <Box sx={{ padding: 1.5 }}>
-          <Grid container spacing={1}>
-            {Object.entries(selectedStudent).map(([key, value], i) => (
-              key !== "id" && key !== "user_id" && (
-                <React.Fragment key={i}>
-                  <Grid item xs={6} sx={{ borderBottom: '1px solid #ccc', pb: '6px' }}>
-                    <Typography variant="body1"><strong>{capitalizeWords(key.replace(/_/g, " "))}</strong></Typography>
-                  </Grid>
-                  <Grid item xs={6} sx={{ borderBottom: '1px solid #ccc', pb: '6px' }}>
-                    <Typography variant="body1">{value}</Typography>
-                  </Grid>
-                </React.Fragment>
-              )
-            ))}
-          </Grid>
-        </Box>
-      ) : (
-        <Typography variant="body1" sx={{ m: 2, fontWeight: 'bold' }}>No Record Selected</Typography>
-      )}
+            {selectedStudent ? (
+              <Box sx={{ padding: 1.5 }}>
+                <Grid container spacing={1}>
+                  {Object.entries(selectedStudent).map(([key, value], i) => (
+                    key !== "id" && key !== "user_id" && (
+                      <React.Fragment key={i}>
+                        <Grid item xs={6} sx={{ borderBottom: '1px solid #ccc', pb: '6px' }}>
+                          <Typography variant="body1"><strong>{capitalizeWords(key.replace(/_/g, " "))}</strong></Typography>
+                        </Grid>
+                        <Grid item xs={6} sx={{ borderBottom: '1px solid #ccc', pb: '6px' }}>
+                          <Typography variant="body1">{value}</Typography>
+                        </Grid>
+                      </React.Fragment>
+                    )
+                  ))}
+                </Grid>
+              </Box>
+            ) : (
+              <Typography variant="body1" sx={{ m: 2, fontWeight: 'bold' }}>No Record Selected</Typography>
+            )}
 
             <Box sx={{ p: 1, overflowX: 'auto' }}>
               <Tabs

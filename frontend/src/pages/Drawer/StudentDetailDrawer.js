@@ -428,11 +428,11 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                 );
               }
 
-              if (formData.student_willow_relationship !== "Yes" &&
-                ['student_willow_relationship', 'student_relationship_type', 'student_employee_name',
-                  'student_employee_designation', 'student_employee_branch', 'student_employee_number'].includes(key)) {
-                return null;  // Don't render the field if the condition is not met
-              }
+              // if (formData.student_willow_relationship !== "Yes" &&
+              //   ['student_willow_relationship', 'student_relationship_type', 'student_employee_name',
+              //     'student_employee_designation', 'student_employee_branch', 'student_employee_number'].includes(key)) {
+              //   return null;  // Don't render the field if the condition is not met
+              // }
 
               // {formData.student_willow_relationship === "Yes" && renderWillowRelationshipFields()}
 

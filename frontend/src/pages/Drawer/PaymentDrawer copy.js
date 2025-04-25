@@ -242,26 +242,44 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
                 InputLabelProps={{ style: { color: isDarkMode ? '#F7FAFC' : '#1E293B' } }}
               />
             </Grid> */}
-            <Grid item xs={12}>
-              <TextField
+        <Grid item xs={12}>
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+              <DatePicker
                 label="Date"
-                name="Payments_Date"
-                type="date"
-                fullWidth
-                value={formData.Payments_Date || ""}
-                onChange={handleChange}
-                sx={{
-                  backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                  color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                  borderRadius: '8px',
-                  '& .MuiInputBase-input': {
-                    color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                  }
+                value={selectedDate}
+                onChange={handleDateChange}
+                inputFormat="dd/MM/yyyy"  // Date format
+                PopperProps={{
+                  modifiers: [
+                    {
+                      name: 'offset',
+                      options: {
+                        offset: [0, 10], // Adjust offset to make sure it doesn't overlap
+                      },
+                    },
+                  ],
                 }}
-                InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    fullWidth
+                    sx={{
+                      backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                      color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                      borderRadius: '8px',
+                      '& .MuiInputBase-input': {
+                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                      },
+                    }}
+                    InputLabelProps={{
+                      style: { color: isDarkMode ? '#F7FAFC' : '#1E293B' },
+                    }}
+                  />
+                )}
               />
-            </Grid>            
-            <Grid item xs={12}>
+            </LocalizationProvider>
+          </Grid>
+                      <Grid item xs={12}>
               <TextField
                 label="ET Number"
                 name="Payments_ET_Number"

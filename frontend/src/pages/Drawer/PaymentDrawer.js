@@ -233,43 +233,77 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
               />
             </Grid>    
             {/* Date Picker Field */}
-            <Grid item xs={12}>
-  <LocalizationProvider dateAdapter={AdapterDateFns}>
-    <DatePicker
-      label="Date"
-      value={selectedDate}
-      onChange={handleDateChange}
-      inputFormat="dd/MM/yyyy"  // Date format
-      PopperProps={{
-        modifiers: [
-          {
-            name: 'offset',
-            options: {
-              offset: [0, 10], // Adjust offset to make sure it doesn't overlap
+            {/* <Grid item xs={12}>
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <DatePicker
+                  label="Date"
+                  value={selectedDate}
+                  onChange={handleDateChange}
+                  format="dd/MM/yyyy"
+                  slots={{
+                    textField: (params) => (
+                      <TextField
+                        {...params}
+                        fullWidth
+                        sx={{
+                          backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                          borderRadius: '8px',
+                          '& .MuiInputBase-input': {
+                            color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                          }
+                        }}
+                        InputLabelProps={{ style: { color: isDarkMode ? '#F7FAFC' : '#1E293B' } }}
+                      />
+                    )
+                  }}
+                />
+              </LocalizationProvider>
+            </Grid> */}
+<Grid container spacing={2}>
+  <Grid item xs={12}>
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <DatePicker
+        label="Payments Date"
+        value={selectedDate}
+        onChange={handleDateChange}
+        inputFormat="dd/MM/yyyy"
+        PopperProps={{
+          modifiers: [
+            {
+              name: 'offset',
+              options: {
+                offset: [0, 10],
+              },
             },
-          },
-        ],
-      }}
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          fullWidth
-          sx={{
-            backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-            color: isDarkMode ? '#F7FAFC' : '#1E293B',
-            borderRadius: '8px',
-            '& .MuiInputBase-input': {
+          ],
+        }}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            fullWidth
+            sx={{
+              backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
               color: isDarkMode ? '#F7FAFC' : '#1E293B',
-            },
-          }}
-          InputLabelProps={{
-            style: { color: isDarkMode ? '#F7FAFC' : '#1E293B' },
-          }}
-        />
-      )}
-    />
-  </LocalizationProvider>
+              borderRadius: '8px',
+              '& .MuiInputBase-input': {
+                color: isDarkMode ? '#F7FAFC' : '#1E293B',
+              },
+              // Ensure the input takes full width
+              '& .MuiInputBase-root': {
+                width: '100%',
+              },
+            }}
+            InputLabelProps={{
+              style: { color: isDarkMode ? '#F7FAFC' : '#1E293B' },
+            }}
+          />
+        )}
+      />
+    </LocalizationProvider>
+  </Grid>
 </Grid>
+
 
             <Grid item xs={12}>
               <TextField

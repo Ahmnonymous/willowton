@@ -83,7 +83,7 @@ const StudentDetails = () => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
       const userId = user.user_id;
-      
+  
       let response;
       if (user.user_type === 'admin') {
         response = await fetch("https://willowtonbursary.co.za/api/student-details");
@@ -91,34 +91,33 @@ const StudentDetails = () => {
         response = await fetch(`https://willowtonbursary.co.za/api/student-detail/${userId}`);
       } else {
         console.error("User type is neither admin nor student or user ID is missing");
-        return [];
+        return {};
       }
-      
+  
       const data = await response.json();
       if (data) {
-        // Dynamically format date fields
-        const formattedData = data.map(student => {
-          const updatedStudent = { ...student };
-          Object.keys(updatedStudent).forEach((key) => {
-            if (key.toLowerCase().includes('date_stamp')) {
-              updatedStudent[key] = formatDate(updatedStudent[key]);
-            }
-          });
-          return updatedStudent;
+        // Dynamically format date fields (check if date_stamp exists)
+        const updatedStudent = { ...data };  // Copy the data to avoid mutation
+        Object.keys(updatedStudent).forEach((key) => {
+          if (key.toLowerCase().includes('date_stamp')) {
+            updatedStudent[key] = formatDate(updatedStudent[key]);  // Format the date
+          }
         });
-        setStudentDetails(formattedData);
-        setSelectedStudent(formattedData[0]);
-        setSelectedStudentid(formattedData[0].id);
+  
+        // Update the state with the formatted student data
+        setStudentDetails([updatedStudent]); // Store it as an array with one element
+        setSelectedStudent(updatedStudent);
+        setSelectedStudentid(updatedStudent.id);
       }
   
       return data;
   
     } catch (error) {
       console.error("Error fetching student details:", error);
-      return [];
+      return {};
     }
-  }, []);  
-
+  }, []);
+  
   const handleDeleteStudent = async (studentId) => {
     // console.log("Student deleted successfully!");
 

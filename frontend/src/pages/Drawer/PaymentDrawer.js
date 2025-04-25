@@ -260,7 +260,7 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
                 />
               </LocalizationProvider>
             </Grid> */}
-<Grid container spacing={2}>
+{/* <Grid container spacing={2}> */}
   <Grid item xs={12}>
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <DatePicker
@@ -268,6 +268,7 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
         value={selectedDate}
         onChange={handleDateChange}
         inputFormat="dd/MM/yyyy"
+        fullWidth
         PopperProps={{
           modifiers: [
             {
@@ -302,7 +303,7 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
       />
     </LocalizationProvider>
   </Grid>
-</Grid>
+{/* </Grid> */}
 
 
             <Grid item xs={12}>

@@ -71,38 +71,53 @@ const StudentDetails = () => {
     color: isDarkMode ? '#ffffff' : '#000000',
   };
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    
+    const options = { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+    const formattedDate = date.toLocaleString('en-GB', options).replace(',', ''); // Replace comma to match format
+    return formattedDate;
+  };
+
   const fetchStudentDetails = useCallback(async () => {
     try {
-      const user = JSON.parse(localStorage.getItem("user"));  // Get the user object from local storage
-      const userId = user.user_id;  // Get the user ID from the logged-in user
-
-      // If user is an admin, fetch all student details
+      const user = JSON.parse(localStorage.getItem("user"));
+      const userId = user.user_id;
+      
       let response;
       if (user.user_type === 'admin') {
         response = await fetch("https://willowtonbursary.co.za/api/student-details");
-      }
-      // If user is a student, fetch their specific student details
-      else if (user.user_type === 'student' && userId) {
+      } else if (user.user_type === 'student' && userId) {
         response = await fetch(`https://willowtonbursary.co.za/api/student-detail/${userId}`);
       } else {
         console.error("User type is neither admin nor student or user ID is missing");
         return [];
       }
-
+      
       const data = await response.json();
       if (data) {
-        setStudentDetails(data);  // Set the student details state
-        setSelectedStudent(data);
-        setSelectedStudentid(data.id);
+        // Dynamically format date fields
+        const formattedData = data.map(student => {
+          const updatedStudent = { ...student };
+          Object.keys(updatedStudent).forEach((key) => {
+            if (key.toLowerCase().includes('date_stamp')) {
+              updatedStudent[key] = formatDate(updatedStudent[key]);
+            }
+          });
+          return updatedStudent;
+        });
+        setStudentDetails(formattedData);
+        setSelectedStudent(formattedData[0]);
+        setSelectedStudentid(formattedData[0].id);
       }
-      // console.log(data);
+  
       return data;
-
+  
     } catch (error) {
       console.error("Error fetching student details:", error);
       return [];
     }
-  }, []);
+  }, []);  
 
   const handleDeleteStudent = async (studentId) => {
     // console.log("Student deleted successfully!");
@@ -134,7 +149,22 @@ const StudentDetails = () => {
     try {
       const response = await fetch(`https://willowtonbursary.co.za/api/about-me/${studentId}`);
       const data = await response.json();
-      setAboutMe(Array.isArray(data) ? data : []);
+    
+      // Format date fields dynamically
+      if (Array.isArray(data)) {
+        const formattedData = data.map(item => {
+          const updatedItem = { ...item };
+          Object.keys(updatedItem).forEach((key) => {
+            if (key.toLowerCase().endsWith('date_stamp')) {
+              updatedItem[key] = formatDate(updatedItem[key]);
+            }
+          });
+          return updatedItem;
+        });
+        setAboutMe(formattedData);
+      } else {
+        setAboutMe([]);
+      }
     } catch (error) {
       console.error("Error refetching About Me:", error);
     }
@@ -144,7 +174,16 @@ const StudentDetails = () => {
     try {
       const response = await fetch(`https://willowtonbursary.co.za/api/parents-details/${studentId}`);
       const data = await response.json();
-      setParentsDetails(data);
+      const formattedData = data.map(item => {
+        const updatedItem = { ...item };
+        Object.keys(updatedItem).forEach((key) => {
+          if (key.toLowerCase().endsWith('date_stamp')) {
+            updatedItem[key] = formatDate(updatedItem[key]);
+          }
+        });
+        return updatedItem;
+      });
+      setParentsDetails(formattedData);
     } catch (error) {
       console.error("Error fetching parent details:", error);
     }
@@ -154,7 +193,16 @@ const StudentDetails = () => {
     try {
       const response = await fetch(`https://willowtonbursary.co.za/api/university-details/${studentId}`);
       const data = await response.json();
-      setUniversityDetails(data);
+      const formattedData = data.map(item => {
+        const updatedItem = { ...item };
+        Object.keys(updatedItem).forEach((key) => {
+          if (key.toLowerCase().endsWith('date_stamp')) {
+            updatedItem[key] = formatDate(updatedItem[key]);
+          }
+        });
+        return updatedItem;
+      });
+      setUniversityDetails(formattedData);
     } catch (error) {
       console.error("Error fetching university details:", error);
     }
@@ -164,7 +212,16 @@ const StudentDetails = () => {
     try {
       const response = await fetch(`https://willowtonbursary.co.za/api/attachments/${studentId}`);
       const data = await response.json();
-      setAttachments(data);
+      const formattedData = data.map(item => {
+        const updatedItem = { ...item };
+        Object.keys(updatedItem).forEach((key) => {
+          if (key.toLowerCase().endsWith('date_stamp')) {
+            updatedItem[key] = formatDate(updatedItem[key]);
+          }
+        });
+        return updatedItem;
+      });
+      setAttachments(formattedData);
     } catch (error) {
       console.error("Error fetching attachments:", error);
     }
@@ -174,7 +231,16 @@ const StudentDetails = () => {
     try {
       const response = await fetch(`https://willowtonbursary.co.za/api/expense-details/${studentId}`);
       const data = await response.json();
-      setExpensesSummary(data);
+      const formattedData = data.map(item => {
+        const updatedItem = { ...item };
+        Object.keys(updatedItem).forEach((key) => {
+          if (key.toLowerCase().endsWith('date_stamp')) {
+            updatedItem[key] = formatDate(updatedItem[key]);
+          }
+        });
+        return updatedItem;
+      });
+      setExpensesSummary(formattedData);
     } catch (error) {
       console.error("Error fetching expense details:", error);
     }
@@ -182,9 +248,18 @@ const StudentDetails = () => {
 
   const fetchAssetsLiabilities = async (studentId) => {
     try {
-      const res = await fetch(`https://willowtonbursary.co.za/api/assets-liabilities/${studentId}`);
-      const data = await res.json();
-      setAssetsLiabilities(data);
+      const response = await fetch(`https://willowtonbursary.co.za/api/assets-liabilities/${studentId}`);
+      const data = await response.json();
+      const formattedData = data.map(item => {
+        const updatedItem = { ...item };
+        Object.keys(updatedItem).forEach((key) => {
+          if (key.toLowerCase().endsWith('date_stamp')) {
+            updatedItem[key] = formatDate(updatedItem[key]);
+          }
+        });
+        return updatedItem;
+      });
+      setAssetsLiabilities(formattedData);
     } catch (err) {
       console.error("Error fetching assets & liabilities:", err);
     }
@@ -192,9 +267,18 @@ const StudentDetails = () => {
 
   const fetchAcademicResults = async (studentId) => {
     try {
-      const res = await fetch(`https://willowtonbursary.co.za/api/academic-results/${studentId}`);
-      const data = await res.json();
-      setAcademicResults(data);
+      const response = await fetch(`https://willowtonbursary.co.za/api/academic-results/${studentId}`);
+      const data = await response.json();
+      const formattedData = data.map(item => {
+        const updatedItem = { ...item };
+        Object.keys(updatedItem).forEach((key) => {
+          if (key.toLowerCase().endsWith('date_stamp')) {
+            updatedItem[key] = formatDate(updatedItem[key]);
+          }
+        });
+        return updatedItem;
+      });
+      setAcademicResults(formattedData);
     } catch (err) {
       console.error("Error fetching academic results:", err);
     }
@@ -202,9 +286,18 @@ const StudentDetails = () => {
 
   const fetchVoluntaryServices = async (studentId) => {
     try {
-      const res = await fetch(`https://willowtonbursary.co.za/api/voluntary-service/${studentId}`);
-      const data = await res.json();
-      setVoluntaryServices(data);
+      const response = await fetch(`https://willowtonbursary.co.za/api/voluntary-service/${studentId}`);
+      const data = await response.json();
+      const formattedData = data.map(item => {
+        const updatedItem = { ...item };
+        Object.keys(updatedItem).forEach((key) => {
+          if (key.toLowerCase().endsWith('date_stamp')) {
+            updatedItem[key] = formatDate(updatedItem[key]);
+          }
+        });
+        return updatedItem;
+      });
+      setVoluntaryServices(formattedData);
     } catch (err) {
       console.error("Error fetching voluntary services:", err);
     }
@@ -214,7 +307,16 @@ const StudentDetails = () => {
     try {
       const response = await fetch(`https://willowtonbursary.co.za/api/payments/${studentId}`);
       const data = await response.json();
-      setPayments(data);
+      const formattedData = data.map(item => {
+        const updatedItem = { ...item };
+        Object.keys(updatedItem).forEach((key) => {
+          if (key.toLowerCase().endsWith('date_stamp')) {
+            updatedItem[key] = formatDate(updatedItem[key]);
+          }
+        });
+        return updatedItem;
+      });
+      setPayments(formattedData);
     } catch (error) {
       console.error("Error fetching payments details:", error);
     }
@@ -224,7 +326,16 @@ const StudentDetails = () => {
     try {
       const response = await fetch(`https://willowtonbursary.co.za/api/interviews/${studentId}`);
       const data = await response.json();
-      setInterviews(data);
+      const formattedData = data.map(item => {
+        const updatedItem = { ...item };
+        Object.keys(updatedItem).forEach((key) => {
+          if (key.toLowerCase().endsWith('date_stamp')) {
+            updatedItem[key] = formatDate(updatedItem[key]);
+          }
+        });
+        return updatedItem;
+      });
+      setInterviews(formattedData);
     } catch (error) {
       console.error("Error fetching interview details:", error);
     }

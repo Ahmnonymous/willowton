@@ -138,7 +138,7 @@ VALUES
 
 -- to do
 /*
-Date Picker setting
+student detail page time stamp format
 hide payments and interviews tabs to students
 error handling and showing properly to users
 email

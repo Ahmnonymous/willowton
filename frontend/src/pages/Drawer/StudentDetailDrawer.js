@@ -396,6 +396,34 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                 );
               }
 
+              if (['student_relationship_type', 'student_employee_name', 'student_employee_designation', 'student_employee_branch', 'student_employee_number'].includes(key)) {
+                // Only render these fields if `student_willow_relationship` is 'Yes'
+                if (formData.student_willow_relationship === "Yes") {
+                  return (
+                    <Grid item xs={12} key={index}>
+                      <TextField
+                        label={key.replace(/_/g, " ").toLowerCase()}
+                        name={key}
+                        fullWidth
+                        value={formData[key] || ""}
+                        onChange={handleChange}
+                        sx={{
+                          backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                          borderRadius: '8px',
+                          '& .MuiInputBase-input': {
+                            color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                          }
+                        }}
+                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                      />
+                    </Grid>
+                  );
+                } else {
+                  // If `student_willow_relationship` is not 'Yes', don't render these fields
+                  return null;
+                }
+              }
               // if (formData.student_willow_relationship !== "Yes" &&
               //   ['student_willow_relationship', 'student_relationship_type', 'student_employee_name',
               //     'student_employee_designation', 'student_employee_branch', 'student_employee_number'].includes(key)) {

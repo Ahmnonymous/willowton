@@ -34,9 +34,12 @@ import { ThemeContext } from '../../config/ThemeContext';
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { format, parse } from 'date-fns';
 
 const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => {
   const { isDarkMode } = useContext(ThemeContext);  // Access theme context
+  const [selectedDate, setSelectedDate] = useState(null);
+
   // Check for larger or smaller screen size
   const isLargeScreen = useMediaQuery("(min-width:600px)");
 
@@ -90,10 +93,12 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
           try {
             const response = await fetch(`https://willowtonbursary.co.za/api/student-details/${studentId}`);
             const data = await response.json();
+            const dates = data.student_dob ? parse(data.student_dob, 'dd/MM/yyyy', new Date()) : null;
+            setSelectedDate(dates);
             setFormData((prev) => ({
               ...prev,
               ...data,
-              student_dob: data.student_dob ? data.student_dob.split("T")[0] : "",
+              student_dob: dates,
             }));
           } catch (error) {
             console.error("Error fetching student data:", error);
@@ -101,6 +106,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
         };
         fetchStudentData();
       } else {
+        setSelectedDate(null);
         setFormData({
           student_name: '',
           student_surname: '',
@@ -143,11 +149,11 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     }
   }, [open, studentId]);
 
-  // const handleDateChange = (newDate) => {
-  //   setSelectedDate(newDate);
-  //   const formattedDate = newDate ? format(newDate, 'dd/MM/yyyy') : '';
-  //   setFormData(prev => ({ ...prev, student_dob: formattedDate }));
-  // };
+  const handleDateChange = (newDate) => {
+    setSelectedDate(newDate);
+    const formattedDate = newDate ? format(newDate, 'dd/MM/yyyy') : '';
+    setFormData(prev => ({ ...prev, student_dob: formattedDate }));
+  };
   
   useEffect(() => {
     if (formData.student_willow_relationship === 'No') {
@@ -276,8 +282,8 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                         className={"datepicker"}
                         label="Student DOB"
                         name="student_dob"
-                        // value={selectedDate}
-                        // onChange={handleDateChange}
+                        value={selectedDate}
+                        onChange={handleDateChange}
                         format="dd/MM/yyyy"
                       />
                     </LocalizationProvider>

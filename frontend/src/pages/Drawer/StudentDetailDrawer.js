@@ -445,12 +445,12 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
               // Exclude `student_date_stamp` and `id`
               if (
                 key === "student_date_stamp" || key === "id" || key === "user_id"
-                || key === 'student_willow_relationship'
-                || key === 'student_relationship_type'
-                || key === 'student_employee_name'
-                || key === 'student_employee_designation'
-                || key === 'student_employee_branch'
-                || key === 'student_employee_number'
+                // || key === 'student_willow_relationship'
+                // || key === 'student_relationship_type'
+                // || key === 'student_employee_name'
+                // || key === 'student_employee_designation'
+                // || key === 'student_employee_branch'
+                // || key === 'student_employee_number'
               ) return null;
 
               let label = key.replace(/_/g, " ").toLowerCase();

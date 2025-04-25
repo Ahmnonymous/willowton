@@ -30,7 +30,10 @@ import {
   provinces,
   yes_no,
 } from "../../components/lov"; // Import LOVs
-import { ThemeContext } from '../../config/ThemeContext';  // Import ThemeContext
+import { ThemeContext } from '../../config/ThemeContext'; 
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 
 const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => {
   const { isDarkMode } = useContext(ThemeContext);  // Access theme context
@@ -140,6 +143,12 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     }
   }, [open, studentId]);
 
+  // const handleDateChange = (newDate) => {
+  //   setSelectedDate(newDate);
+  //   const formattedDate = newDate ? format(newDate, 'dd/MM/yyyy') : '';
+  //   setFormData(prev => ({ ...prev, student_dob: formattedDate }));
+  // };
+  
   useEffect(() => {
     if (formData.student_willow_relationship === 'No') {
       setFormData((prevState) => ({
@@ -241,24 +250,37 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
             {Object.keys(formData).map((key, index) => {
               if (key === "student_dob") {
                 return (
+                  // <Grid item xs={12} key={index}>
+                  //   <TextField
+                  //     label="Student DOB"
+                  //     name="student_dob"
+                  //     type="date"
+                  //     fullWidth
+                  //     value={formData.student_dob || ""}
+                  //     onChange={handleChange}
+                  //     sx={{
+                  //       backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                  //       color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                  //       borderRadius: '8px',
+                  //       '& .MuiInputBase-input': {
+                  //         color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                  //       }
+                  //     }}
+                  //     InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                  //   />
+                  // </Grid>
                   <Grid item xs={12} key={index}>
-                    <TextField
-                      label="Student DOB"
-                      name="student_dob"
-                      type="date"
-                      fullWidth
-                      value={formData.student_dob || ""}
-                      onChange={handleChange}
-                      sx={{
-                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        borderRadius: '8px',
-                        '& .MuiInputBase-input': {
-                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        }
-                      }}
-                      InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                    />
+                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                      <DatePicker
+                        wrapperClassName={"datepicker"}
+                        className={"datepicker"}
+                        label="Student DOB"
+                        name="student_dob"
+                        // value={selectedDate}
+                        // onChange={handleDateChange}
+                        format="dd/MM/yyyy"
+                      />
+                    </LocalizationProvider>
                   </Grid>
                 );
               }

@@ -75,7 +75,7 @@ router.get("/attachments/id/:id", async (req, res) => {
 
 router.post("/attachments/insert", upload.single('Attachment'), async (req, res) => {
   const { Attachments_Name, Attachments_Description, Student_Details_Portal_id } = req.body;
-  const attachmentBuffer = req.file.buffer;
+  const attachmentBuffer = req.file ? req.file.buffer : null;
   const query = `
     INSERT INTO Student_Portal_Attachments (
       Attachments_Name, Attachments_Description, Student_Details_Portal_id, Attachment

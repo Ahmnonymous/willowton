@@ -41,8 +41,10 @@ router.post("/payments/insert", upload.single("Proof_of_Payment"), async (req, r
     Student_Details_Portal_id,
   } = req.body;
 
-  const fileBuffer = req.file.buffer || null;
-  const fileName = req.file?.originalname || null;
+  // const fileBuffer = req.file.buffer || null;
+  // const fileName = req.file?.originalname || null;
+  const fileBuffer = req.file ? req.file.buffer : null;
+  const fileName = req.file ? req.file.originalname : null;
 
   try {
     const result = await pool.query(
@@ -79,8 +81,10 @@ router.put("/payments/update/:id", upload.single("Proof_of_Payment"), async (req
     Payment_Created_By,
   } = req.body;
 
-  const fileBuffer = req.file?.buffer;
-  const fileName = req.file?.originalname;
+  // const fileBuffer = req.file?.buffer;
+  // const fileName = req.file?.originalname;
+  const fileBuffer = req.file ? req.file.buffer : null;
+  const fileName = req.file ? req.file.originalname : null;
 
   try {
     let query, values;

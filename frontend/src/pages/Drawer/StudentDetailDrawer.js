@@ -140,6 +140,20 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     }
   }, [open, studentId]);
 
+  useEffect(() => {
+    if (formData.student_willow_relationship === 'No') {
+      setFormData((prevState) => ({
+        ...prevState,
+        student_relationship_type: "",
+        student_employee_name: "",
+        student_employee_designation: "",
+        student_employee_branch: "",
+        student_employee_number: "",
+      }));
+    }
+  }, [formData.student_willow_relationship]);
+
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevState) => ({ ...prevState, [name]: value }));
@@ -402,7 +416,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                   return (
                     <Grid item xs={12} key={index}>
                       <TextField
-                        label={key.replace(/_/g, " ").toLowerCase()}
+                        label={key.replace(/_/g, " ").toLowerCase().split(" ").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")}
                         name={key}
                         fullWidth
                         value={formData[key] || ""}
@@ -455,6 +469,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                 .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize each word
                 .join(" "); // Rejoin into a string
 
+                
               // Handling LOV fields with Autocomplete for other fields
               if (key === "student_nationality") {
                 return (

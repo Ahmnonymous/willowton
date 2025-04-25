@@ -1,4 +1,13 @@
 -- create tables
+CREATE TABLE Student_portal_users (
+    user_id SERIAL PRIMARY KEY,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    email_address VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    user_type VARCHAR(10) NOT NULL
+);
+
 create table Student_Details_Portal (
     id serial primary key,
     Student_Name varchar(4000),
@@ -16,7 +25,7 @@ create table Student_Details_Portal (
     Student_Suburb varchar(4000),
     Student_Area_Code varchar(4000),
     Student_Province varchar(4000),
-    Student_DOB date DEFAULT 'CURRENT_TIMESTAMP',
+    Student_DOB date DEFAULT CURRENT_TIMESTAMP,
     Student_Race varchar(4000),
     Student_Marital_Status varchar(4000),
     Student_Employment_Status varchar(4000),
@@ -36,7 +45,9 @@ create table Student_Details_Portal (
     Student_Emergency_Contact_Number varchar(4000),
     Student_Emergency_Contact_Relationship varchar(4000),
     Student_Emergency_Contact_Address varchar(4000),
-    Student_Date_Stamp date DEFAULT ''CURRENT_TIMESTAMP''
+    Student_Date_Stamp timestamp DEFAULT CURRENT_TIMESTAMP,
+    user_id integer,
+    CONSTRAINT fk_student_user FOREIGN KEY (user_id) REFERENCES Student_portal_users(user_id) ON DELETE SET NULL
 );
 
 create table Student_Portal_Parents_Details (
@@ -53,7 +64,7 @@ create table Student_Portal_Parents_Details (
     Parent_Salary varchar(4000),
     Parent_Grant varchar(4000),
     Parent_Other_Income varchar(4000),
-    Parent_Date_Stamp date DEFAULT 'CURRENT_TIMESTAMP'
+    Parent_Date_Stamp timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
 create table Student_Portal_University_Details (
@@ -93,7 +104,7 @@ create table Student_Portal_University_Details (
     Previous_Bursary_Org_3_Amount varchar(4000),
     Previous_Bursary_Org_3_Contact varchar(4000),
     Application_Process_Status varchar(4000),
-    University_Details_Date_Stamp date DEFAULT 'CURRENT_TIMESTAMP'
+    University_Details_Date_Stamp timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
 create table Student_Portal_Assets_Liabilities (
@@ -103,7 +114,7 @@ create table Student_Portal_Assets_Liabilities (
     Cash_in_Bank varchar(4000),
     Investments varchar(4000),
     Liabilities varchar(4000),
-    Assets_Liabilities_Date_Stamp date DEFAULT 'CURRENT_TIMESTAMP'
+    Assets_Liabilities_Date_Stamp timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE Student_Portal_Expense_Details (
@@ -127,7 +138,7 @@ CREATE TABLE Student_Portal_Expense_Details (
     Insurance_Expense VARCHAR(4000),
     Other_Expense VARCHAR(4000),
     Total_Expenses VARCHAR(4000),
-    Expense_Date_Stamp date DEFAULT 'CURRENT_TIMESTAMP'
+    Expense_Date_Stamp timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
 create table Student_Portal_Attachments (
@@ -136,7 +147,7 @@ create table Student_Portal_Attachments (
     Attachments_Name varchar(4000),
     Attachments_Description varchar(4000),
     Attachment bytea,
-    Attachments_Date_Stamp date DEFAULT 'CURRENT_TIMESTAMP'
+    Attachments_Date_Stamp timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
 create table Student_Portal_About_Me (
@@ -163,7 +174,7 @@ create table Student_Portal_About_Me (
     About_Me_Q19 varchar(4000),
     About_Me_Q20 varchar(4000),
     About_Me_Q21 varchar(4000),
-    About_Me_Date_Stamp date DEFAULT 'CURRENT_TIMESTAMP'
+    About_Me_Date_Stamp timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
 create table Student_Portal_Payments (
@@ -177,7 +188,7 @@ create table Student_Portal_Payments (
     Payments_Attachment_Name varchar(4000),
     Proof_of_Payment bytea,
     Payment_Created_By varchar(4000),
-    Payments_Date_Stamp date DEFAULT 'CURRENT_TIMESTAMP'
+    Payments_Date_Stamp timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
 create table Student_Portal_Results (
@@ -187,7 +198,7 @@ create table Student_Portal_Results (
     Results_Percentage varchar(4000),
     Results_Attachment bytea,
     Results_Attachment_Name VARCHAR(4000),
-    Results_Date_Stamp date DEFAULT 'CURRENT_TIMESTAMP'
+    Results_Date_Stamp timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
 create table Student_Portal_Voluntary_Service (
@@ -197,9 +208,9 @@ create table Student_Portal_Voluntary_Service (
     Contact_Person varchar(4000),
     Contact_Person_Number varchar(4000),
     Hours_Contributed varchar(4000),
-    Service_Attachment_Name varchar2(4000),
+    Service_Attachment_Name varchar(4000),
     Proof_of_Service bytea,
-    Voluntary_Service_Date_Stamp date DEFAULT 'CURRENT_TIMESTAMP'
+    Voluntary_Service_Date_Stamp timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
 create table Student_Portal_Interview (
@@ -232,16 +243,7 @@ create table Student_Portal_Interview (
     Interview_Q23 varchar(4000),
     Interview_Q24 varchar(4000),
     Interview_Created_By varchar(4000),
-    date_Stamp date DEFAULT 'CURRENT_TIMESTAMP'
-);
-
-CREATE TABLE Student_portal_users (
-    user_id SERIAL PRIMARY KEY,
-    first_name VARCHAR(100) NOT NULL,
-    last_name VARCHAR(100) NOT NULL,
-    email_address VARCHAR(100) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    user_type VARCHAR(10) NOT NULL
+    date_Stamp timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
 -- table index
@@ -276,13 +278,3 @@ create index Student_Portal_Interview_i1 on Student_Portal_Interview (Student_De
 
 -- table index
 create index Student_portal_users_i1 on Student_portal_users(user_id);
-
--- Add user_id column to Student_Details_Portal
-ALTER TABLE Student_Details_Portal ADD COLUMN user_id INTEGER;
-
--- Add foreign key constraint on user_id to link to Student_portal_users
-ALTER TABLE Student_Details_Portal
-ADD CONSTRAINT fk_student_user
-FOREIGN KEY (user_id)
-REFERENCES Student_portal_users(user_id)
-ON DELETE SET NULL;

@@ -105,13 +105,13 @@ const StudentDetails = () => {
   }, []);
 
   const handleDeleteStudent = async (studentId) => {
-    try {
+    // try {
       // Delete the student from the backend
-      const response = await fetch(`https://willowtonbursary.co.za/api/student-details/delete/${studentId}`, {
-        method: 'DELETE',
-      });
+      // const response = await fetch(`https://willowtonbursary.co.za/api/student-details/delete/${studentId}`, {
+      //   method: 'DELETE',
+      // });
   
-      if (response.ok) {
+      // if (response.ok) {
         console.log("Student deleted successfully!");
   
         if (isStudent) {
@@ -129,15 +129,15 @@ const StudentDetails = () => {
             setSelectedStudent(null);  // No students left, reset the selected student
             setSelectedStudentid(null);
           }
-        }
+        // }
   
         // Optionally, refresh the list of students after deletion
         fetchStudentDetails();
-      } else {
-        console.error("Failed to delete student.");
-      }
-    } catch (error) {
-      console.error("Error deleting student:", error);
+    //   } else {
+    //     console.error("Failed to delete student.");
+    //   }
+    // } catch (error) {
+    //   console.error("Error deleting student:", error);
     }
   };
   

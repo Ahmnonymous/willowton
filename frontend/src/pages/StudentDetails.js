@@ -311,38 +311,69 @@ const StudentDetails = () => {
   const renderDrawer = () => (
     <DrawerForm
       open={drawerOpen}
-      onClose={() => {
-        // Close the drawer
-        setDrawerOpen(false);
-  
-        // Fetch the updated student details after the drawer closes
-        fetchStudentDetails().then((updatedList) => {
-          if (updatedList.length > 0) {
-            // Set the first student from the updated list as selectedStudent
-            setSelectedStudent(updatedList[0]);
-            setSelectedStudentid(updatedList[0].id);
-          } else {
-            // No students left, reset selectedStudent and selectedStudentid
-            setSelectedStudent(null);
-            setSelectedStudentid(null);
-          }
-        });
-      }}
+      onClose={() => setDrawerOpen(false)}
       studentId={selectedStudentid}
       onSave={(savedStudent) => {
         console.log("Saving student data...");
   
-        // You can remove any logic related to fetching after save since we are fetching after the drawer closes
+        // Fetch updated student details after saving
+        fetchStudentDetails().then((updatedList) => {
+          console.log("Fetched updated student details after save");
+  
+          if (savedStudent?.id) {
+            console.log("Saved student has ID");
+  
+            // If savedStudent has an ID, update selectedStudent with the saved data
+            setSelectedStudentid(savedStudent.id);
+            setSelectedStudent(savedStudent);
+  
+            console.log("Updated selected student");
+          } else {
+            // If no savedStudent, check the updated list and set the first student (if any)
+            if (updatedList.length > 0) {
+              console.log("No savedStudent, but updated list available. Setting first student");
+              setSelectedStudent(updatedList[0]);
+              setSelectedStudentid(updatedList[0].id);
+            } else {
+              // If the list is empty, reset the selectedStudent and selectedStudentid
+              console.log("No students found in the updated list. Resetting selected student.");
+              setSelectedStudent(null);
+              setSelectedStudentid(null);
+            }
+          }
+        });
+  
+        // Close the drawer after saving
         console.log("Closing drawer after save.");
+        setDrawerOpen(false);
       }}
       onDelete={() => {
         console.log("Deleting student...");
   
-        // You can remove any logic related to fetching after delete since we are fetching after the drawer closes
+        // Here, we perform the delete logic and then fetch the updated student list
+        fetchStudentDetails().then((updatedList) => {
+          console.log("Fetched updated student details after delete");
+  
+          if (updatedList.length > 0) {
+            // Set the first student from the updated list as selectedStudent
+            console.log("Updated list available. Setting first student.");
+            setSelectedStudent(updatedList[0]);
+            setSelectedStudentid(updatedList[0].id);
+          } else {
+            // No students left, reset selectedStudent and selectedStudentid
+            console.log("No students found in the updated list after deletion. Resetting selected student.");
+            setSelectedStudent(null);
+            setSelectedStudentid(null);
+          }
+        });
+  
+        // Close the drawer after deletion
         console.log("Closing drawer after delete.");
+        setDrawerOpen(false);
       }}
     />
   );
+  
   
 
   const tabSections = [

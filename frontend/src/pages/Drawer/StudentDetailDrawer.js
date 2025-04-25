@@ -396,38 +396,6 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                 );
               }
 
-              if (key === "student_willow_relationship") {
-                return (
-                  <Grid item xs={12} key={index}>
-                    {/* <Select
-                      value={formData.student_willow_relationship || ""}
-                      onChange={handleChange}
-                      label="Willow Relationship"
-                      name="student_willow_relationship"
-                      fullWidth
-                    >
-                      <MenuItem value="Yes">Yes</MenuItem>
-                      <MenuItem value="No">No</MenuItem>
-                    </Select> */}
-                    <Autocomplete
-                      value={formData[key] || ""}
-                      onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
-                      options={yes_no}
-                      renderInput={(params) => <TextField {...params} label={label} sx={{
-                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        borderRadius: '8px',
-                        '& .MuiInputBase-input': {
-                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        }
-                      }}
-                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                      />}
-                    />
-                  </Grid>
-                );
-              }
-
               // if (formData.student_willow_relationship !== "Yes" &&
               //   ['student_willow_relationship', 'student_relationship_type', 'student_employee_name',
               //     'student_employee_designation', 'student_employee_branch', 'student_employee_number'].includes(key)) {
@@ -467,6 +435,28 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                       value={formData[key] || ""}
                       onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
                       options={nationality}
+                      renderInput={(params) => <TextField {...params} label={label} sx={{
+                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        borderRadius: '8px',
+                        '& .MuiInputBase-input': {
+                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        }
+                      }}
+                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                      />}
+                    />
+                  </Grid>
+                );
+              }
+
+              if (key === "student_willow_relationship") {
+                return (
+                  <Grid item xs={12} key={index}>
+                    <Autocomplete
+                      value={formData[key] || ""}
+                      onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
+                      options={yes_no}
                       renderInput={(params) => <TextField {...params} label={label} sx={{
                         backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
                         color: isDarkMode ? '#F7FAFC' : '#1E293B',

@@ -261,7 +261,7 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
               </LocalizationProvider>
             </Grid> */}
 {/* <Grid container spacing={2}> */}
-  <Grid item xs={12} minWidth='100%'>
+  <Grid item xs={12} fullWidth  minWidth='100%'>
     <LocalizationProvider dateAdapter={AdapterDateFns} fullWidth minWidth='100%'>
       <DatePicker
         label="Payments Date"
@@ -298,10 +298,11 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
               // Ensure the input takes full width
               '& .MuiInputBase-root': {
                 width: '100%',
+                minWidth: '100%',
               },
             }}
             InputLabelProps={{
-              style: { color: isDarkMode ? '#F7FAFC' : '#1E293B' },
+              style: { color: isDarkMode ? '#F7FAFC' : '#1E293B',minWidth: '100%' },
             }}
           />
         )}

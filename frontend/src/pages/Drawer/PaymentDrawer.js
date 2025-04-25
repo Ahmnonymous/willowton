@@ -261,20 +261,21 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
               </LocalizationProvider>
             </Grid> */}
 {/* <Grid container spacing={2}> */}
-  <Grid item xs={12}>
-    <LocalizationProvider dateAdapter={AdapterDateFns}>
+  <Grid item xs={12} minWidth='100%'>
+    <LocalizationProvider dateAdapter={AdapterDateFns} fullWidth minWidth='100%'>
       <DatePicker
         label="Payments Date"
         value={selectedDate}
         onChange={handleDateChange}
         inputFormat="dd/MM/yyyy"
         fullWidth
+        minWidth='100%'
         PopperProps={{
           modifiers: [
             {
               name: 'offset',
               options: {
-                offset: [0, 12],
+                offset: [0, 10],
               },
             },
           ],
@@ -289,6 +290,8 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
               backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
               color: isDarkMode ? '#F7FAFC' : '#1E293B',
               borderRadius: '8px',
+              width: '100%',
+              minWidth: '100%',
               '& .MuiInputBase-input': {
                 color: isDarkMode ? '#F7FAFC' : '#1E293B',
               },

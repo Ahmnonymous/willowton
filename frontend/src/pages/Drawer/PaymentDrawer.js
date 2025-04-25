@@ -242,7 +242,7 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
               label="Payments Date"
               value={selectedDate}
               onChange={handleDateChange}
-              format="DD/MM/YYYY"
+              format="dd/MM/yyyy"
             />
           </LocalizationProvider>
         </Grid>

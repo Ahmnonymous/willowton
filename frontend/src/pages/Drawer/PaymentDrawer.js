@@ -18,26 +18,22 @@ import SaveIcon from "@mui/icons-material/Save";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import { ThemeContext } from '../../config/ThemeContext'; // Import ThemeContext
+import { ThemeContext } from '../../config/ThemeContext';
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { format, parse } from 'date-fns';
 
 const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
-  const { isDarkMode } = useContext(ThemeContext);  // Access theme context
+  const { isDarkMode } = useContext(ThemeContext);
 
   const [formData, setFormData] = useState({});
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
-  const [openDateDialog, setOpenDateDialog] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
-  
-  // Check for larger or smaller screen size
-  const isLargeScreen = useMediaQuery("(min-width:600px)");
 
-  // Drawer width based on screen size
+  const isLargeScreen = useMediaQuery("(min-width:600px)");
   const drawerWidth = isLargeScreen ? 500 : 330;
 
-  // Get the first name and last name from localStorage (assuming the user object is stored there)
   const user = JSON.parse(localStorage.getItem("user"));
   const createdBy = `${user?.first_name} ${user?.last_name}`;
 
@@ -53,13 +49,16 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
         Payments_ET_Number: "",
         Payments_Attachment_Name: "",
         Proof_of_Payment: null,
-        Payment_Created_By: createdBy,  // Set created_by field to first and last name of logged-in user
+        Payment_Created_By: createdBy,
         Student_Details_Portal_id: studentId
       });
+      setSelectedDate(null);
     } else {
       fetch(`https://willowtonbursary.co.za/api/payments/id/${recordId}`)
         .then(res => res.json())
         .then(data => {
+          const date = data.payments_date ? parse(data.payments_date, 'dd/MM/yyyy', new Date()) : null;
+          setSelectedDate(date);
           setFormData({
             Payments_Expense_Type: data.payments_expense_type || "",
             Payments_Vendor: data.payments_vendor || "",
@@ -68,7 +67,7 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
             Payments_ET_Number: data.payments_et_number || "",
             Payments_Attachment_Name: data.payments_attachment_name || "",
             Proof_of_Payment: null,
-            Payment_Created_By: data.payment_created_by || createdBy,  // Ensure `created_by` is set
+            Payment_Created_By: data.payment_created_by || createdBy,
             id: data.id,
             Student_Details_Portal_id: data.student_details_portal_id || studentId
           });
@@ -97,7 +96,7 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
       window.open(`https://willowtonbursary.co.za/api/payments/view/${formData.id}`, "_blank");
     }
   };
-    
+
   const handleSave = async () => {
     const isUpdate = !!formData.id;
     const url = isUpdate
@@ -129,7 +128,7 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
   };
 
   const handleDeleteClick = () => {
-    setDeleteConfirmationOpen(true); // Open confirmation dialog
+    setDeleteConfirmationOpen(true);
   };
 
   const handleDeleteConfirm = async () => {
@@ -140,24 +139,20 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
       });
       onSave(null);
       onClose();
-      setDeleteConfirmationOpen(false); // Close confirmation dialog
+      setDeleteConfirmationOpen(false);
     } catch (err) {
       console.error("Failed to delete payment", err);
     }
   };
 
   const handleDeleteCancel = () => {
-    setDeleteConfirmationOpen(false); // Close confirmation dialog
-  };
-
-  const handleDateDialogClose = () => {
-    setOpenDateDialog(false);
+    setDeleteConfirmationOpen(false);
   };
 
   const handleDateChange = (newDate) => {
     setSelectedDate(newDate);
-    setFormData(prev => ({ ...prev, Payments_Date: newDate }));
-    setOpenDateDialog(false); // Close dialog after selection
+    const formattedDate = newDate ? format(newDate, 'dd/MM/yyyy') : '';
+    setFormData(prev => ({ ...prev, Payments_Date: formattedDate }));
   };
 
   return (
@@ -167,7 +162,7 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        backgroundColor: isDarkMode ? '#2D3748' : '#fff' // Background color based on dark/light mode
+        backgroundColor: isDarkMode ? '#2D3748' : '#fff'
       }}>
         {/* Header */}
         <Box sx={{
@@ -202,27 +197,33 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
               />
             </Grid>
 
-            {/* Date Field Trigger */}
+            {/* Date Picker Field */}
             <Grid item xs={12}>
-              <TextField
-                label="Date"
-                name="Payments_Date"
-                value={selectedDate || formData.Payments_Date || ""}
-                fullWidth
-                onClick={() => setOpenDateDialog(true)}
-                sx={{
-                  backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                  color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                  borderRadius: '8px',
-                  '& .MuiInputBase-input': {
-                    color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                  }
-                }}
-                InputLabelProps={{ style: { color: isDarkMode ? '#F7FAFC' : '#1E293B' } }}
-                InputProps={{
-                  readOnly: true
-                }}
-              />
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <DatePicker
+                  label="Date"
+                  value={selectedDate}
+                  onChange={handleDateChange}
+                  format="dd/MM/yyyy"
+                  slots={{
+                    textField: (params) => (
+                      <TextField
+                        {...params}
+                        fullWidth
+                        sx={{
+                          backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                          borderRadius: '8px',
+                          '& .MuiInputBase-input': {
+                            color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                          }
+                        }}
+                        InputLabelProps={{ style: { color: isDarkMode ? '#F7FAFC' : '#1E293B' } }}
+                      />
+                    )
+                  }}
+                />
+              </LocalizationProvider>
             </Grid>
 
             <Grid item xs={12}>
@@ -283,7 +284,6 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
                 </Button>
               </Grid>
             )}
-
           </Grid>
         </Box>
 
@@ -344,25 +344,7 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
           </DialogActions>
         </Dialog>
       </Box>
-
-      {/* Date Picker Modal */}
-      <Dialog open={openDateDialog} onClose={handleDateDialogClose}>
-        <DialogTitle>Select Date</DialogTitle>
-        <DialogContent>
-          <LocalizationProvider dateAdapter={AdapterDateFns}>
-            <DatePicker
-              value={selectedDate}
-              onChange={handleDateChange}
-              renderInput={(params) => <TextField {...params} />}
-            />
-          </LocalizationProvider>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDateDialogClose} color="primary">Close</Button>
-        </DialogActions>
-      </Dialog>
     </Drawer>
-    
   );
 };
 

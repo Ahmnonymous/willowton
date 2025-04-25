@@ -153,7 +153,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     }
   }, [formData.student_willow_relationship]);
 
-  
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevState) => ({ ...prevState, [name]: value }));
@@ -195,26 +195,6 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     setDeleteConfirmationOpen(true); // Open the dialog
   };
 
-  // const handleDeleteConfirm = async () => {
-  //   if (!studentId) return;
-
-  //   try {
-  //     const response = await fetch(
-  //       `https://willowtonbursary.co.za/api/student-details/delete/${studentId}`,
-  //       { method: "DELETE" }
-  //     );
-
-  //     if (response.ok) {
-  //       onSave(null);
-  //       onClose();
-  //       setDeleteConfirmationOpen(false); // Close the confirmation dialog
-  //     } else {
-  //       console.error("Failed to delete student");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error deleting student:", error);
-  //   }
-  // };
 
   const handleDeleteConfirm = async () => {
     if (!studentId) return;
@@ -226,8 +206,6 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
       );
 
       if (response.ok) {
-        // Inform parent component that the student was deleted by passing `null` as the saved student
-        // onSave(null); // This will update the student data in the parent component
         onDelete(studentId);
 
         // Close the drawer
@@ -247,107 +225,6 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
   const handleDeleteCancel = () => {
     setDeleteConfirmationOpen(false); // Close the confirmation dialog
   };
-
-  // const renderWillowRelationshipFields = () => {
-  //   if (formData.student_willow_relationship === "Yes") {
-  //     return (
-  //       <>
-  //         <Grid item xs={12}>
-  //           <TextField
-  //             label="Relationship Type"
-  //             name="student_relationship_type"
-  //             fullWidth
-  //             value={formData.student_relationship_type || ""}
-  //             onChange={handleChange}
-  //             sx={{
-  //               backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-  //               color: isDarkMode ? '#F7FAFC' : '#1E293B',
-  //               borderRadius: '8px',
-  //               '& .MuiInputBase-input': {
-  //                 color: isDarkMode ? '#F7FAFC' : '#1E293B',
-  //               }
-  //             }}
-  //             InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-  //           />
-  //         </Grid>
-  //         <Grid item xs={12}>
-  //           <TextField
-  //             label="Employee Name"
-  //             name="student_employee_name"
-  //             fullWidth
-  //             value={formData.student_employee_name || ""}
-  //             onChange={handleChange}
-  //             sx={{
-  //               backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-  //               color: isDarkMode ? '#F7FAFC' : '#1E293B',
-  //               borderRadius: '8px',
-  //               '& .MuiInputBase-input': {
-  //                 color: isDarkMode ? '#F7FAFC' : '#1E293B',
-  //               }
-  //             }}
-  //             InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-  //           />
-  //         </Grid>
-  //         <Grid item xs={12}>
-  //           <TextField
-  //             label="Employee Designation"
-  //             name="student_employee_designation"
-  //             fullWidth
-  //             value={formData.student_employee_designation || ""}
-  //             onChange={handleChange}
-  //             sx={{
-  //               backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-  //               color: isDarkMode ? '#F7FAFC' : '#1E293B',
-  //               borderRadius: '8px',
-  //               '& .MuiInputBase-input': {
-  //                 color: isDarkMode ? '#F7FAFC' : '#1E293B',
-  //               }
-  //             }}
-  //             InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-  //           />
-  //         </Grid>
-  //         <Grid item xs={12}>
-  //           <TextField
-  //             label="Employee Branch"
-  //             name="student_employee_branch"
-  //             fullWidth
-  //             value={formData.student_employee_branch || ""}
-  //             onChange={handleChange}
-  //             sx={{
-  //               backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-  //               color: isDarkMode ? '#F7FAFC' : '#1E293B',
-  //               borderRadius: '8px',
-  //               '& .MuiInputBase-input': {
-  //                 color: isDarkMode ? '#F7FAFC' : '#1E293B',
-  //               }
-  //             }}
-  //             InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-  //           />
-  //         </Grid>
-  //         <Grid item xs={12}>
-  //           <TextField
-  //             label="Employee Number"
-  //             name="student_employee_number"
-  //             fullWidth
-  //             value={formData.student_employee_number || ""}
-  //             onChange={handleChange}
-  //             sx={{
-  //               backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-  //               color: isDarkMode ? '#F7FAFC' : '#1E293B',
-  //               borderRadius: '8px',
-  //               '& .MuiInputBase-input': {
-  //                 color: isDarkMode ? '#F7FAFC' : '#1E293B',
-  //               }
-  //             }}
-  //             InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-  //           />
-  //         </Grid>
-  //       </>
-  //     );
-  //   }
-  //   return null;  // If "No" is selected, nothing will be rendered.
-  // };
-
   return (
     <Drawer anchor="right" open={open} onClose={onClose}>
       <Box sx={{ width: drawerWidth, height: "100%", display: "flex", flexDirection: "column", backgroundColor: isDarkMode ? '#2D3748' : '#fff' }}>
@@ -438,29 +315,9 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                   return null;
                 }
               }
-              // if (formData.student_willow_relationship !== "Yes" &&
-              //   ['student_willow_relationship', 'student_relationship_type', 'student_employee_name',
-              //     'student_employee_designation', 'student_employee_branch', 'student_employee_number'].includes(key)) {
-              //   return null;  // Don't render the field if the condition is not met
-              // }
 
-              // {formData.student_willow_relationship === "Yes" && renderWillowRelationshipFields()}
-
-              // 'student_willow_relationship'
-              // 'student_relationship_type'
-              // 'student_employee_name'
-              // 'student_employee_designation'
-              // 'student_employee_branch'
-              // 'student_employee_number'
-              // Exclude `student_date_stamp` and `id`
               if (
                 key === "student_date_stamp" || key === "id" || key === "user_id"
-                // || key === 'student_willow_relationship'
-                // || key === 'student_relationship_type'
-                // || key === 'student_employee_name'
-                // || key === 'student_employee_designation'
-                // || key === 'student_employee_branch'
-                // || key === 'student_employee_number'
               ) return null;
 
               let label = key.replace(/_/g, " ").toLowerCase();
@@ -469,7 +326,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                 .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize each word
                 .join(" "); // Rejoin into a string
 
-                
+
               // Handling LOV fields with Autocomplete for other fields
               if (key === "student_nationality") {
                 return (

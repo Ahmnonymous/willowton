@@ -12,8 +12,6 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Select,
-  MenuItem
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useMediaQuery } from "@mui/material";
@@ -30,6 +28,7 @@ import {
   highestEducation,
   nationality,
   provinces,
+  yes_no,
 } from "../../components/lov"; // Import LOVs
 import { ThemeContext } from '../../config/ThemeContext';  // Import ThemeContext
 
@@ -80,7 +79,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     student_emergency_contact_address: "",
     student_date_stamp: "",
   });
-  
+
   useEffect(() => {
     if (open) {
       if (studentId) {
@@ -235,106 +234,105 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     setDeleteConfirmationOpen(false); // Close the confirmation dialog
   };
 
-  const renderWillowRelationshipFields = () => {
-    if (formData.student_willow_relationship === "Yes") {
-      return (
-        <>
-          <Grid item xs={12}>
-            <TextField
-              label="Relationship Type"
-              name="student_relationship_type"
-              fullWidth
-              value={formData.student_relationship_type || ""}
-              onChange={handleChange}
-              sx={{
-                backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                borderRadius: '8px',
-                '& .MuiInputBase-input': {
-                  color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                }
-              }}
-              InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              label="Employee Name"
-              name="student_employee_name"
-              fullWidth
-              value={formData.student_employee_name || ""}
-              onChange={handleChange}
-              sx={{
-                backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                borderRadius: '8px',
-                '& .MuiInputBase-input': {
-                  color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                }
-              }}
-              InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              label="Employee Designation"
-              name="student_employee_designation"
-              fullWidth
-              value={formData.student_employee_designation || ""}
-              onChange={handleChange}
-              sx={{
-                backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                borderRadius: '8px',
-                '& .MuiInputBase-input': {
-                  color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                }
-              }}
-              InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              label="Employee Branch"
-              name="student_employee_branch"
-              fullWidth
-              value={formData.student_employee_branch || ""}
-              onChange={handleChange}
-              sx={{
-                backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                borderRadius: '8px',
-                '& .MuiInputBase-input': {
-                  color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                }
-              }}
-              InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              label="Employee Number"
-              name="student_employee_number"
-              fullWidth
-              value={formData.student_employee_number || ""}
-              onChange={handleChange}
-              sx={{
-                backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                borderRadius: '8px',
-                '& .MuiInputBase-input': {
-                  color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                }
-              }}
-              InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-            />
-          </Grid>
-        </>
-      );
-    }
-    return null;  // If "No" is selected, nothing will be rendered.
-  };
-    
+  // const renderWillowRelationshipFields = () => {
+  //   if (formData.student_willow_relationship === "Yes") {
+  //     return (
+  //       <>
+  //         <Grid item xs={12}>
+  //           <TextField
+  //             label="Relationship Type"
+  //             name="student_relationship_type"
+  //             fullWidth
+  //             value={formData.student_relationship_type || ""}
+  //             onChange={handleChange}
+  //             sx={{
+  //               backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+  //               color: isDarkMode ? '#F7FAFC' : '#1E293B',
+  //               borderRadius: '8px',
+  //               '& .MuiInputBase-input': {
+  //                 color: isDarkMode ? '#F7FAFC' : '#1E293B',
+  //               }
+  //             }}
+  //             InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+  //           />
+  //         </Grid>
+  //         <Grid item xs={12}>
+  //           <TextField
+  //             label="Employee Name"
+  //             name="student_employee_name"
+  //             fullWidth
+  //             value={formData.student_employee_name || ""}
+  //             onChange={handleChange}
+  //             sx={{
+  //               backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+  //               color: isDarkMode ? '#F7FAFC' : '#1E293B',
+  //               borderRadius: '8px',
+  //               '& .MuiInputBase-input': {
+  //                 color: isDarkMode ? '#F7FAFC' : '#1E293B',
+  //               }
+  //             }}
+  //             InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+  //           />
+  //         </Grid>
+  //         <Grid item xs={12}>
+  //           <TextField
+  //             label="Employee Designation"
+  //             name="student_employee_designation"
+  //             fullWidth
+  //             value={formData.student_employee_designation || ""}
+  //             onChange={handleChange}
+  //             sx={{
+  //               backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+  //               color: isDarkMode ? '#F7FAFC' : '#1E293B',
+  //               borderRadius: '8px',
+  //               '& .MuiInputBase-input': {
+  //                 color: isDarkMode ? '#F7FAFC' : '#1E293B',
+  //               }
+  //             }}
+  //             InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+  //           />
+  //         </Grid>
+  //         <Grid item xs={12}>
+  //           <TextField
+  //             label="Employee Branch"
+  //             name="student_employee_branch"
+  //             fullWidth
+  //             value={formData.student_employee_branch || ""}
+  //             onChange={handleChange}
+  //             sx={{
+  //               backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+  //               color: isDarkMode ? '#F7FAFC' : '#1E293B',
+  //               borderRadius: '8px',
+  //               '& .MuiInputBase-input': {
+  //                 color: isDarkMode ? '#F7FAFC' : '#1E293B',
+  //               }
+  //             }}
+  //             InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+  //           />
+  //         </Grid>
+  //         <Grid item xs={12}>
+  //           <TextField
+  //             label="Employee Number"
+  //             name="student_employee_number"
+  //             fullWidth
+  //             value={formData.student_employee_number || ""}
+  //             onChange={handleChange}
+  //             sx={{
+  //               backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+  //               color: isDarkMode ? '#F7FAFC' : '#1E293B',
+  //               borderRadius: '8px',
+  //               '& .MuiInputBase-input': {
+  //                 color: isDarkMode ? '#F7FAFC' : '#1E293B',
+  //               }
+  //             }}
+  //             InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+  //           />
+  //         </Grid>
+  //       </>
+  //     );
+  //   }
+  //   return null;  // If "No" is selected, nothing will be rendered.
+  // };
 
   return (
     <Drawer anchor="right" open={open} onClose={onClose}>
@@ -401,7 +399,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
               if (key === "student_willow_relationship") {
                 return (
                   <Grid item xs={12} key={index}>
-                    <Select
+                    {/* <Select
                       value={formData.student_willow_relationship || ""}
                       onChange={handleChange}
                       label="Willow Relationship"
@@ -410,16 +408,43 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                     >
                       <MenuItem value="Yes">Yes</MenuItem>
                       <MenuItem value="No">No</MenuItem>
-                    </Select>
+                    </Select> */}
+                    <Autocomplete
+                      value={formData[key] || ""}
+                      onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
+                      options={yes_no}
+                      renderInput={(params) => <TextField {...params} label={label} sx={{
+                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        borderRadius: '8px',
+                        '& .MuiInputBase-input': {
+                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        }
+                      }}
+                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                      />}
+                    />
                   </Grid>
                 );
-              }              
+              }
 
-              {formData.student_willow_relationship === "Yes" && renderWillowRelationshipFields()}
+              if (formData.student_willow_relationship !== "Yes" &&
+                ['student_willow_relationship', 'student_relationship_type', 'student_employee_name',
+                  'student_employee_designation', 'student_employee_branch', 'student_employee_number'].includes(key)) {
+                return null;  // Don't render the field if the condition is not met
+              }
 
+              // {formData.student_willow_relationship === "Yes" && renderWillowRelationshipFields()}
+
+              // 'student_willow_relationship'
+              // 'student_relationship_type'
+              // 'student_employee_name'
+              // 'student_employee_designation'
+              // 'student_employee_branch'
+              // 'student_employee_number'
               // Exclude `student_date_stamp` and `id`
               if (
-                key === "student_date_stamp" || key === "id" || key === "user_id" 
+                key === "student_date_stamp" || key === "id" || key === "user_id"
                 || key === 'student_willow_relationship'
                 || key === 'student_relationship_type'
                 || key === 'student_employee_name'

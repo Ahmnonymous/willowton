@@ -24,6 +24,11 @@ export const races = [
     "Widowed"
   ];
   
+  export const yes_no = [
+    "Yes",
+    "No"
+  ];
+  
   export const employmentStatus = [
     "Disabled Grant",
     "Full Time Employed",

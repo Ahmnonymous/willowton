@@ -93,7 +93,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
           try {
             const response = await fetch(`https://willowtonbursary.co.za/api/student-details/${studentId}`);
             const data = await response.json();
-            const dates = data.student_dob ? parse(data.student_dob, 'dd/MM/yyyy', new Date()) : null;
+            const dates = data.student_dob ? parse(data.student_dob, 'MM/dd/yyyy', new Date()) : null;
             setSelectedDate(dates);
             setFormData((prev) => ({
               ...prev,
@@ -151,7 +151,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
 
   const handleDateChange = (newDate) => {
     setSelectedDate(newDate);
-    const formattedDate = newDate ? format(newDate, 'dd/MM/yyyy') : '';
+    const formattedDate = newDate ? format(newDate, 'MM/dd/yyyy') : '';
     setFormData(prev => ({ ...prev, student_dob: formattedDate }));
   };
   
@@ -284,7 +284,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                         name="student_dob"
                         value={selectedDate}
                         onChange={handleDateChange}
-                        format="dd/MM/yyyy"
+                        format="MM/dd/yyyy"
                       />
                     </LocalizationProvider>
                   </Grid>

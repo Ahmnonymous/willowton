@@ -57,7 +57,7 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
       fetch(`https://willowtonbursary.co.za/api/payments/id/${recordId}`)
         .then(res => res.json())
         .then(data => {
-          const date = data.payments_date ? parse(data.payments_date, 'dd/MM/yyyy', new Date()) : null;
+          const date = data.payments_date ? parse(data.payments_date, 'MM/dd/yyyy', new Date()) : null;
           setSelectedDate(date);
           setFormData({
             Payments_Expense_Type: data.payments_expense_type || "",
@@ -151,7 +151,7 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
 
   const handleDateChange = (newDate) => {
     setSelectedDate(newDate);
-    const formattedDate = newDate ? format(newDate, 'dd/MM/yyyy') : '';
+    const formattedDate = newDate ? format(newDate, 'MM/dd/yyyy') : '';
     setFormData(prev => ({ ...prev, Payments_Date: formattedDate }));
   };
 
@@ -241,7 +241,7 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
                   label="Payments Date"
                   value={selectedDate}
                   onChange={handleDateChange}
-                  format="dd/MM/yyyy"
+                  format="MM/dd/yyyy"
                 />
               </LocalizationProvider>
             </Grid>

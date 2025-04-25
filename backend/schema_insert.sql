@@ -142,7 +142,5 @@ Date Picker setting
 show / hide fields for willow relationship on yes/no
 hide payments and interviews tabs to students
 error handling and showing properly to users
-on delete of record of student the region doesn't refresh
-
 email
 */

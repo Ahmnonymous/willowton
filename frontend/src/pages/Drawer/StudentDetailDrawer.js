@@ -12,6 +12,8 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Select,
+  MenuItem
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useMediaQuery } from "@mui/material";
@@ -66,7 +68,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     student_current_salary: "",
     student_number_of_siblings: "",
     student_siblings_bursary: "",
-    student_willow_relationship: "",
+    student_willow_relationship: "", // Add this here
     student_relationship_type: "",
     student_employee_name: "",
     student_employee_designation: "",
@@ -78,7 +80,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     student_emergency_contact_address: "",
     student_date_stamp: "",
   });
-
+  
   useEffect(() => {
     if (open) {
       if (studentId) {
@@ -147,23 +149,23 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
   const handleSave = async () => {
     const user = JSON.parse(localStorage.getItem("user"));  // Get user data from localStorage
     const userId = user?.user_id; // Get the user_id from the logged-in user
-  
+
     const url = studentId
       ? `https://willowtonbursary.co.za/api/student-details/update/${studentId}`  // URL for updating the student
       : `https://willowtonbursary.co.za/api/student-details/insert`;  // URL for inserting a new student
-  
+
     const method = studentId ? "PUT" : "POST";  // Use PUT for update and POST for insert
-  
+
     // If creating a new student, add user_id to the formData
-    const dataToSend = studentId ? formData : { ...formData, user_id: userId }; 
-  
+    const dataToSend = studentId ? formData : { ...formData, user_id: userId };
+
     try {
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(dataToSend),  // Send the appropriate data for insert or update
       });
-  
+
       if (response.ok) {
         const savedStudent = await response.json();
         onSave(savedStudent);  // Callback to parent to handle after saving
@@ -175,7 +177,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
       console.error("Error saving student data:", error);
     }
   };
-  
+
   const handleDeleteClick = () => {
     setDeleteConfirmationOpen(true); // Open the dialog
   };
@@ -203,21 +205,21 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
 
   const handleDeleteConfirm = async () => {
     if (!studentId) return;
-  
+
     try {
       const response = await fetch(
         `https://willowtonbursary.co.za/api/student-details/delete/${studentId}`,
         { method: "DELETE" }
       );
-  
+
       if (response.ok) {
         // Inform parent component that the student was deleted by passing `null` as the saved student
         // onSave(null); // This will update the student data in the parent component
         onDelete(studentId);
-  
+
         // Close the drawer
         onClose();
-  
+
         // Close the confirmation dialog
         setDeleteConfirmationOpen(false);
       } else {
@@ -228,11 +230,110 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     }
   };
 
-  
+
   const handleDeleteCancel = () => {
     setDeleteConfirmationOpen(false); // Close the confirmation dialog
   };
-
+// Render the Willow Relationship and related fields conditionally
+const renderWillowRelationshipFields = () => {
+  if (formData.student_willow_relationship === "Yes") {
+    return (
+      <>
+        <Grid item xs={12}>
+          <TextField
+            label="Relationship Type"
+            name="student_relationship_type"
+            fullWidth
+            value={formData.student_relationship_type || ""}
+            onChange={handleChange}
+            sx={{
+              backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+              color: isDarkMode ? '#F7FAFC' : '#1E293B',
+              borderRadius: '8px',
+              '& .MuiInputBase-input': {
+                color: isDarkMode ? '#F7FAFC' : '#1E293B',
+              }
+            }}
+            InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            label="Employee Name"
+            name="student_employee_name"
+            fullWidth
+            value={formData.student_employee_name || ""}
+            onChange={handleChange}
+            sx={{
+              backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+              color: isDarkMode ? '#F7FAFC' : '#1E293B',
+              borderRadius: '8px',
+              '& .MuiInputBase-input': {
+                color: isDarkMode ? '#F7FAFC' : '#1E293B',
+              }
+            }}
+            InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            label="Employee Designation"
+            name="student_employee_designation"
+            fullWidth
+            value={formData.student_employee_designation || ""}
+            onChange={handleChange}
+            sx={{
+              backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+              color: isDarkMode ? '#F7FAFC' : '#1E293B',
+              borderRadius: '8px',
+              '& .MuiInputBase-input': {
+                color: isDarkMode ? '#F7FAFC' : '#1E293B',
+              }
+            }}
+            InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            label="Employee Branch"
+            name="student_employee_branch"
+            fullWidth
+            value={formData.student_employee_branch || ""}
+            onChange={handleChange}
+            sx={{
+              backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+              color: isDarkMode ? '#F7FAFC' : '#1E293B',
+              borderRadius: '8px',
+              '& .MuiInputBase-input': {
+                color: isDarkMode ? '#F7FAFC' : '#1E293B',
+              }
+            }}
+            InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            label="Employee Number"
+            name="student_employee_number"
+            fullWidth
+            value={formData.student_employee_number || ""}
+            onChange={handleChange}
+            sx={{
+              backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+              color: isDarkMode ? '#F7FAFC' : '#1E293B',
+              borderRadius: '8px',
+              '& .MuiInputBase-input': {
+                color: isDarkMode ? '#F7FAFC' : '#1E293B',
+              }
+            }}
+            InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+          />
+        </Grid>
+      </>
+    );
+  }
+  return null; // If "No" is selected, nothing will be rendered.
+};
   return (
     <Drawer anchor="right" open={open} onClose={onClose}>
       <Box sx={{ width: drawerWidth, height: "100%", display: "flex", flexDirection: "column", backgroundColor: isDarkMode ? '#2D3748' : '#fff' }}>
@@ -246,6 +347,20 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
         {/* Form content */}
         <Box sx={{ flex: 1, overflowY: "auto", padding: 2 }}>
           <Grid container spacing={2}>
+          <Grid item xs={12}>
+              <Select
+                value={formData.student_willow_relationship || ""}
+                onChange={handleChange}
+                label="Willow Relationship"
+                name="student_willow_relationship"
+                fullWidth
+              >
+                <MenuItem value="Yes">Yes</MenuItem>
+                <MenuItem value="No">No</MenuItem>
+              </Select>
+            </Grid>
+
+            {renderWillowRelationshipFields()}
             {Object.keys(formData).map((key, index) => {
               if (key === "student_dob") {
                 return (
@@ -296,7 +411,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
               }
 
               // Exclude `student_date_stamp` and `id`
-              if (key === "student_date_stamp" || key === "id"  || key === "user_id") return null;
+              if (key === "student_date_stamp" || key === "id" || key === "user_id") return null;
 
               let label = key.replace(/_/g, " ").toLowerCase();
               label = label

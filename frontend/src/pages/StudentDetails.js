@@ -105,42 +105,27 @@ const StudentDetails = () => {
   }, []);
 
   const handleDeleteStudent = async (studentId) => {
-    // try {
-      // Delete the student from the backend
-      // const response = await fetch(`https://willowtonbursary.co.za/api/student-details/delete/${studentId}`, {
-      //   method: 'DELETE',
-      // });
-  
-      // if (response.ok) {
-        console.log("Student deleted successfully!");
-  
-        if (isStudent) {
-          // If the user is a student, clear the selected student details
-          setSelectedStudent(null);
-          setSelectedStudentid(null);
-        } else if (isAdmin) {
-          // If the user is an admin, fetch and set the next student
-          const remainingStudents = studentDetails.filter(student => student.id !== studentId);
-          if (remainingStudents.length > 0) {
-            const nextStudent = remainingStudents[0];  // Select the first student in the remaining list
-            setSelectedStudent(nextStudent);
-            setSelectedStudentid(nextStudent.id);
-          } else {
-            setSelectedStudent(null);  // No students left, reset the selected student
-            setSelectedStudentid(null);
-          }
-        // }
-  
-        // Optionally, refresh the list of students after deletion
-        fetchStudentDetails();
-    //   } else {
-    //     console.error("Failed to delete student.");
-    //   }
-    // } catch (error) {
-    //   console.error("Error deleting student:", error);
+    // console.log("Student deleted successfully!");
+
+    if (isStudent) {
+      // If the user is a student, clear the selected student details
+      setSelectedStudent(null);
+      setSelectedStudentid(null);
+    } else if (isAdmin) {
+      // If the user is an admin, fetch and set the next student
+      const remainingStudents = studentDetails.filter(student => student.id !== studentId);
+      if (remainingStudents.length > 0) {
+        const nextStudent = remainingStudents[0];  // Select the first student in the remaining list
+        setSelectedStudent(nextStudent);
+        setSelectedStudentid(nextStudent.id);
+      } else {
+        setSelectedStudent(null);  // No students left, reset the selected student
+        setSelectedStudentid(null);
+      }
+      fetchStudentDetails();
     }
   };
-  
+
   const isStudentWithNoData = isStudent && !selectedStudent;
   const isUserWithData = (isAdmin || isStudent) && selectedStudent;
   const isSelectedStudent = selectedStudent;
@@ -256,97 +241,32 @@ const StudentDetails = () => {
 
   const handleTabChange = (event, newValue) => setTabValue(newValue);
 
-  // const renderDrawer = () => (
-  //   <DrawerForm
-  //     open={drawerOpen}
-  //     onClose={() => setDrawerOpen(false)}
-  //     studentId={selectedStudentid}
-  //     onSave={(savedStudent) => {
-  //       console.log("Saving student data...");
-
-  //       // Fetch updated student details after saving
-  //       fetchStudentDetails().then((updatedList) => {
-  //         console.log("Fetched updated student details after save");
-
-  //         if (savedStudent?.id) {
-  //           console.log("Saved student has ID");
-
-  //           // If savedStudent has an ID, update selectedStudent with the saved data
-  //           setSelectedStudentid(savedStudent.id);
-  //           setSelectedStudent(savedStudent);
-
-  //           console.log("Updated selected student");
-  //         } else {
-  //           // If no savedStudent, check the updated list and set the first student (if any)
-  //           if (updatedList.length > 0) {
-  //             console.log("No savedStudent, but updated list available. Setting first student");
-  //             setSelectedStudent(updatedList[0]);
-  //             setSelectedStudentid(updatedList[0].id);
-  //           } else {
-  //             // If the list is empty, reset the selectedStudent and selectedStudentid
-  //             console.log("No students found in the updated list. Resetting selected student.");
-  //             setSelectedStudent(null);
-  //             setSelectedStudentid(null);
-  //           }
-  //         }
-  //       });
-
-  //       // Close the drawer after saving
-  //       console.log("Closing drawer after save.");
-  //       setDrawerOpen(false);
-  //     }}
-  //     onDelete={() => {
-  //       console.log("Deleting student...");
-
-  //       // Fetch updated student details after deleting
-  //       fetchStudentDetails().then((updatedList) => {
-  //         console.log("Fetched updated student details after delete");
-
-  //         if (updatedList.length > 0) {
-  //           // Set the first student from the updated list as selectedStudent
-  //           console.log("Updated list available. Setting first student.");
-  //           setSelectedStudent(updatedList[0]);
-  //           setSelectedStudentid(updatedList[0].id);
-  //         } else {
-  //           // No students left, reset selectedStudent and selectedStudentid
-  //           console.log("No students found in the updated list after deletion. Resetting selected student.");
-  //           setSelectedStudent(null);
-  //           setSelectedStudentid(null);
-  //         }
-  //       });
-
-  //       // Close the drawer after deletion
-  //       console.log("Closing drawer after delete.");
-  //       setDrawerOpen(false);
-  //     }}
-  //   />
-  // );
-const renderDrawer = () => (
-<DrawerForm
-  open={drawerOpen}
-  onClose={() => setDrawerOpen(false)}
-  studentId={selectedStudentid}
-  onSave={(savedStudent) => {
-    console.log("Saving student data...");
-    fetchStudentDetails().then((updatedList) => {
-      if (savedStudent?.id) {
-        setSelectedStudentid(savedStudent.id);
-        setSelectedStudent(savedStudent);
-      } else {
-        if (updatedList.length > 0) {
-          setSelectedStudent(updatedList[0]);
-          setSelectedStudentid(updatedList[0].id);
-        } else {
-          setSelectedStudent(null);
-          setSelectedStudentid(null);
-        }
-      }
-    });
-    setDrawerOpen(false);
-  }}
-  onDelete={handleDeleteStudent} // Pass the delete handler to the drawer
-/>
-);
+  const renderDrawer = () => (
+    <DrawerForm
+      open={drawerOpen}
+      onClose={() => setDrawerOpen(false)}
+      studentId={selectedStudentid}
+      onSave={(savedStudent) => {
+        console.log("Saving student data...");
+        fetchStudentDetails().then((updatedList) => {
+          if (savedStudent?.id) {
+            setSelectedStudentid(savedStudent.id);
+            setSelectedStudent(savedStudent);
+          } else {
+            if (updatedList.length > 0) {
+              setSelectedStudent(updatedList[0]);
+              setSelectedStudentid(updatedList[0].id);
+            } else {
+              setSelectedStudent(null);
+              setSelectedStudentid(null);
+            }
+          }
+        });
+        setDrawerOpen(false);
+      }}
+      onDelete={handleDeleteStudent} // Pass the delete handler to the drawer
+    />
+  );
 
   const tabSections = [
     { label: "Show all", key: "show_all" },

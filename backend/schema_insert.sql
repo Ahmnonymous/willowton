@@ -116,3 +116,33 @@ VALUES
 -- Student_Portal_Results
 -- Student_Portal_Voluntary_Service
 -- Student_Portal_Interview
+
+TRUNCATE TABLE 
+    Student_Details_Portal,
+    Student_Portal_Parents_Details,
+    Student_Portal_University_Details,
+    Student_Portal_Assets_Liabilities,
+    Student_Portal_Expense_Details,
+    Student_Portal_Attachments,
+    Student_Portal_About_Me,
+    Student_Portal_Payments,
+    Student_Portal_Results,
+    Student_Portal_Voluntary_Service,
+    Student_Portal_Interview,
+    Student_portal_users
+CASCADE;
+INSERT INTO Student_portal_users (first_name, last_name, email_address, password, user_type)
+VALUES 
+    ('Admin', 'WillowTon', 'communication@willowtonbursary.co.za', '$2b$10$QGVMC.m9wgx1BAirIp6fPezg/Vlm7elwvJ1uhIuDdJW3bo.fNMAqa', 'admin');
+
+
+-- to do
+/*
+Date Picker setting
+show / hide fields for willow relationship on yes/no
+hide payments and interviews tabs to students
+error handling and showing properly to users
+on delete of record of student the region doesn't refresh
+
+email
+*/

@@ -279,7 +279,9 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
             },
           ],
         }}
-        renderInput={(params) => (
+        slots={{
+          textField: (params) => (
+        // renderInput={(params) => (
           <TextField
             {...params}
             fullWidth
@@ -299,7 +301,7 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
               style: { color: isDarkMode ? '#F7FAFC' : '#1E293B' },
             }}
           />
-        )}
+        )}}
       />
     </LocalizationProvider>
   </Grid>

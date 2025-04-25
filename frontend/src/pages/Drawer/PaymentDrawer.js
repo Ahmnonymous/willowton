@@ -21,8 +21,9 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import { ThemeContext } from '../../config/ThemeContext';
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { format, parse } from 'date-fns';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+
 
 const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
   const { isDarkMode } = useContext(ThemeContext);
@@ -233,10 +234,21 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
               />
             </Grid>    
             {/* Date Picker Field */}
+            <Grid item xs={12}>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DatePicker
+              label="Payments Date"
+              value={selectedDate}
+              onChange={handleDateChange}
+              format="DD/MM/YYYY"
+              fullWidth
+            />
+          </LocalizationProvider>
+        </Grid>
             {/* <Grid item xs={12}>
               <LocalizationProvider dateAdapter={AdapterDateFns}>
                 <DatePicker
-                  label="Date"
+                  label="Payment Date"
                   value={selectedDate}
                   onChange={handleDateChange}
                   format="dd/MM/yyyy"
@@ -261,15 +273,14 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
               </LocalizationProvider>
             </Grid> */}
 {/* <Grid container spacing={2}> */}
-  <Grid item xs={12} fullWidth  minWidth='100%'>
-    <LocalizationProvider dateAdapter={AdapterDateFns} fullWidth minWidth='100%'>
+  {/* <Grid item xs={12}>
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
       <DatePicker
         label="Payments Date"
         value={selectedDate}
         onChange={handleDateChange}
         inputFormat="dd/MM/yyyy"
         fullWidth
-        minWidth='100%'
         PopperProps={{
           modifiers: [
             {
@@ -290,26 +301,23 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
               backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
               color: isDarkMode ? '#F7FAFC' : '#1E293B',
               borderRadius: '8px',
-              width: '100%',
-              minWidth: '100%',
               '& .MuiInputBase-input': {
                 color: isDarkMode ? '#F7FAFC' : '#1E293B',
               },
               // Ensure the input takes full width
               '& .MuiInputBase-root': {
                 width: '100%',
-                minWidth: '100%',
               },
             }}
             InputLabelProps={{
-              style: { color: isDarkMode ? '#F7FAFC' : '#1E293B',minWidth: '100%' },
+              style: { color: isDarkMode ? '#F7FAFC' : '#1E293B' },
             }}
           />
         )}
       // }
       />
     </LocalizationProvider>
-  </Grid>
+  </Grid> */}
 {/* </Grid> */}
 
 

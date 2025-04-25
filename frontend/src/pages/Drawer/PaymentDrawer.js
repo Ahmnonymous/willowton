@@ -22,8 +22,8 @@ import { ThemeContext } from '../../config/ThemeContext';
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { format, parse } from 'date-fns';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-
+// import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 
 const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
   const { isDarkMode } = useContext(ThemeContext);
@@ -235,7 +235,7 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
             </Grid>    
             {/* Date Picker Field */}
             <Grid item xs={12}>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <LocalizationProvider dateAdapter={AdapterDateFns}>
             <DatePicker
               wrapperClassName={"datepicker"}
               className={"datepicker"}

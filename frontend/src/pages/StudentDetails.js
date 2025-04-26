@@ -73,7 +73,7 @@ const StudentDetails = () => {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    
+
     const options = { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
     const formattedDate = date.toLocaleString('en-GB', options).replace(',', ''); // Replace comma to match format
     return formattedDate;
@@ -83,7 +83,7 @@ const StudentDetails = () => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
       const userId = user.user_id;
-  
+
       let response;
       if (user.user_type === 'admin') {
         response = await fetch("https://willowtonbursary.co.za/api/student-details");
@@ -93,7 +93,7 @@ const StudentDetails = () => {
         console.error("User type is neither admin nor student or user ID is missing");
         return {};
       }
-  
+
       const data = await response.json();
       if (data) {
         // Dynamically format date fields (check if date_stamp exists)
@@ -103,21 +103,21 @@ const StudentDetails = () => {
             updatedStudent[key] = formatDate(updatedStudent[key]);  // Format the date
           }
         });
-  
+
         // Update the state with the formatted student data
         setStudentDetails([updatedStudent]); // Store it as an array with one element
         setSelectedStudent(updatedStudent);
         setSelectedStudentid(updatedStudent.id);
       }
-  
+
       return data;
-  
+
     } catch (error) {
       console.error("Error fetching student details:", error);
       return {};
     }
   }, []);
-  
+
   const handleDeleteStudent = async (studentId) => {
     // console.log("Student deleted successfully!");
 
@@ -148,7 +148,7 @@ const StudentDetails = () => {
     try {
       const response = await fetch(`https://willowtonbursary.co.za/api/about-me/${studentId}`);
       const data = await response.json();
-    
+
       // Format date fields dynamically
       if (Array.isArray(data)) {
         const formattedData = data.map(item => {
@@ -161,7 +161,6 @@ const StudentDetails = () => {
           return updatedItem;
         });
         setAboutMe(formattedData);
-        console.log(formattedData);
       } else {
         setAboutMe([]);
       }
@@ -358,7 +357,7 @@ const StudentDetails = () => {
       onClose={() => setDrawerOpen(false)}
       studentId={selectedStudentid}
       onSave={(savedStudent) => {
-        console.log("Saving student data...");
+        // console.log("Saving student data...");
         fetchStudentDetails().then((updatedList) => {
           if (savedStudent?.id) {
             setSelectedStudentid(savedStudent.id);
@@ -431,20 +430,36 @@ const StudentDetails = () => {
               .map((key) => fetch(`https://willowtonbursary.co.za/api/${key}/${selectedStudent.id}`).then(res => res.json()))
           );
 
-          setAboutMe(responses[0]);
-          setParentsDetails(responses[1]);
-          setUniversityDetails(responses[2]);
-          setAttachments(responses[3]);
-          setExpensesSummary(responses[4]);
-          setAssetsLiabilities(responses[5]);
-          setAcademicResults(responses[6]);
-          setVoluntaryServices(responses[7]);
-          setPayments(responses[8]);
-          setInterviews(responses[9]);
+          // Apply date formatting for each response (if needed)
+          const formatResponseData = (data) => {
+            return data.map(item => {
+              const updatedItem = { ...item };
+              Object.keys(updatedItem).forEach((key) => {
+                if (key.toLowerCase().endsWith('date_stamp') && updatedItem[key]) {
+                  updatedItem[key] = formatDate(updatedItem[key]); // Format the date
+                }
+              });
+              return updatedItem;
+            });
+          };
+
+          // Format the data for each section
+          setAboutMe(formatResponseData(responses[0]));
+          setParentsDetails(formatResponseData(responses[1]));
+          setUniversityDetails(formatResponseData(responses[2]));
+          setAttachments(formatResponseData(responses[3]));
+          setExpensesSummary(formatResponseData(responses[4]));
+          setAssetsLiabilities(formatResponseData(responses[5]));
+          setAcademicResults(formatResponseData(responses[6]));
+          setVoluntaryServices(formatResponseData(responses[7]));
+          setPayments(formatResponseData(responses[8]));
+          setInterviews(formatResponseData(responses[9]));
+
         } catch (error) {
           console.error("Error fetching section data:", error);
         }
       };
+
 
       fetchAllData();
     }

@@ -447,10 +447,10 @@ const StudentDetails = () => {
     { label: "Parents Details", key: "parents-details" },
     { label: "University Details", key: "university-details" },
     { label: "Attachments", key: "attachments" },
-    { label: "Financial Details", key: "expenses-summary" },
+    { label: "Financial Details", key: "expense-details" },
     { label: "Assets & Liabilities", key: "assets-liabilities" },
     { label: "Academic Results", key: "academic-results" },
-    { label: "Voluntary Services", key: "voluntary-services" },
+    { label: "Voluntary Services", key: "voluntary-service" },
   ];
   
   if (isAdmin) {
@@ -494,7 +494,7 @@ const StudentDetails = () => {
       const fetchAllData = async () => {
         try {
           const responses = await Promise.all(
-            ["about-me", "parents-details", "university-details", "attachments", "expenses-summary", "assets-liabilities", "academic-results", "voluntary-services", "payments", "interviews"]
+            ["about-me", "parents-details", "university-details", "attachments", "expense-details", "assets-liabilities", "academic-results", "voluntary-service", "payments", "interviews"]
               .map((key) => fetch(`https://willowtonbursary.co.za/api/${key}/${selectedStudent.id}`).then(res => res.json()))
           );
 

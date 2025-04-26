@@ -415,7 +415,7 @@ const StudentDetails = () => {
       onClose={() => setDrawerOpen(false)}
       studentId={selectedStudentid}
       onSave={(savedStudent) => {
-        // console.log("Saving student data...");
+        console.log("Saving student data...");
         fetchStudentDetails().then((updatedList) => {
           if (updatedList && updatedList.length > 0) {
             const updatedStudent = updatedList[0];

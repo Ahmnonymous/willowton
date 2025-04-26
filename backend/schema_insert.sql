@@ -138,8 +138,6 @@ VALUES
 
 -- to do
 /*
-student detail page time stamp format
-hide payments and interviews tabs to students
 error handling and showing properly to users
 email
 */

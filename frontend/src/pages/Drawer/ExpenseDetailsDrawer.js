@@ -109,7 +109,7 @@ const ExpenseDetailsDrawer = ({ open, onClose, studentId, expenseDetailsId, onSa
     // Update form data
     setFormData(prev => {
       const newFormData = { ...prev, [name]: value };
-      
+
       // Recalculate total income and total expenses
       const incomeFields = [
         'Father_Monthly_Salary', 'Mother_Monthly_Salary', 'Spouse_Monthly_Salary',
@@ -135,29 +135,29 @@ const ExpenseDetailsDrawer = ({ open, onClose, studentId, expenseDetailsId, onSa
     const totalIncome = Object.keys(formData)
       .filter(key => key.includes("Salary") || key.includes("Income"))
       .reduce((total, key) => total + (parseFloat(formData[key]) || 0), 0);
-  
+
     const totalExpenses = Object.keys(formData)
       .filter(key => key.includes("Expense"))
       .reduce((total, key) => total + (parseFloat(formData[key]) || 0), 0);
-  
+
     const updatedFormData = {
       ...formData,
       total_income: totalIncome.toString(),
       total_expenses: totalExpenses.toString()
     };
-  
+
     const stringFormData = Object.keys(updatedFormData).reduce((acc, key) => {
       const value = updatedFormData[key];
       acc[key] = value !== '' ? value.toString() : value;  // Convert to string
       return acc;
     }, {});
-  
+
     const url = expenseDetailsId
       ? `https://willowtonbursary.co.za/api/expense-details/update/${expenseDetailsId}`
       : `https://willowtonbursary.co.za/api/expense-details/insert`;
-  
+
     const method = expenseDetailsId ? 'PUT' : 'POST';
-  
+
     fetch(url, {
       method,
       headers: { 'Content-Type': 'application/json' },
@@ -172,7 +172,7 @@ const ExpenseDetailsDrawer = ({ open, onClose, studentId, expenseDetailsId, onSa
         console.error('Error saving expense details:', error);
       });
   };
-  
+
   const handleDeleteClick = () => {
     setDeleteConfirmationOpen(true); // Open confirmation dialog
   };

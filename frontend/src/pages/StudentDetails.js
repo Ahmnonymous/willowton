@@ -91,51 +91,11 @@ const StudentDetails = () => {
     return formattedDate.replace(/\//g, '/'); // Replace any / if needed (it shouldn't actually change here)
   };
 
-
-  // const fetchStudentDetails = useCallback(async () => {
-  //   try {
-  //     const user = JSON.parse(localStorage.getItem("user"));
-  //     const userId = user.user_id;
-
-  //     let response;
-  //     if (user.user_type === 'admin') {
-  //       response = await fetch("https://willowtonbursary.co.za/api/student-details");
-  //     } else if (user.user_type === 'student' && userId) {
-  //       response = await fetch(`https://willowtonbursary.co.za/api/student-detail/${userId}`);
-  //     } else {
-  //       console.error("User type is neither admin nor student or user ID is missing");
-  //       return {};
-  //     }
-
-  //     const data = await response.json();
-  //     if (data) {
-  //       // Dynamically format date fields (check if date_stamp exists)
-  //       const updatedStudent = { ...data };  // Copy the data to avoid mutation
-  //       Object.keys(updatedStudent).forEach((key) => {
-  //         if (key.toLowerCase().includes('date_stamp')) {
-  //           updatedStudent[key] = formatDate(updatedStudent[key]);  // Format the date
-  //         }
-  //       });
-
-  //       // Update the state with the formatted student data
-  //       setStudentDetails([updatedStudent]); // Store it as an array with one element
-  //       setSelectedStudent(updatedStudent);
-  //       setSelectedStudentid(updatedStudent.id);
-  //     }
-
-  //     return data;
-
-  //   } catch (error) {
-  //     console.error("Error fetching student details:", error);
-  //     return {};
-  //   }
-  // }, []);
-
   const fetchStudentDetails = useCallback(async () => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
       const userId = user.user_id;
-  
+
       let response;
       if (user.user_type === 'admin') {
         // Admin gets an array of students, handle the first student for now (or modify later to handle a selection)
@@ -147,35 +107,35 @@ const StudentDetails = () => {
         console.error("User type is neither admin nor student or user ID is missing");
         return {};
       }
-  
+
       const data = await response.json();
-  
+
       // Handle different data formats for admin and student
       if (data) {
         // For admin, data is an array, so select the first student or handle as needed
         const updatedStudent = Array.isArray(data) ? data[0] : data;  // If it's an array, take the first student
-  
+
         // Dynamically format date fields (check if date_stamp exists)
         Object.keys(updatedStudent).forEach((key) => {
           if (key.toLowerCase().includes('date_stamp')) {
             updatedStudent[key] = formatDate(updatedStudent[key]);  // Format the date
           }
         });
-  
+
         // Update the state with the formatted student data
         setStudentDetails(Array.isArray(data) ? data : [updatedStudent]);  // Ensure it's an array for consistency
         setSelectedStudent(updatedStudent);
         setSelectedStudentid(updatedStudent.id);
       }
-  
+
       return data;
-  
+
     } catch (error) {
       console.error("Error fetching student details:", error);
       return {};
     }
   }, []);
-  
+
   const handleDeleteStudent = async (studentId) => {
     // console.log("Student deleted successfully!");
 
@@ -416,7 +376,7 @@ const StudentDetails = () => {
       studentId={selectedStudentid}
       onSave={(savedStudent) => {
         console.log("Saving student data...");
-  
+
         // Use savedStudent directly to update the state
         if (savedStudent) {
           // Apply date formatting after saving student data
@@ -425,7 +385,7 @@ const StudentDetails = () => {
               savedStudent[key] = formatDate(savedStudent[key]); // Format the date
             }
           });
-  
+
           // Update the selected student and student ID state
           setSelectedStudentid(savedStudent.id);
           setSelectedStudent(savedStudent);
@@ -433,45 +393,13 @@ const StudentDetails = () => {
           setSelectedStudent(null);
           setSelectedStudentid(null);
         }
-  
+
         // Close the drawer
         setDrawerOpen(false);
       }}
       onDelete={handleDeleteStudent} // Pass the delete handler to the drawer
     />
   );
-  
-  // const renderDrawer = () => (
-  //   <DrawerForm
-  //     open={drawerOpen}
-  //     onClose={() => setDrawerOpen(false)}
-  //     studentId={selectedStudentid}
-  //     onSave={(savedStudent) => {
-  //       console.log("Saving student data...");
-  //       fetchStudentDetails().then((updatedList) => {
-  //         if (updatedList && updatedList.length > 0) {
-  //           const updatedStudent = updatedList[0];
-
-  //           // Apply date formatting after saving student data
-  //           Object.keys(updatedStudent).forEach((key) => {
-  //             if (key.toLowerCase().includes('date_stamp') && updatedStudent[key]) {
-  //               updatedStudent[key] = formatDate(updatedStudent[key]); // Format the date
-  //             }
-  //           });
-
-  //           setSelectedStudentid(updatedStudent.id);
-  //           setSelectedStudent(updatedStudent);
-  //         } else {
-  //           setSelectedStudent(null);
-  //           setSelectedStudentid(null);
-  //         }
-  //       });
-  //       setDrawerOpen(false);
-  //     }}
-  //     onDelete={handleDeleteStudent} // Pass the delete handler to the drawer
-  //   />
-  // );
-
 
   const tabSections = [
     { label: "Show all", key: "show_all" },
@@ -484,13 +412,13 @@ const StudentDetails = () => {
     { label: "Academic Results", key: "academic-results" },
     { label: "Voluntary Services", key: "voluntary-services" },
   ];
-  
+
   if (isAdmin) {
     tabSections.push(
       { label: "Payments", key: "payments" },
       { label: "Interviews", key: "interviews" }
     );
-  }  
+  }
 
   const capitalizeWords = (str) => str.replace(/\b\w/g, (char) => char.toUpperCase()).replace(/-/g, ' ');
 
@@ -745,17 +673,17 @@ const StudentDetails = () => {
 
   const renderTabContent = (tabValue) => {
     const section = tabSections[tabValue];
-    
+
     return section.key === "show_all"
       ? tabSections.filter(s => s.key !== "show_all").map((sec, i) => (
-          // Check if the section is Payments or Interviews, and render only for admin
-          (isAdmin || (sec.key !== 'payments' && sec.key !== 'interviews')) && (
-            <TabContent key={i} sectionKey={sec.key} data={dataForSection(sec.key)} />
-          )
-        ))
+        // Check if the section is Payments or Interviews, and render only for admin
+        (isAdmin || (sec.key !== 'payments' && sec.key !== 'interviews')) && (
+          <TabContent key={i} sectionKey={sec.key} data={dataForSection(sec.key)} />
+        )
+      ))
       : <TabContent sectionKey={section.key} data={dataForSection(section.key)} />;
   };
-  
+
   return (
     <div>
       {/* style={{ backgroundColor: pageStyle.backgroundColor, color: pageStyle.color }}> */}

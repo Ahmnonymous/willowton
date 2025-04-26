@@ -63,32 +63,32 @@ const LoginSignup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     // Reset errors before validating the form
     setErrors({ email: "", password: "" });
-  
+
     // Validation checks only for "signup" mode
     let formValid = true;
     const newErrors = { email: "", password: "" };
-  
+
     if (authMode === "signup") {
       // Email and password validation for Register (signup)
       if (!formData.email_address) {
         newErrors.email = "Email is required";
         formValid = false;
       }
-  
+
       if (formData.password.length < 8) {
         newErrors.password = "Password must be at least 8 characters";
         formValid = false;
       }
     }
-  
+
     if (!formValid) {
       setErrors(newErrors);
       return; // Stop submission if form is invalid
     }
-  
+
     try {
       let response;
       if (authMode === "login") {
@@ -97,7 +97,7 @@ const LoginSignup = () => {
           email_address: formData.email_address,
           password: formData.password,
         });
-  
+
         if (response.data.msg === "User not found") {
           setErrors({
             email: "User does not exist",
@@ -111,11 +111,11 @@ const LoginSignup = () => {
           });
           return; // Stop further processing if password is incorrect
         }
-  
+
         // Ensure both token and user data are stored in localStorage
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("user", JSON.stringify(response.data.user)); // Store user data
-  
+
         // Redirect user to profile or dashboard based on user type
         if (response.data.user.user_type === 'student') {
           window.location.href = "/student-details";  // Redirect to student details
@@ -125,17 +125,17 @@ const LoginSignup = () => {
       } else {
         // Send signup request to backend
         response = await axios.post("https://willowtonbursary.co.za/api/users", formData);
-  
+
         // Auto-login after successful registration
         const loginResponse = await axios.post("https://willowtonbursary.co.za/api/login", {
           email_address: formData.email_address,
           password: formData.password,
         });
-  
+
         // Store token and user data from login
         localStorage.setItem("token", loginResponse.data.token);
         localStorage.setItem("user", JSON.stringify(loginResponse.data.user));
-  
+
         // Redirect to dashboard or student details page based on user type
         if (loginResponse.data.user.user_type === 'student') {
           window.location.href = "/student-details";  // Redirect to student details
@@ -145,7 +145,7 @@ const LoginSignup = () => {
       }
     } catch (error) {
       console.error("Error submitting form", error);
-  
+
       if (error.response?.data?.msg === "Email address is already in use") {
         setErrors((prevErrors) => ({
           ...prevErrors,
@@ -159,7 +159,7 @@ const LoginSignup = () => {
       }
     }
   };
-  
+
 
   return (
     <Box
@@ -338,18 +338,18 @@ const LoginSignup = () => {
           )}
         </form>
       </Box>
-      
+
       {/* Forgot Password Popup */}
-      <Dialog 
-        open={openForgotPassword} 
-        onClose={() => setOpenForgotPassword(false)} 
-        sx={{ 
-          '& .MuiDialog-paper': { 
+      <Dialog
+        open={openForgotPassword}
+        onClose={() => setOpenForgotPassword(false)}
+        sx={{
+          '& .MuiDialog-paper': {
             maxWidth: '300px',          // Set max width to 600px for a wider dialog
             width: '100%',              // Make it responsive to full screen width
             margin: 'auto',             // Center the dialog horizontally and vertically
             padding: '5px',            // Add some padding inside the dialog for better spacing
-          } 
+          }
         }}
       >
         <DialogTitle>
@@ -373,10 +373,10 @@ const LoginSignup = () => {
           />
         </DialogContent>
         <DialogActions sx={{ padding: '5px 20px 20px 20px' }}>
-          <Button 
-            onClick={handleForgotPasswordSubmit} 
-            fullWidth 
-            variant="contained" 
+          <Button
+            onClick={handleForgotPasswordSubmit}
+            fullWidth
+            variant="contained"
             sx={{ backgroundColor: 'black', fontFamily: "Sansation Light", padding: '10px' }}
           >
             Request Password

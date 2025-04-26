@@ -109,15 +109,15 @@ const UserReport = () => {
     onSubmit: async (values) => {
       const response = editUser
         ? await fetch(`https://willowtonbursary.co.za/api/users/${editUser.user_id}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(values),
-          })
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(values),
+        })
         : await fetch("https://willowtonbursary.co.za/api/users", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(values),
-          });
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(values),
+        });
 
       if (response.ok) {
         const data = await response.json();
@@ -174,7 +174,7 @@ const UserReport = () => {
       {/* Header Section with Button */}
       <Box sx={{ border: '1px solid #ccc', padding: "12px", backgroundColor: isDarkMode ? '#1E293B' : '#e1f5fe', borderRadius: "8px", marginBottom: "12px", display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography variant="h6" sx={{ fontWeight: "bold", color: isDarkMode ? '#F7FAFC' : '#1E293B' }}>User Information</Typography>
-        
+
         {/* Show create button only for admins */}
         {userType === "admin" && (
           <Button
@@ -255,8 +255,9 @@ const UserReport = () => {
                     onChange={formik.handleChange}
                     error={formik.touched.first_name && Boolean(formik.errors.first_name)}
                     helperText={formik.touched.first_name && formik.errors.first_name}
-                    sx={{ backgroundColor: isDarkMode ? '#1A202C' : '#ffffff', color: isDarkMode ? '#F7FAFC' : '#1E293B' 
-                      ,'& .MuiInputBase-input': {
+                    sx={{
+                      backgroundColor: isDarkMode ? '#1A202C' : '#ffffff', color: isDarkMode ? '#F7FAFC' : '#1E293B'
+                      , '& .MuiInputBase-input': {
                         color: isDarkMode ? 'white' : '#1e293b',  // Text color inside the input field
                       }
                     }}
@@ -272,13 +273,14 @@ const UserReport = () => {
                     onChange={formik.handleChange}
                     error={formik.touched.last_name && Boolean(formik.errors.last_name)}
                     helperText={formik.touched.last_name && formik.errors.last_name}
-                    sx={{ backgroundColor: isDarkMode ? '#1A202C' : '#ffffff', color: isDarkMode ? '#F7FAFC' : '#1E293B' 
-                      ,'& .MuiInputBase-input': {
+                    sx={{
+                      backgroundColor: isDarkMode ? '#1A202C' : '#ffffff', color: isDarkMode ? '#F7FAFC' : '#1E293B'
+                      , '& .MuiInputBase-input': {
                         color: isDarkMode ? 'white' : '#1e293b',  // Text color inside the input field
                       }
                     }}
                     InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                    
+
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -290,8 +292,9 @@ const UserReport = () => {
                     onChange={formik.handleChange}
                     error={formik.touched.email_address && Boolean(formik.errors.email_address)}
                     helperText={formik.touched.email_address && formik.errors.email_address}
-                    sx={{ backgroundColor: isDarkMode ? '#1A202C' : '#ffffff', color: isDarkMode ? '#F7FAFC' : '#1E293B' 
-                      ,'& .MuiInputBase-input': {
+                    sx={{
+                      backgroundColor: isDarkMode ? '#1A202C' : '#ffffff', color: isDarkMode ? '#F7FAFC' : '#1E293B'
+                      , '& .MuiInputBase-input': {
                         color: isDarkMode ? 'white' : '#1e293b',  // Text color inside the input field
                       }
                     }}
@@ -308,8 +311,9 @@ const UserReport = () => {
                     onChange={formik.handleChange}
                     error={formik.touched.password && Boolean(formik.errors.password)}
                     helperText={formik.touched.password && formik.errors.password}
-                    sx={{ backgroundColor: isDarkMode ? '#1A202C' : '#ffffff', color: isDarkMode ? '#F7FAFC' : '#1E293B' 
-                      ,'& .MuiInputBase-input': {
+                    sx={{
+                      backgroundColor: isDarkMode ? '#1A202C' : '#ffffff', color: isDarkMode ? '#F7FAFC' : '#1E293B'
+                      , '& .MuiInputBase-input': {
                         color: isDarkMode ? 'white' : '#1e293b',  // Text color inside the input field
                       }
                     }}
@@ -317,32 +321,32 @@ const UserReport = () => {
                   />
                 </Grid>
                 <Grid item xs={12}>
-                <TextField
-                  label="User Type"
-                  value={editUser ? editUser.user_type : "admin"} // Default value or user type from edit
-                  disabled // Makes the field non-editable
-                  fullWidth
-                  sx={{
-                    backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',  // Background color
-                    color: isDarkMode ? 'white' : '#1E293B',  // Label color
-                    marginTop: 2,
-                    '& .MuiInputBase-input': {
-                      color: isDarkMode ? 'white' : '#1E293B',  // Text color inside the input field
-                    },
-                    '& .MuiInputLabel-root': {
-                      color: isDarkMode ? '#ffffff' : '#000000',  // Label color
-                    },
-                    '& .MuiInputBase-root.Mui-disabled': {
-                      backgroundColor: isDarkMode ? '#1A202C' : '#ffffff', // Background color for disabled state
-                    },
-                    '& .MuiInputBase-input.Mui-disabled': {
-                      WebkitTextFillColor: isDarkMode ? 'white' : '#1E293B',  // Text color inside the input field when disabled
-                    },
-                  }}
-                  InputLabelProps={{
-                    style: { color: isDarkMode ? '#ffffff' : '#000000' }
-                  }}
-                /> 
+                  <TextField
+                    label="User Type"
+                    value={editUser ? editUser.user_type : "admin"} // Default value or user type from edit
+                    disabled // Makes the field non-editable
+                    fullWidth
+                    sx={{
+                      backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',  // Background color
+                      color: isDarkMode ? 'white' : '#1E293B',  // Label color
+                      marginTop: 2,
+                      '& .MuiInputBase-input': {
+                        color: isDarkMode ? 'white' : '#1E293B',  // Text color inside the input field
+                      },
+                      '& .MuiInputLabel-root': {
+                        color: isDarkMode ? '#ffffff' : '#000000',  // Label color
+                      },
+                      '& .MuiInputBase-root.Mui-disabled': {
+                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff', // Background color for disabled state
+                      },
+                      '& .MuiInputBase-input.Mui-disabled': {
+                        WebkitTextFillColor: isDarkMode ? 'white' : '#1E293B',  // Text color inside the input field when disabled
+                      },
+                    }}
+                    InputLabelProps={{
+                      style: { color: isDarkMode ? '#ffffff' : '#000000' }
+                    }}
+                  />
 
                 </Grid>
               </Grid>

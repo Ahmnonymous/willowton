@@ -33,7 +33,7 @@ router.get('/attachments/view/:id', async (req, res) => {
 
     if (result.rows.length > 0) {
       const file = result.rows[0];
-      
+
       // Ensure Attachments_Name exists before trying to split it
       const fileName = file.attachments_name;
       if (!fileName) {
@@ -41,12 +41,12 @@ router.get('/attachments/view/:id', async (req, res) => {
       }
 
       // Manually extracting the filename and extension
-      const extname = fileName.split('.').pop();  // Get the file extension
-      const baseName = fileName.substring(0, fileName.lastIndexOf('.')); // Get the base name (without extension)
+      const extname = fileName.split('.').pop();
+      const baseName = fileName.substring(0, fileName.lastIndexOf('.'));
 
       // Set content headers for file download/view
       res.setHeader('Content-Disposition', `inline; filename="${fileName}"`);
-      res.setHeader('Content-Type', `application/${extname}`); // Dynamically setting the content type based on the extension
+      res.setHeader('Content-Type', `application/${extname}`);
 
       // Send the file content as the response
       res.send(file.attachment);

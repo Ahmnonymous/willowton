@@ -214,8 +214,8 @@ const UniversityDetailsDrawer = ({
                         '& .MuiInputBase-input': {
                           color: isDarkMode ? '#F7FAFC' : '#1E293B',
                         }
-                      }} 
-                      InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                      }}
+                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
                       />}
                     />
                   </Grid>
@@ -236,8 +236,8 @@ const UniversityDetailsDrawer = ({
                         '& .MuiInputBase-input': {
                           color: isDarkMode ? '#F7FAFC' : '#1E293B',
                         }
-                      }} 
-                      InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                      }}
+                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
                       />}
                     />
                   </Grid>

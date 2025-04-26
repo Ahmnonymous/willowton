@@ -40,156 +40,156 @@ router.get('/dashboard', async (req, res) => {
 
 // Route to fetch region data (assuming there's a region column in your `Student_Details_Portal`)
 router.get('/student-region-distribution', async (req, res) => {
-    try {
-      const query = `
+  try {
+    const query = `
         SELECT Student_Province, COUNT(*) as count 
         FROM Student_Details_Portal 
         GROUP BY Student_Province;
       `;
-  
-      const result = await pool.query(query);
-      
-      // Send the result back to the client
-      res.json(result.rows);
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Server Error' });
-    }
-  });
 
-  
+    const result = await pool.query(query);
+
+    // Send the result back to the client
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server Error' });
+  }
+});
+
+
 // Route to fetch employment status data
 router.get('/student-employment-status', async (req, res) => {
-    try {
-      const query = `
+  try {
+    const query = `
         SELECT Student_Employment_Status, COUNT(*) as count 
         FROM Student_Details_Portal 
         GROUP BY Student_Employment_Status;
       `;
-  
-      const result = await pool.query(query);
-      
-      // Send the result back to the client
-      res.json(result.rows);
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Server Error' });
-    }
-  });
+
+    const result = await pool.query(query);
+
+    // Send the result back to the client
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server Error' });
+  }
+});
 
 // Route to fetch nationality distribution (assuming there's a `Student_Nationality` column in your `Student_Details_Portal`)
 router.get('/student-nationality-distribution', async (req, res) => {
-    try {
-      const query = `
+  try {
+    const query = `
         SELECT Student_Nationality, COUNT(*) as count 
         FROM Student_Details_Portal 
         GROUP BY Student_Nationality;
       `;
-      
-      const result = await pool.query(query);
-      
-      // Send the result back to the client
-      res.json(result.rows);  // The result should have { Student_Nationality, count }
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Server Error' });
-    }
-  });
+
+    const result = await pool.query(query);
+
+    // Send the result back to the client
+    res.json(result.rows);  // The result should have { Student_Nationality, count }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server Error' });
+  }
+});
 
 // Route to fetch current education distribution (assuming there's a `Student_Highest_Education` column in your `Student_Details_Portal`)
 router.get('/student-highest-education-distribution', async (req, res) => {
-    try {
-      const query = `
+  try {
+    const query = `
         SELECT Student_Highest_Education, COUNT(*) as count 
         FROM Student_Details_Portal 
         GROUP BY Student_Highest_Education;
       `;
-      
-      const result = await pool.query(query);
-      
-      // Send the result back to the client
-      res.json(result.rows);  // The result should have { Student_Highest_Education, count }
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Server Error' });
-    }
-  });
 
-  // Route to fetch current education distribution (assuming there's a `Student_Highest_Education` column in your `Student_Details_Portal`)
+    const result = await pool.query(query);
+
+    // Send the result back to the client
+    res.json(result.rows);  // The result should have { Student_Highest_Education, count }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server Error' });
+  }
+});
+
+// Route to fetch current education distribution (assuming there's a `Student_Highest_Education` column in your `Student_Details_Portal`)
 router.get('/student-current-education-distribution', async (req, res) => {
-    try {
-      const query = `
+  try {
+    const query = `
         SELECT Student_Type, COUNT(*) as count 
         FROM Student_Details_Portal 
         GROUP BY Student_Type;
       `;
-      
-      const result = await pool.query(query);
-      
-      // Send the result back to the client
-      res.json(result.rows);  // The result should have { Student_Highest_Education, count }
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Server Error' });
-    }
-  });
+
+    const result = await pool.query(query);
+
+    // Send the result back to the client
+    res.json(result.rows);  // The result should have { Student_Highest_Education, count }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server Error' });
+  }
+});
 
 
-  // Route to fetch race distribution (assuming there's a `Student_Highest_Education` column in your `Student_Details_Portal`)
-  router.get('/student-race-distribution', async (req, res) => {
-    try {
-      const query = `
+// Route to fetch race distribution (assuming there's a `Student_Highest_Education` column in your `Student_Details_Portal`)
+router.get('/student-race-distribution', async (req, res) => {
+  try {
+    const query = `
         SELECT Student_Race, COUNT(*) as count 
         FROM Student_Details_Portal 
         GROUP BY Student_Race;
       `;
-      
-      const result = await pool.query(query);
-      
-      // Send the result back to the client
-      res.json(result.rows);  // The result should have { Student_Highest_Education, count }
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Server Error' });
-    }
-  });
 
-  // Route to fetch martial-status distribution (assuming there's a `Student_Highest_Education` column in your `Student_Details_Portal`)
-  router.get('/student-employment-status-distribution', async (req, res) => {
-    try {
-      const query = `
+    const result = await pool.query(query);
+
+    // Send the result back to the client
+    res.json(result.rows);  // The result should have { Student_Highest_Education, count }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server Error' });
+  }
+});
+
+// Route to fetch martial-status distribution (assuming there's a `Student_Highest_Education` column in your `Student_Details_Portal`)
+router.get('/student-employment-status-distribution', async (req, res) => {
+  try {
+    const query = `
         SELECT Student_employment_status, COUNT(*) as count 
         FROM Student_Details_Portal 
         GROUP BY Student_employment_status;
       `;
-      
-      const result = await pool.query(query);
-      
-      // Send the result back to the client
-      res.json(result.rows);  // The result should have { Student_Highest_Education, count }
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Server Error' });
-    }
-  });
+
+    const result = await pool.query(query);
+
+    // Send the result back to the client
+    res.json(result.rows);  // The result should have { Student_Highest_Education, count }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server Error' });
+  }
+});
 
 // Route to fetch martial-status distribution (assuming there's a `Student_Highest_Education` column in your `Student_Details_Portal`)
 router.get('/student-marital-status-distribution', async (req, res) => {
-    try {
-      const query = `
+  try {
+    const query = `
         SELECT Student_marital_status, COUNT(*) as count 
         FROM Student_Details_Portal 
         GROUP BY Student_marital_status;
       `;
-      
-      const result = await pool.query(query);
-      
-      // Send the result back to the client
-      res.json(result.rows);  // The result should have { Student_Highest_Education, count }
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Server Error' });
-    }
-  });
+
+    const result = await pool.query(query);
+
+    // Send the result back to the client
+    res.json(result.rows);  // The result should have { Student_Highest_Education, count }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server Error' });
+  }
+});
 
 module.exports = router;

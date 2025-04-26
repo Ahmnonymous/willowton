@@ -25,7 +25,7 @@ const PageNotFound = () => {
         px: 2,
       }}
     >
-      <Typography variant="h2" fontWeight="bold" sx={{ py: 4, px: 4,mb: 2,fontSize : '5rem', fontFamily: 'Sansation Light, sans-serif', fontWeight:'bold',color:'black',backgroundColor: 'white' }}>
+      <Typography variant="h2" fontWeight="bold" sx={{ py: 4, px: 4, mb: 2, fontSize: '5rem', fontFamily: 'Sansation Light, sans-serif', fontWeight: 'bold', color: 'black', backgroundColor: 'white' }}>
         PAGE NOT FOUND
       </Typography>
 

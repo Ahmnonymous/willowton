@@ -23,7 +23,6 @@ const StudentExpenseUpdateEmail = ({ studentName, studentSurname }) => {
       <body>
         <div className="email-container">
           <h1>Student Expense Update</h1>
-          {/* <img className="exp" src="https://s3-alpha-sig.figma.com/img/dd6b/5ccd/a6eba30223addf4cdcb4ca53ea1c40b7?Expires=1745798400&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=jUAyNNPGRaISeXeg5sMGkNh8RnfLZ70sjvRRDswEbNQ5m2e1K06R3IyHhw~L7EOHNMxk2oU0R6n2bkuPU8JvpSsu5m4K5EGbiBx3XXT78gZiXcq2zLOf3D2WkfVIYrsu09OPZuSgjrh1PPQM4sjVLOU51GaNLZnTgNJc-wx0XlO9WRbfiwr2w3Ar8XJ8Qzozamm3OAHKbP7OJUmgIHLA0D4acEjrtyZWngcwo1gQcZdYnGXCrstY1acGNw5HE6Jy5E8umCm4uihKqA6oGXJazh8TGSIy3A4x~ctpLLj3C7rgD1eAYjMfabH5glyMaSiquag~o33QX70HNDuVgUxLSA__" alt="Student Expense Update" /> */}
           <Box
             component="img"
             src={backgroundImage}

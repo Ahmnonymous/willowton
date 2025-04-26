@@ -132,9 +132,8 @@ router.put("/expense-details/update/:id", async (req, res) => {
   const assignments = fields.map((field, i) => `${field} = $${i + 1}`).join(", ");
 
   try {
-    const query = `UPDATE Student_Portal_Expense_Details SET ${assignments} WHERE id = $${
-      fields.length + 1
-    } RETURNING *`;
+    const query = `UPDATE Student_Portal_Expense_Details SET ${assignments} WHERE id = $${fields.length + 1
+      } RETURNING *`;
     const result = await pool.query(query, [...values, id]);
     res.json(result.rows[0]);
   } catch (err) {

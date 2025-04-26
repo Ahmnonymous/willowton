@@ -23,7 +23,6 @@ const StudentVoluntaryServicesEmail = ({ studentName, studentSurname }) => {
       <body>
         <div className="email-container">
           <h1>Student Voluntary Services</h1>
-          {/* <img className='volun' src="https://s3-alpha-sig.figma.com/img/7cb0/1aa5/4a2e3670a63bf2269403187686d7dcc7?Expires=1745798400&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=EatlZ-jWuQmhX6NDL-UIch~fVzb9Ytxy2H-c-Ka5tqXKFaOKcIqWEz4U7rFTGqXlPWApt87bcZiTRQ1jpTClIxcLnhDEFkCQuHXm9FtYIFFV-LvCaVBICPKTyjX-iyfuclkTR72zlBp-wTK7SEC-7-p7vdYsM8g6q9BprRYWNRQsQm6xovHicFatqIdFNzLbwXTHOX1yZYTpp-inF3paM4KrBAMa9Y4wEc9SzrPvxXJ8La7r5upljTa39IebotVmGF1zSvrbqWPlr0Br5UJOFi51yDxQVQOJ35gesR7Jq1g~hI77Tr6k0F69XOC0t~aq9I3tqvTzsELd1uAgQEejUg__" alt="Student Voluntary Services" /> */}
           <Box
             component="img"
             src={backgroundImage}

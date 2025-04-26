@@ -4,45 +4,45 @@ const pool = require("../db");
 
 // Utility function to format date to yyyy-MM-dd
 const formatDate = (date) => {
-    if (date) {
-      // Convert the date to a Date object
-      const formattedDate = new Date(date);
-      
-      // Handle time zone shift by adding 19 hours (UTC+19) to adjust the time to your desired output.
-      formattedDate.setHours(formattedDate.getHours() + 19); // Add 19 hours to the date (adjust as needed)
-  
-      // Return the date in ISO format (keeping the date in UTC format)
-      // return formattedDate.toISOString();
-      return formattedDate.toISOString().split('T')[0];
-    }
-    return null; // If date is null, return null
-  };
+  if (date) {
+    // Convert the date to a Date object
+    const formattedDate = new Date(date);
+
+    // Handle time zone shift by adding 19 hours (UTC+19) to adjust the time to your desired output.
+    formattedDate.setHours(formattedDate.getHours() + 19); // Add 19 hours to the date (adjust as needed)
+
+    // Return the date in ISO format (keeping the date in UTC format)
+    // return formattedDate.toISOString();
+    return formattedDate.toISOString().split('T')[0];
+  }
+  return null; // If date is null, return null
+};
 
 // Route for Student details
 router.get("/view/student-details", async (req, res) => {
-    try {
-      const result = await pool.query("SELECT * FROM Student_Details_Portal ORDER BY STUDENT_NAME,STUDENT_SURNAME");
-  
-      // Format the dob field before sending response
-      const formattedResults = result.rows.map(student => {
-        return {
-          ...student,
-          student_dob: formatDate(student.student_dob),  // Format DOB field
-        };
-      });
-  
-      res.json(formattedResults);
-    } catch (error) {
-      console.error("Error fetching student details:", error);
-      res.status(500).json({ error: "Failed to fetch student details" });
-    }
-  });
+  try {
+    const result = await pool.query("SELECT * FROM Student_Details_Portal ORDER BY STUDENT_NAME,STUDENT_SURNAME");
+
+    // Format the dob field before sending response
+    const formattedResults = result.rows.map(student => {
+      return {
+        ...student,
+        student_dob: formatDate(student.student_dob),  // Format DOB field
+      };
+    });
+
+    res.json(formattedResults);
+  } catch (error) {
+    console.error("Error fetching student details:", error);
+    res.status(500).json({ error: "Failed to fetch student details" });
+  }
+});
 
 // Route for Parent Details Report
 router.get('/view/parent-detail-report', async (req, res) => {
-    try {
-      // SQL Query to fetch required columns from both Student_Details_Portal and Student_Portal_Parents_Details
-      const query = `
+  try {
+    // SQL Query to fetch required columns from both Student_Details_Portal and Student_Portal_Parents_Details
+    const query = `
         SELECT 
           s.Student_Name,
           s.Student_Surname,
@@ -62,27 +62,27 @@ router.get('/view/parent-detail-report', async (req, res) => {
         ON 
           s.id = p.Student_Details_Portal_id;
       `;
-  
-      const result = await pool.query(query);
-  
-      // If no data is found
-      if (result.rows.length === 0) {
-        return res.status(404).json({ message: 'No records found' });
-      }
-  
-      // Send the result back to the client
-      res.json(result.rows);
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Server Error' });
+
+    const result = await pool.query(query);
+
+    // If no data is found
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'No records found' });
     }
-  });
-    
+
+    // Send the result back to the client
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server Error' });
+  }
+});
+
 // Route for Student Equity Report
 router.get('/view/student-equity', async (req, res) => {
-    try {
-      // SQL Query to fetch required columns from both Student_Details_Portal and Student_Portal_Assets_Liabilities
-      const query = `
+  try {
+    // SQL Query to fetch required columns from both Student_Details_Portal and Student_Portal_Assets_Liabilities
+    const query = `
       SELECT 
         s.Student_Name,
         s.Student_Surname,
@@ -113,29 +113,29 @@ router.get('/view/student-equity', async (req, res) => {
         (a.Investments ~ '^\\d+(\\.\\d+)?$' OR a.Investments IS NULL) AND
         (a.Liabilities ~ '^\\d+(\\.\\d+)?$' OR a.Liabilities IS NULL);
     `;
-    
-    
-      const result = await pool.query(query);
-  
-      // If no data is found
-      if (result.rows.length === 0) {
-        return res.status(404).json({ message: 'No records found' });
-      }
-  
-      // Send the result back to the client
-      res.json(result.rows);
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Server Error' });
+
+
+    const result = await pool.query(query);
+
+    // If no data is found
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'No records found' });
     }
-  });
-  
+
+    // Send the result back to the client
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server Error' });
+  }
+});
+
 
 // Route for Student Payments
 router.get('/view/student-payments-report', async (req, res) => {
-    try {
-      // SQL Query to fetch required columns from both Student_Details_Portal and Student_Portal_Payments
-      const query = `
+  try {
+    // SQL Query to fetch required columns from both Student_Details_Portal and Student_Portal_Payments
+    const query = `
         SELECT 
           s.Student_Name,
           s.Student_Surname,
@@ -157,28 +157,28 @@ router.get('/view/student-payments-report', async (req, res) => {
         ON 
           s.id = p.Student_Details_Portal_id;
       `;
-  
-      const result = await pool.query(query);
-  
-      // If no data is found
-      if (result.rows.length === 0) {
-        return res.status(404).json({ message: 'No records found' });
-      }
-  
-      // Send the result back to the client
-      res.json(result.rows);
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Server Error' });
+
+    const result = await pool.query(query);
+
+    // If no data is found
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'No records found' });
     }
-  });
+
+    // Send the result back to the client
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server Error' });
+  }
+});
 
 
 // Route for Voluntary Servies
 router.get('/view/student-voluntary-service', async (req, res) => {
-    try {
-      // SQL Query to fetch required columns from both Student_Details_Portal and Student_Portal_Voluntary_Service
-      const query = `
+  try {
+    // SQL Query to fetch required columns from both Student_Details_Portal and Student_Portal_Voluntary_Service
+    const query = `
         SELECT 
           s.Student_Name,
           s.Student_Surname,
@@ -198,21 +198,21 @@ router.get('/view/student-voluntary-service', async (req, res) => {
         ON 
           s.id = v.Student_Details_Portal_id;
       `;
-  
-      const result = await pool.query(query);
-  
-      // If no data is found
-      if (result.rows.length === 0) {
-        return res.status(404).json({ message: 'No records found' });
-      }
-  
-      // Send the result back to the client
-      res.json(result.rows);
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Server Error' });
+
+    const result = await pool.query(query);
+
+    // If no data is found
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'No records found' });
     }
-  });
-  
+
+    // Send the result back to the client
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server Error' });
+  }
+});
+
 
 module.exports = router;

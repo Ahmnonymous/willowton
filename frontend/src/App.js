@@ -17,7 +17,6 @@ import Eligibility from "./pages/Eligibility";
 import POPIA from "./pages/POPIA";
 import PageNotFound from "./pages/PageNotFound";
 import Dashboard from "./pages/Dashboard";
-import AddStudent from "./pages/AddStudent";
 import StudentDetails from "./pages/StudentDetails";
 import UserCreation from "./pages/CreateAdmin";
 import LogReg from "./pages/logreg";
@@ -47,7 +46,6 @@ const PageTitleUpdater = () => {
     else if (path === "/dashboard") title = "Dashboard";
     else if (path === "/student-details") title = "Student Details";
     else if (path === "/user-info") title = "User Information";
-    else if (path === "/add-student") title = "Add Student";
     else if (path === "/login-register") title = "Login/Register";
     else if (path === "/send-email") title = "Send Email";
     else if (path.startsWith("/reports")) {
@@ -86,14 +84,14 @@ const LayoutHandler = () => {
   const pageBackgroundColor = pageBackgroundColors[location.pathname] || null;
 
   const isWebAppPage = location.pathname.startsWith("/dashboard") ||
-                       location.pathname.startsWith("/add-student") ||
-                       location.pathname.startsWith("/student-details") ||
-                       location.pathname.startsWith("/user-info") ||
-                       location.pathname.startsWith("/reports/student-report") ||
-                       location.pathname.startsWith("/reports/parent-report") ||
-                       location.pathname.startsWith("/reports/student-equity") ||
-                       location.pathname.startsWith("/reports/payment-report") ||
-                       location.pathname.startsWith("/reports/voluntary-report");
+    location.pathname.startsWith("/add-student") ||
+    location.pathname.startsWith("/student-details") ||
+    location.pathname.startsWith("/user-info") ||
+    location.pathname.startsWith("/reports/student-report") ||
+    location.pathname.startsWith("/reports/parent-report") ||
+    location.pathname.startsWith("/reports/student-equity") ||
+    location.pathname.startsWith("/reports/payment-report") ||
+    location.pathname.startsWith("/reports/voluntary-report");
 
   const isReportPage = location.pathname.startsWith("/reports");
 
@@ -114,7 +112,7 @@ const LayoutHandler = () => {
   const isAccessiblePage = () => {
     if (!isLoggedIn) {
       // User is not logged in, allow access to public pages
-      return ["/", "/about-us", "/contact-us", "/eligibility", "/popia", "/login-register","/send-email"].includes(location.pathname);
+      return ["/", "/about-us", "/contact-us", "/eligibility", "/popia", "/login-register", "/send-email"].includes(location.pathname);
     }
     if (isAdmin) {
       // Admin has access to all pages
@@ -175,7 +173,6 @@ const LayoutHandler = () => {
           {isAdmin && (
             <>
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/add-student" element={<AddStudent />} />
               <Route path="/student-details" element={<StudentDetails />} />
               <Route path="/user-info" element={<UserCreation />} />
             </>
@@ -190,13 +187,13 @@ const LayoutHandler = () => {
 
           {isAdmin && (
             <>
-          {/* Report Pages */}
-          <Route path="/reports/parent-report" element={<ParentReport />} />
-          <Route path="/reports/student-equity" element={<StudentEquity />} />
-          <Route path="/reports/payment-report" element={<PaymentReport />} />
-          <Route path="/reports/student-report" element={<StudentReport />} />
-          <Route path="/reports/voluntary-report" element={<VoluntaryReport />} />
-          </>
+              {/* Report Pages */}
+              <Route path="/reports/parent-report" element={<ParentReport />} />
+              <Route path="/reports/student-equity" element={<StudentEquity />} />
+              <Route path="/reports/payment-report" element={<PaymentReport />} />
+              <Route path="/reports/student-report" element={<StudentReport />} />
+              <Route path="/reports/voluntary-report" element={<VoluntaryReport />} />
+            </>
           )}
 
           {/* Page Not Found */}

@@ -2,8 +2,8 @@
 const express = require("express");
 const cors = require("cors");
 const session = require("express-session");  // Import session
+const allRoutes = require("./routes/allroutes"); 
 const studentRoutes = require("./routes/studentRoutes"); 
-const studentRoutesother = require("./routes/studentRoutes_other"); 
 const aboutMeRoutes = require("./routes/aboutmeroutes");
 const parentsRoutes = require("./routes/parentsroutes");
 const universitydetailsroutes = require("./routes/universitydetailsroutes");
@@ -36,7 +36,7 @@ app.use(
 
 // Use the student routes
 app.use("/api", studentRoutes); 
-app.use("/api", studentRoutesother);
+app.use("/api", allRoutes);
 app.use("/api", aboutMeRoutes);
 app.use("/api", parentsRoutes);
 app.use("/api", universitydetailsroutes);

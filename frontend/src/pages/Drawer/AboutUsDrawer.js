@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react"; 
+import React, { useEffect, useState, useContext } from "react";
 import {
   Drawer,
   Box,
@@ -28,7 +28,7 @@ const AboutusDrawer = ({ open, onClose, studentId, aboutMeId, onSave }) => {
   const isLargeScreen = useMediaQuery("(min-width:600px)");
 
   // Drawer width based on screen size
-  const drawerWidth = isLargeScreen ? 500 : 330;  
+  const drawerWidth = isLargeScreen ? 500 : 330;
 
   // Custom questions
   const questions = [

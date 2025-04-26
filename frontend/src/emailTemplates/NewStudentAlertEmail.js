@@ -23,7 +23,6 @@ const NewStudentAlertEmail = ({ studentName, studentSurname }) => {
       <body>
         <div className="email-container">
           <h1>New Student Alert</h1>
-          {/* <img className="new" src="https://s3-alpha-sig.figma.com/img/8c01/7638/e98d42a44034a49b108612e133a51685?Expires=1745798400&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=jC~sXo-6bqDFz73LgFC26gc3Mwwo5oIcACyRHofxiwP2gmL~Jw1DUtrStftFWZIC82qIV9MNv~G~g6rJvuaWK6cMvXuXopXvqjd3TB2Og9myYYGzPC-Ko8M1Et~r~xy--WejoJ2SFOiF9cRIWmJlZGk-MwYpTD20SVeDxMdGpEUZ7ElF4H~RTQRa0MlSMf3lHFfBCBdx-sWgwlQXGDPWS0dL9RoHarEAO54qGO-SLPbpalgjHcXhp7TMzaYJUqeQQKPOgWdCv-6GtOY6xmBEw19Z3R5yexzVtL8KJkbc6~8Vh1yyiZ7YrlKApuzLMo9AS-wWaTOnzCwType3K8UA2A__" alt="New Student" /> */}
           <Box
             component="img"
             src={backgroundImage}

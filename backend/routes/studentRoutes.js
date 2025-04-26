@@ -7,7 +7,7 @@ const formatDate = (date) => {
   if (date) {
     // Convert the date to a Date object
     const formattedDate = new Date(date);
-    
+
     // Handle time zone shift by adding 19 hours (UTC+19) to adjust the time to your desired output.
     formattedDate.setHours(formattedDate.getHours() + 19); // Add 19 hours to the date (adjust as needed)
 
@@ -124,7 +124,7 @@ router.post("/student-details/insert", async (req, res) => {
     // Handle null values for student_dob and student_number_of_siblings
     const formattedDob = student_dob === "" ? null : student_dob;
     const formattedSiblings = student_number_of_siblings === "" ? null : student_number_of_siblings;
-    
+
     // Insert into database
     const result = await pool.query(
       `INSERT INTO Student_Details_Portal (
@@ -182,7 +182,7 @@ router.post("/student-details/insert", async (req, res) => {
     // res.status(201).json({ message: "Student created successfully", id: result.rows[0].id });
     const newStudentId = result.rows[0].id;
     const newStudentResult = await pool.query("SELECT * FROM Student_Details_Portal WHERE id = $1", [newStudentId]);
-    
+
     if (newStudentResult.rows.length > 0) {
       const student = newStudentResult.rows[0];
       student.student_dob = formatDate(student.student_dob);
@@ -190,7 +190,7 @@ router.post("/student-details/insert", async (req, res) => {
     } else {
       res.status(404).json({ error: "Student created but not found" });
     }
-    
+
   } catch (error) {
     console.error("Error creating student:", error);
     res.status(500).json({ error: "Failed to create student" });
@@ -242,7 +242,7 @@ router.put("/student-details/update/:id", async (req, res) => {
     // Handle null values for student_dob and student_number_of_siblings
     const formattedDob = student_dob === "" ? null : student_dob;
     const formattedSiblings = student_number_of_siblings === "" ? null : student_number_of_siblings;
-  
+
     const result = await pool.query(
       `UPDATE Student_Details_Portal SET
         student_name = $1,

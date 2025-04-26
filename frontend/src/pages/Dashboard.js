@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Card, CardContent, Typography, Grid, CircularProgress, Box , useTheme, useMediaQuery } from '@mui/material';
+import { Card, CardContent, Typography, Grid, CircularProgress, Box, useTheme, useMediaQuery } from '@mui/material';
 import { People, Payment, VolunteerActivism, Work } from '@mui/icons-material';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts'; // Using Recharts for Pie Chart
 import { useContext } from 'react';
@@ -22,11 +22,11 @@ const Dashboard = () => {
   const theme = useTheme();
   // const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm')); // Detect small screen sizes (mobile)
   // const isMediumScreen = useMediaQuery(theme.breakpoints.up('sm').and(theme.breakpoints.down('md'))); // Detect medium screen sizes (tablet)
-  
+
   // Detect screen sizes
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm')); // Detect small screen sizes (mobile)
   const isMediumScreen = useMediaQuery(theme.breakpoints.between('sm', 'md')); // Detect medium screen sizes (tablet)
-  
+
   // Dynamically set the radius based on screen size
   const getOuterRadius = () => {
     if (isSmallScreen) return 55; // Small screen: smaller radius
@@ -155,7 +155,7 @@ const Dashboard = () => {
           Welcome, {userName}! 👋
         </Typography>
       </Box>
-      
+
       <Grid container spacing={3}>
         {/* Student Count Card */}
         <Grid item xs={12} sm={6} md={3}>

@@ -73,8 +73,6 @@ router.post("/academic-results/insert", upload.single("Results_Attachment"), asy
 
 router.put("/academic-results/update/:id", upload.single("Results_Attachment"), async (req, res) => {
   const { Results_Module, Results_Percentage } = req.body;
-  // const fileBuffer = req.file?.buffer;
-  // const fileName = req.file?.originalname;
   const fileBuffer = req.file ? req.file.buffer : null;
   const fileName = req.file ? req.file.originalname : null;
 

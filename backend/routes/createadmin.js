@@ -2,7 +2,7 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const pool = require("../db");  // Assuming you're using pg for PostgreSQL
+const pool = require("../db");
 const session = require("express-session");
 const router = express.Router();
 
@@ -46,7 +46,6 @@ router.post("/users", async (req, res) => {
 });
 
 // User login (with password validation and session)
-// User login (with password validation and session)
 router.post("/login", async (req, res) => {
   const { email_address, password } = req.body;
 
@@ -58,7 +57,7 @@ router.post("/login", async (req, res) => {
 
     // Check if user exists
     if (result.rows.length === 0) {
-      return res.status(400).json({ msg: "User not found" }); // Return user not found error
+      return res.status(400).json({ msg: "User not found" });
     }
 
     const user = result.rows[0];
@@ -66,7 +65,7 @@ router.post("/login", async (req, res) => {
 
     // Check if password matches
     if (!isMatch) {
-      return res.status(400).json({ msg: "Incorrect password" }); // Return incorrect password error
+      return res.status(400).json({ msg: "Incorrect password" });
     }
 
     // Create a JWT token
@@ -180,7 +179,7 @@ router.put("/users/:id", async (req, res) => {
         first_name,
         last_name,
         email_address,
-        hashedPassword || undefined, // Only update password if provided
+        hashedPassword || undefined,
         id
       ]
     );

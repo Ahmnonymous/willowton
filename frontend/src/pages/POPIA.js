@@ -101,7 +101,7 @@ const POPIA = () => {
           Processing Personal Information
         </Typography>
         <Divider sx={{ borderColor: 'white' }} />
-        <Typography  mt={1} sx={textStyle}>
+        <Typography mt={1} sx={textStyle}>
           We may share your information under the following circumstances:
         </Typography>
         <Box
@@ -146,7 +146,7 @@ const POPIA = () => {
           Cookies
         </Typography>
         <Divider sx={{ borderColor: 'white' }} />
-        <Typography  mt={1} variant="body1" paragraph sx={textStyle}>
+        <Typography mt={1} variant="body1" paragraph sx={textStyle}>
           Cookies are small text files used to recognize users and enhance website functionality. You can disable cookies via your browser settings, but certain features may not be available without them.
         </Typography>
 
@@ -154,7 +154,7 @@ const POPIA = () => {
           Security Measures
         </Typography>
         <Divider sx={{ borderColor: 'white' }} />
-        <Typography  mt={1} variant="body1" paragraph sx={textStyle}>
+        <Typography mt={1} variant="body1" paragraph sx={textStyle}>
           We treat your personal information as confidential and implement appropriate measures to protect it against unauthorized access, loss, or damage. We will notify you promptly of any unauthorized use or disclosure of your information.
         </Typography>
 
@@ -162,15 +162,15 @@ const POPIA = () => {
           Retention of Personal Information
         </Typography>
         <Divider sx={{ borderColor: 'white' }} />
-        <Typography  mt={1} variant="body1" paragraph sx={textStyle}>
+        <Typography mt={1} variant="body1" paragraph sx={textStyle}>
           We will not retain your personal information longer than necessary, unless required by law or with your consent.
         </Typography>
 
         <Typography variant="h6" gutterBottom sx={{ ...textStyle, fontWeight: "bold", fontSize: fontSizes.h6, marginTop: '30px' }}>
           Selling Personal Information
         </Typography>
-        <Divider  sx={{ borderColor: 'white' }} />
-        <Typography  mt={1} variant="body1" paragraph sx={textStyle}>
+        <Divider sx={{ borderColor: 'white' }} />
+        <Typography mt={1} variant="body1" paragraph sx={textStyle}>
           We do not sell your personal information. We only share it with service providers in line with this privacy policy.
         </Typography>
 
@@ -178,7 +178,7 @@ const POPIA = () => {
           Your Rights
         </Typography>
         <Divider sx={{ borderColor: 'white' }} />
-        <Typography mt={1}  variant="body1" paragraph mb={0} sx={textStyle}>
+        <Typography mt={1} variant="body1" paragraph mb={0} sx={textStyle}>
           You have the rights to:
         </Typography>
 
@@ -198,23 +198,23 @@ const POPIA = () => {
         <Typography variant="h6" gutterBottom sx={{ ...textStyle, fontWeight: "bold", fontSize: fontSizes.h6, marginTop: '30px' }}>
           Transborder of Flow Information
         </Typography>
-        <Divider  sx={{ borderColor: 'white' }} />
-        <Typography mt={1}  variant="body1" paragraph sx={textStyle}>
+        <Divider sx={{ borderColor: 'white' }} />
+        <Typography mt={1} variant="body1" paragraph sx={textStyle}>
           We may transfer your information across South African borders for retention purposes or if our service providers operate internationally. We will ensure these providers have comparable privacy policies.
         </Typography>
 
         <Typography variant="h6" gutterBottom sx={{ ...textStyle, fontWeight: "bold", fontSize: fontSizes.h6, marginTop: '30px' }}>
           Changes to This Policy
         </Typography>
-        <Divider  sx={{ borderColor: 'white' }} />
-        <Typography  mt={1} variant="body1" paragraph sx={textStyle}>
+        <Divider sx={{ borderColor: 'white' }} />
+        <Typography mt={1} variant="body1" paragraph sx={textStyle}>
           We may update this privacy notice to reflect changes in our practices or legal requirements. If you are dissatisfied with our response, you have the right to lodge a complaint with:
         </Typography>
 
         <Typography variant="h6" fontStyle='italic' gutterBottom sx={{ ...textStyle, fontSize: fontSizes.h6, marginTop: '20px' }}>
           The Information Regulator
         </Typography>
-        <Typography  variant="body1" paragraph sx={textStyle}>
+        <Typography variant="body1" paragraph sx={textStyle}>
           JD House, 27 Stiemens Street, Braamfontein, Johannesburg, 2001
           <br />Complaints: complaints.IR@justice.gov.za
           <br />General Queries: inforeg@justice.gov.za

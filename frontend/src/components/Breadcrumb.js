@@ -8,7 +8,7 @@ const Breadcrumb = ({ title }) => {
 
   return (
     <Box sx={{ padding: "12px", backgroundColor: isDarkMode ? '#1e293b' : '#e1f5fe', borderRadius: "8px", marginBottom: "12px", border: '1px solid #ccc' }}>
-      <Typography variant="h6" sx={{ color: isDarkMode ? 'white' : 'black',fontWeight: "bold"}}>
+      <Typography variant="h6" sx={{ color: isDarkMode ? 'white' : 'black', fontWeight: "bold" }}>
         {title}
       </Typography>
     </Box>

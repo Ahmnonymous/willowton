@@ -116,17 +116,14 @@ const TopNavBar = ({ toggleSidebar }) => {
             onClose={handleMenuClose}
             sx={{
               borderRadius: "0",  // Square corners for the dropdown
-              // border: "2px solid black",  // Black border
-              // width: "200px",
-              // boxShadow: "0 4px 8px rgba(0,0,0,0.15)",
               marginTop: "10px",
             }}
           >
             {/* Menu Items with Icons */}
-            <MenuItem component="a" href="/" sx={{ padding: '10px', fontFamily: 'Sansation Light', marginTop:'-8px' }}>
+            <MenuItem component="a" href="/" sx={{ padding: '10px', fontFamily: 'Sansation Light', marginTop: '-8px' }}>
               <DashboardIcon sx={{ mr: 1 }} /> Home
             </MenuItem>
-            <MenuItem onClick={handleLogout} sx={{ padding: '10px', fontFamily: 'Sansation Light', marginBottom:'-8px' }}>
+            <MenuItem onClick={handleLogout} sx={{ padding: '10px', fontFamily: 'Sansation Light', marginBottom: '-8px' }}>
               <ExitToAppIcon sx={{ mr: 1 }} /> Logout
             </MenuItem>
           </Menu>

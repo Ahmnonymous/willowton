@@ -26,7 +26,7 @@ const EligibilityPage = () => {
           },
         }}
       >
-        <Typography variant="h4" align="center" gutterBottom sx={{ ...textStyle,mb: 4, fontWeight: "bold", fontSize: fontSizes.h4 }}>
+        <Typography variant="h4" align="center" gutterBottom sx={{ ...textStyle, mb: 4, fontWeight: "bold", fontSize: fontSizes.h4 }}>
           Eligibility Requirements
         </Typography>
 
@@ -77,7 +77,7 @@ const EligibilityPage = () => {
           />
         </ListItem>
 
-        <Typography variant="h6" gutterBottom sx={{ ...textStyle,mt: 2, mb: 1, fontWeight: "bold", fontSize: fontSizes.h6 }}>
+        <Typography variant="h6" gutterBottom sx={{ ...textStyle, mt: 2, mb: 1, fontWeight: "bold", fontSize: fontSizes.h6 }}>
           Scholarship Awards
         </Typography>
         <Divider />
@@ -85,7 +85,7 @@ const EligibilityPage = () => {
           Applicants may be required to achieve a minimum of 65% in a subject/module to be considered for the bursary.
         </Typography>
 
-        <Typography variant="h6" gutterBottom sx={{ ...textStyle,mt: 4, mb: 1, fontWeight: "bold", fontSize: fontSizes.h6 }}>
+        <Typography variant="h6" gutterBottom sx={{ ...textStyle, mt: 4, mb: 1, fontWeight: "bold", fontSize: fontSizes.h6 }}>
           Eligibility for Zakah
         </Typography>
         <Divider />
@@ -102,13 +102,13 @@ const EligibilityPage = () => {
             "Those in Debt: Individuals who find themselves in debt due to circumstances beyond their control and cannot settle their debt from existing assets.",
             "Zakah is an outright grant and does not require repayment. However, voluntary contributions or ‘repayment’ may be made if desired, and this will be judged by Allah."
           ].map((text, idx) => (
-            <Box key={idx} component="li" sx={{ mb:1, fontSize: fontSizes.body1 }}>
+            <Box key={idx} component="li" sx={{ mb: 1, fontSize: fontSizes.body1 }}>
               {text}
             </Box>
           ))}
         </List>
 
-        <Typography variant="h6" gutterBottom sx={{ ...textStyle,mt: 2, mb: 1, fontWeight: "bold", fontSize: fontSizes.h6 }}>
+        <Typography variant="h6" gutterBottom sx={{ ...textStyle, mt: 2, mb: 1, fontWeight: "bold", fontSize: fontSizes.h6 }}>
           Bursary Coverage
         </Typography>
         <Divider />
@@ -123,7 +123,7 @@ const EligibilityPage = () => {
           ))}
         </List>
 
-        <Typography variant="h6" gutterBottom sx={{ ...textStyle,mt: 2, mb: 1, fontWeight: "bold", fontSize: fontSizes.h6 }}>
+        <Typography variant="h6" gutterBottom sx={{ ...textStyle, mt: 2, mb: 1, fontWeight: "bold", fontSize: fontSizes.h6 }}>
           How to Apply
         </Typography>
         <Divider />
@@ -184,7 +184,7 @@ const EligibilityPage = () => {
                       <List sx={{ listStyleType: "disc", pl: 3 }} >
                         {section.items.map((item, i) => (
                           <ListItem key={i} sx={{ display: "list-item", mb: -2 }}>
-                            <ListItemText primary={item} primaryTypographyProps={textStyle}  mb={1} />
+                            <ListItemText primary={item} primaryTypographyProps={textStyle} mb={1} />
                           </ListItem>
                         ))}
                       </List>
@@ -223,16 +223,16 @@ const EligibilityPage = () => {
             "Students will not be entitled to withdraw any funds paid by Willowton/SANZAF, even if a balance remains in their favour.",
             "All information submitted in the application is confidential. Certain details may be shared with SANZAF members when necessary."
           ].map((text, idx) => (
-            <Box key={idx} component="li" sx={{ mb: 1, color:'black', fontSize: fontSizes.body1 }}>
+            <Box key={idx} component="li" sx={{ mb: 1, color: 'black', fontSize: fontSizes.body1 }}>
               {text}
             </Box>
           ))}
         </List>
       </Container>
-      
+
       <Box
         component="img"
-        src={footerImage} 
+        src={footerImage}
         alt="Graduates"
         sx={{ width: '100%', height: 'auto', mb: 1 }}
       />

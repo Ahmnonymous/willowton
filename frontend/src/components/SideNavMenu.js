@@ -19,7 +19,7 @@ const SideNavMenu = ({ open }) => {
   const location = useLocation();
   const [openDropdown, setOpenDropdown] = useState(false);
   const [user, setUser] = useState(null); // State for user data
-  
+
   // Load user from localStorage
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));

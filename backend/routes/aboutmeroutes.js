@@ -31,26 +31,26 @@ router.get("/about-me/:studentId", async (req, res) => {
 });
 
 router.get("/about-me/id/:id", async (req, res) => {
-    const { id } = req.params;
-    try {
-      const result = await pool.query(
-        "SELECT * FROM Student_Portal_About_Me WHERE id = $1",
-        [id]
-      );
-      if (result.rows.length > 0) {
-        const data = result.rows[0];
-        data.about_me_date_stamp = formatDate(data.about_me_date_stamp);
-        res.json(data);
-      } else {
-        res.status(404).json({ error: "Not found" });
-      }
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: "Error fetching About Me by ID" });
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      "SELECT * FROM Student_Portal_About_Me WHERE id = $1",
+      [id]
+    );
+    if (result.rows.length > 0) {
+      const data = result.rows[0];
+      data.about_me_date_stamp = formatDate(data.about_me_date_stamp);
+      res.json(data);
+    } else {
+      res.status(404).json({ error: "Not found" });
     }
-  });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error fetching About Me by ID" });
+  }
+});
 
-  
+
 router.post("/about-me/insert", async (req, res) => {
   const {
     student_details_portal_id,

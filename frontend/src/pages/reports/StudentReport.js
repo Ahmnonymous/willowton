@@ -51,22 +51,22 @@ function GenericTable() {
   const sentenceCase = (str) => {
     return str
       .replace(/_/g, ' ') // Replace underscores with spaces
-      .replace(/\b\w/g, (char) => char.toUpperCase()) 
+      .replace(/\b\w/g, (char) => char.toUpperCase())
   };
 
   return (
     <Box sx={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC', minHeight: '100vh', padding: '1px' }}>
       <div>
         <Breadcrumb title="Student Report" />
-        
+
         {/* Generic Search Input */}
         <div className="generic-search-container">
-          <input 
-            type="text" 
-            className="generic-search-input" 
-            placeholder="Search..." 
-            value={searchTerm} 
-            onChange={(e) => setSearchTerm(e.target.value)} 
+          <input
+            type="text"
+            className="generic-search-input"
+            placeholder="Search..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
 
@@ -88,9 +88,9 @@ function GenericTable() {
                     {columns.map((column) => (
                       <td key={column} style={{ color: isDarkMode ? 'white' : '#1e293b' }}>
                         {/* Format dates for 'student_date_stamp' and 'student_dob' columns */}
-                        {column === 'student_date_stamp' || column === 'student_dob' 
+                        {column === 'student_date_stamp' || column === 'student_dob'
                           ? formatDate(student[column]) // Format the date fields
-                          : student[column]} 
+                          : student[column]}
                       </td>
                     ))}
                   </tr>

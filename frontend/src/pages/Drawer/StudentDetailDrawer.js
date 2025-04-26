@@ -30,7 +30,7 @@ import {
   provinces,
   yes_no,
 } from "../../components/lov"; // Import LOVs
-import { ThemeContext } from '../../config/ThemeContext'; 
+import { ThemeContext } from '../../config/ThemeContext';
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -154,7 +154,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     const formattedDate = newDate ? format(newDate, 'MM/dd/yyyy') : '';
     setFormData(prev => ({ ...prev, student_dob: formattedDate }));
   };
-  
+
   useEffect(() => {
     if (formData.student_willow_relationship === 'No') {
       setFormData((prevState) => ({
@@ -256,25 +256,6 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
             {Object.keys(formData).map((key, index) => {
               if (key === "student_dob") {
                 return (
-                  // <Grid item xs={12} key={index}>
-                  //   <TextField
-                  //     label="Student DOB"
-                  //     name="student_dob"
-                  //     type="date"
-                  //     fullWidth
-                  //     value={formData.student_dob || ""}
-                  //     onChange={handleChange}
-                  //     sx={{
-                  //       backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                  //       color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                  //       borderRadius: '8px',
-                  //       '& .MuiInputBase-input': {
-                  //         color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                  //       }
-                  //     }}
-                  //     InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                  //   />
-                  // </Grid>
                   <Grid item xs={12} key={index}>
                     <LocalizationProvider dateAdapter={AdapterDateFns}>
                       <DatePicker

@@ -49,58 +49,58 @@ function GenericTable() {
 
   return (
     <Box sx={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC', minHeight: '100vh', padding: '1px' }}>
-    <div>
-      <Breadcrumb title="Voluntary Service" />
-      
-      {/* Generic Search Input */}
-      <div className="generic-search-container">
-        <input 
-          type="text" 
-          className="generic-search-input" 
-          placeholder="Search..." 
-          value={searchTerm} 
-          onChange={(e) => setSearchTerm(e.target.value)} 
-        />
-      </div>
+      <div>
+        <Breadcrumb title="Voluntary Service" />
 
-      <div className="generic-table-container">
-      <table className="generic-table" style={{ backgroundColor: isDarkMode ? '#1e293b' : 'white' }}>
-          <thead>
-            <tr>
-              {columns.map((column) => (
-                <th key={column}>
-                  {column
-                    .replace(/_/g, ' ') // Replace underscores with spaces
-                    .replace(/\b\w/g, (char) => char.toUpperCase())} {/* Convert to Title Case */}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {filteredStudents.length > 0 ? (
-              filteredStudents.map((student) => (
-                <tr key={student.id}>
-                  {columns.map((column) => (
-                    <td key={column}>
-                      {/* Format dates for 'student_date_stamp' and 'student_dob' columns */}
-                      {column === 'voluntary_service_date_stamp' || column === 'student_dob' 
-                        ? formatDate(student[column]) // Format the date fields
-                        : student[column]} 
-                    </td>
-                  ))}
-                </tr>
-              ))
-            ) : (
+        {/* Generic Search Input */}
+        <div className="generic-search-container">
+          <input
+            type="text"
+            className="generic-search-input"
+            placeholder="Search..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+
+        <div className="generic-table-container">
+          <table className="generic-table" style={{ backgroundColor: isDarkMode ? '#1e293b' : 'white' }}>
+            <thead>
               <tr>
-                <td colSpan={columns.length} className="no-matching-records">
-                  No matching records found
-                </td>
+                {columns.map((column) => (
+                  <th key={column}>
+                    {column
+                      .replace(/_/g, ' ') // Replace underscores with spaces
+                      .replace(/\b\w/g, (char) => char.toUpperCase())} {/* Convert to Title Case */}
+                  </th>
+                ))}
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredStudents.length > 0 ? (
+                filteredStudents.map((student) => (
+                  <tr key={student.id}>
+                    {columns.map((column) => (
+                      <td key={column}>
+                        {/* Format dates for 'student_date_stamp' and 'student_dob' columns */}
+                        {column === 'voluntary_service_date_stamp' || column === 'student_dob'
+                          ? formatDate(student[column]) // Format the date fields
+                          : student[column]}
+                      </td>
+                    ))}
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={columns.length} className="no-matching-records">
+                    No matching records found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
     </Box>
   );
 }

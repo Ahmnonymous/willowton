@@ -172,9 +172,9 @@ const AttachmentsDrawer = ({ open, onClose, studentId, attachmentId, onSave }) =
                     color: isDarkMode ? '#F7FAFC' : '#1E293B',
                   },
                   '& .MuiInputBase-input.Mui-disabled': {
-                      WebkitTextFillColor: isDarkMode ? 'white' : '#1E293B',  // Text color inside the input field when disabled
-                    },
-                    
+                    WebkitTextFillColor: isDarkMode ? 'white' : '#1E293B',  // Text color inside the input field when disabled
+                  },
+
                 }}
                 InputLabelProps={{ style: { color: isDarkMode ? '#F7FAFC' : '#1E293B' } }}
               />

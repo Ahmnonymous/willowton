@@ -84,7 +84,7 @@ const WebNavBar = () => {
       case '/popia':
         return 'white'; // POPIA
       case '/logreg':
-        return 'black';  
+        return 'black';
       default:
         return 'black';
     }
@@ -102,10 +102,10 @@ const WebNavBar = () => {
         return '#FFFFFF'; // Eligibility
       case '/popia':
         return '#000000'; // POPIA
-      case '/logreg':  
+      case '/logreg':
         return '#FFB612';
       default:
-        return '#FFB612';  
+        return '#FFB612';
     }
   };
 
@@ -164,7 +164,7 @@ const WebNavBar = () => {
           sx={{
             color: getButtonTextColor(location.pathname),
             backgroundColor: 'transparent',
-            border: '2px solid '+getButtonTextColor(location.pathname),
+            border: '2px solid ' + getButtonTextColor(location.pathname),
             padding: '6px 12px',
             borderRadius: '2px',
             fontFamily: 'Sansation Light, sans-serif',
@@ -183,7 +183,7 @@ const WebNavBar = () => {
       )}
       {token && (  // If the user is logged in, show the user icon with a dropdown
         <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} ref={dropdownRef} onClick={handleMenuClick}>
-          <AccountCircleIcon sx={{ fontSize: 30, mr: 1,color: getButtonTextColor(location.pathname) }} />  {/* User icon filled with black */}
+          <AccountCircleIcon sx={{ fontSize: 30, mr: 1, color: getButtonTextColor(location.pathname) }} />  {/* User icon filled with black */}
           <Typography sx={{ color: getButtonTextColor(location.pathname), fontFamily: 'Sansation Light', fontSize: '0.8rem' }}>
             {user.first_name}
           </Typography>
@@ -193,25 +193,20 @@ const WebNavBar = () => {
             open={Boolean(anchorEl)}
             onClose={handleMenuClose}
             sx={{
-              // boxShadow: "0 4px 8px rgba(0,0,0,0.15)",
               borderRadius: "0",  // Removed rounded corners for square
-              // marginTop: "5px",  // Reduced margin to make the dropdown appear closer
-              // border: "2px solid black",  // Black border around the dropdown
-              // padding: "0",
-              // width: "200px",
             }}
           >
             {/* Conditional redirection based on user type */}
             {user.user_type === 'student' ? (
-              <MenuItem component={Link} to="/student-details" onClick={handleMenuClose} sx={{ color: 'black', padding: '10px', fontFamily: 'Sansation Light', marginTop:'-8px' }} >
-                <AccountCircleIcon sx={{ mr: 1, color: 'black'}} /> Student Details
+              <MenuItem component={Link} to="/student-details" onClick={handleMenuClose} sx={{ color: 'black', padding: '10px', fontFamily: 'Sansation Light', marginTop: '-8px' }} >
+                <AccountCircleIcon sx={{ mr: 1, color: 'black' }} /> Student Details
               </MenuItem>
             ) : (
-              <MenuItem component={Link} to="/dashboard" onClick={handleMenuClose} sx={{ color: 'black', padding: '10px', fontFamily: 'Sansation Light', marginTop:'-8px'  }} >
+              <MenuItem component={Link} to="/dashboard" onClick={handleMenuClose} sx={{ color: 'black', padding: '10px', fontFamily: 'Sansation Light', marginTop: '-8px' }} >
                 <AccountCircleIcon sx={{ mr: 1, color: 'black' }} /> Dashboard
               </MenuItem>
             )}
-            <MenuItem onClick={handleLogout} sx={{ padding: '10px', fontFamily: 'Sansation Light' , marginBottom:'-8px' }}>
+            <MenuItem onClick={handleLogout} sx={{ padding: '10px', fontFamily: 'Sansation Light', marginBottom: '-8px' }}>
               <ExitToAppIcon sx={{ mr: 1 }} /> Log Out
             </MenuItem>
           </Menu>
@@ -227,7 +222,7 @@ const WebNavBar = () => {
     { text: 'POPIA', link: '/popia' },
     { text: 'Contact Us', link: '/contact-us' },
     ...(token ? [  // If the user is logged in, add Dashboard or Student Details options based on user type
-      user.user_type === 'admin' 
+      user.user_type === 'admin'
         ? { text: 'Dashboard', link: '/dashboard' }
         : { text: 'Student Details', link: '/student-details' },
       { text: 'Log Out', link: '#', onClick: handleLogout },
@@ -239,41 +234,14 @@ const WebNavBar = () => {
   return (
     <AppBar position="relative" sx={{ backgroundColor: 'transparent', boxShadow: 'none' }}>
       <Toolbar>
-        <Container sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%',
+        <Container sx={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%',
           maxWidth: 'none', // Removes the max-width constraint
           '@media (min-width:1200px)': {
             maxWidth: '100%', // Ensures the container spans the full width on larger screens
           },
-         }}>
+        }}>
           {/* Left side: Hamburger + WillowTon */}
-          {/* <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              edge="start"
-              onClick={() => toggleDrawer(true)}
-              sx={{ display: { xs: 'flex', sm: 'none' }, mr: 1 ,color: getButtonTextColor(location.pathname) }}
-            >
-              <MenuIcon />
-            </IconButton>
-
-            <Typography
-              variant="h6"
-              component={Link}  // Make it clickable using Link component
-              to="/"  // Link to the home page
-              sx={{
-                color: getButtonTextColor(location.pathname),
-                // fontWeight: 600,
-                display: 'block',
-                // fontFamily: 'Sansation Light, sans-serif',
-                textDecoration: 'none', // Remove underline from link
-                cursor: 'pointer', // Change cursor to pointer for better UX
-              }}
-            >
-              WillowTon
-            </Typography>
-          </Box> */}
-
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             {/* Hamburger (only on XS) */}
             <IconButton

@@ -92,45 +92,90 @@ const StudentDetails = () => {
   };
 
 
+  // const fetchStudentDetails = useCallback(async () => {
+  //   try {
+  //     const user = JSON.parse(localStorage.getItem("user"));
+  //     const userId = user.user_id;
+
+  //     let response;
+  //     if (user.user_type === 'admin') {
+  //       response = await fetch("https://willowtonbursary.co.za/api/student-details");
+  //     } else if (user.user_type === 'student' && userId) {
+  //       response = await fetch(`https://willowtonbursary.co.za/api/student-detail/${userId}`);
+  //     } else {
+  //       console.error("User type is neither admin nor student or user ID is missing");
+  //       return {};
+  //     }
+
+  //     const data = await response.json();
+  //     if (data) {
+  //       // Dynamically format date fields (check if date_stamp exists)
+  //       const updatedStudent = { ...data };  // Copy the data to avoid mutation
+  //       Object.keys(updatedStudent).forEach((key) => {
+  //         if (key.toLowerCase().includes('date_stamp')) {
+  //           updatedStudent[key] = formatDate(updatedStudent[key]);  // Format the date
+  //         }
+  //       });
+
+  //       // Update the state with the formatted student data
+  //       setStudentDetails([updatedStudent]); // Store it as an array with one element
+  //       setSelectedStudent(updatedStudent);
+  //       setSelectedStudentid(updatedStudent.id);
+  //     }
+
+  //     return data;
+
+  //   } catch (error) {
+  //     console.error("Error fetching student details:", error);
+  //     return {};
+  //   }
+  // }, []);
+
   const fetchStudentDetails = useCallback(async () => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
       const userId = user.user_id;
-
+  
       let response;
       if (user.user_type === 'admin') {
+        // Admin gets an array of students, handle the first student for now (or modify later to handle a selection)
         response = await fetch("https://willowtonbursary.co.za/api/student-details");
       } else if (user.user_type === 'student' && userId) {
+        // Student gets a single student object
         response = await fetch(`https://willowtonbursary.co.za/api/student-detail/${userId}`);
       } else {
         console.error("User type is neither admin nor student or user ID is missing");
         return {};
       }
-
+  
       const data = await response.json();
+  
+      // Handle different data formats for admin and student
       if (data) {
+        // For admin, data is an array, so select the first student or handle as needed
+        const updatedStudent = Array.isArray(data) ? data[0] : data;  // If it's an array, take the first student
+  
         // Dynamically format date fields (check if date_stamp exists)
-        const updatedStudent = { ...data };  // Copy the data to avoid mutation
         Object.keys(updatedStudent).forEach((key) => {
           if (key.toLowerCase().includes('date_stamp')) {
             updatedStudent[key] = formatDate(updatedStudent[key]);  // Format the date
           }
         });
-
+  
         // Update the state with the formatted student data
-        setStudentDetails([updatedStudent]); // Store it as an array with one element
+        setStudentDetails(Array.isArray(data) ? data : [updatedStudent]);  // Ensure it's an array for consistency
         setSelectedStudent(updatedStudent);
         setSelectedStudentid(updatedStudent.id);
       }
-
+  
       return data;
-
+  
     } catch (error) {
       console.error("Error fetching student details:", error);
       return {};
     }
   }, []);
-
+  
   const handleDeleteStudent = async (studentId) => {
     // console.log("Student deleted successfully!");
 

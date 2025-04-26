@@ -468,10 +468,10 @@ const StudentDetails = () => {
       "parents-details": parentsDetails,
       "university-details": universityDetails,
       "attachments": attachments,
-      "expenses-summary": expensesSummary,
+      "expense-details": expensesSummary,
       "assets-liabilities": assetsLiabilities,
       "academic-results": academicResults,
-      "voluntary-services": voluntaryServices,
+      "voluntary-service": voluntaryServices,
       "payments": payments,
       "interviews": interviews
     };
@@ -540,10 +540,10 @@ const StudentDetails = () => {
     const isParents = sectionKey === "parents-details";
     const isUniversityDetails = sectionKey === "university-details";
     const isAttachments = sectionKey === "attachments";
-    const isExpenses = sectionKey === "expenses-summary";
+    const isExpenses = sectionKey === "expense-details";
     const isAssetsLiabilities = sectionKey === "assets-liabilities";
     const isAcademicResults = sectionKey === "academic-results";
-    const isVoluntaryServices = sectionKey === "voluntary-services";
+    const isVoluntaryServices = sectionKey === "voluntary-service";
     const isPayments = sectionKey === "payments";
     const isInterview = sectionKey === "interviews";
 
@@ -555,7 +555,7 @@ const StudentDetails = () => {
       <Box sx={{ padding: 0, border: '1px solid #ccc', marginBottom: 2, backgroundColor: isDarkMode ? '#1e293b' : 'white', color: pageStyle.color }}>
         <Box sx={{ padding: 1, display: 'flex', alignItems: 'center', marginBottom: 0.5, borderBottom: 1, borderBottomColor: '#ccc', height: 40, backgroundColor: isDarkMode ? '#1e293b' : '#e1f5fe' }}>
           <Typography variant="h6" sx={{ fontWeight: 'bold', marginLeft: 1 }}>
-            {capitalizeWords(sectionKey === "expenses-summary" ? "financial-details" : sectionKey)}
+            {capitalizeWords(sectionKey === "expense-details" ? "financial-details" : sectionKey)}
           </Typography>
 
           {isSelectedStudent && (isAboutMe || isParents || isUniversityDetails || isAttachments || isExpenses

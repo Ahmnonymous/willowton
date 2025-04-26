@@ -447,10 +447,10 @@ const StudentDetails = () => {
     { label: "Parents Details", key: "parents-details" },
     { label: "University Details", key: "university-details" },
     { label: "Attachments", key: "attachments" },
-    { label: "Financial Details", key: "expense-details" },
+    { label: "Financial Details", key: "expenses-summary" },
     { label: "Assets & Liabilities", key: "assets-liabilities" },
     { label: "Academic Results", key: "academic-results" },
-    { label: "Voluntary Services", key: "voluntary-service" },
+    { label: "Voluntary Services", key: "voluntary-services" },
   ];
   
   if (isAdmin) {
@@ -468,10 +468,10 @@ const StudentDetails = () => {
       "parents-details": parentsDetails,
       "university-details": universityDetails,
       "attachments": attachments,
-      "expense-details": expensesSummary,
+      "expenses-summary": expensesSummary,
       "assets-liabilities": assetsLiabilities,
       "academic-results": academicResults,
-      "voluntary-service": voluntaryServices,
+      "voluntary-services": voluntaryServices,
       "payments": payments,
       "interviews": interviews
     };
@@ -494,7 +494,7 @@ const StudentDetails = () => {
       const fetchAllData = async () => {
         try {
           const responses = await Promise.all(
-            ["about-me", "parents-details", "university-details", "attachments", "expense-details", "assets-liabilities", "academic-results", "voluntary-service", "payments", "interviews"]
+            ["about-me", "parents-details", "university-details", "attachments", "expenses-summary", "assets-liabilities", "academic-results", "voluntary-services", "payments", "interviews"]
               .map((key) => fetch(`https://willowtonbursary.co.za/api/${key}/${selectedStudent.id}`).then(res => res.json()))
           );
 
@@ -540,10 +540,10 @@ const StudentDetails = () => {
     const isParents = sectionKey === "parents-details";
     const isUniversityDetails = sectionKey === "university-details";
     const isAttachments = sectionKey === "attachments";
-    const isExpenses = sectionKey === "expense-details";
+    const isExpenses = sectionKey === "expenses-summary";
     const isAssetsLiabilities = sectionKey === "assets-liabilities";
     const isAcademicResults = sectionKey === "academic-results";
-    const isVoluntaryServices = sectionKey === "voluntary-service";
+    const isVoluntaryServices = sectionKey === "voluntary-services";
     const isPayments = sectionKey === "payments";
     const isInterview = sectionKey === "interviews";
 
@@ -555,7 +555,7 @@ const StudentDetails = () => {
       <Box sx={{ padding: 0, border: '1px solid #ccc', marginBottom: 2, backgroundColor: isDarkMode ? '#1e293b' : 'white', color: pageStyle.color }}>
         <Box sx={{ padding: 1, display: 'flex', alignItems: 'center', marginBottom: 0.5, borderBottom: 1, borderBottomColor: '#ccc', height: 40, backgroundColor: isDarkMode ? '#1e293b' : '#e1f5fe' }}>
           <Typography variant="h6" sx={{ fontWeight: 'bold', marginLeft: 1 }}>
-            {capitalizeWords(sectionKey === "expense-details" ? "financial-details" : sectionKey)}
+            {capitalizeWords(sectionKey === "expenses-summary" ? "financial-details" : sectionKey)}
           </Typography>
 
           {isSelectedStudent && (isAboutMe || isParents || isUniversityDetails || isAttachments || isExpenses

@@ -19,6 +19,7 @@ import { Link, useLocation } from 'react-router-dom';
 import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import WillowTonLogo from '../images/willowton_logo.png';  // Adjust path as needed
 
 const WebNavBar = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -245,8 +246,7 @@ const WebNavBar = () => {
           },
          }}>
           {/* Left side: Hamburger + WillowTon */}
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            {/* Hamburger (only on XS) */}
+          {/* <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <IconButton
               color="inherit"
               aria-label="open drawer"
@@ -257,7 +257,6 @@ const WebNavBar = () => {
               <MenuIcon />
             </IconButton>
 
-            {/* WillowTon text (now clickable to go to home page) */}
             <Typography
               variant="h6"
               component={Link}  // Make it clickable using Link component
@@ -273,6 +272,28 @@ const WebNavBar = () => {
             >
               WillowTon
             </Typography>
+          </Box> */}
+
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            {/* Hamburger (only on XS) */}
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              edge="start"
+              onClick={() => toggleDrawer(true)}
+              sx={{ display: { xs: 'flex', sm: 'none' }, mr: 1, color: getButtonTextColor(location.pathname) }}
+            >
+              <MenuIcon />
+            </IconButton>
+
+            {/* Replace the text with the logo image */}
+            <Link to="/" style={{ textDecoration: 'none' }}>
+              <img
+                src={WillowTonLogo} // Path to the logo image
+                alt="WillowTon Logo"
+                style={{ height: '40px', width: 'auto' }} // Adjust height as needed
+              />
+            </Link>
           </Box>
 
           {/* Nav items on desktop */}

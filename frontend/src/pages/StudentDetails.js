@@ -74,10 +74,23 @@ const StudentDetails = () => {
   const formatDate = (dateString) => {
     const date = new Date(dateString);
 
-    const options = { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
-    const formattedDate = date.toLocaleString('en-GB', options).replace(',', ''); // Replace comma to match format
-    return formattedDate;
+    // Create the format for the date in the form of '24/Apr/2025 06:15PM'
+    const options = {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    };
+
+    // Format the date
+    const formattedDate = date.toLocaleString('en-GB', options).replace(',', '');
+
+    // Ensure the format is exactly what you want
+    return formattedDate.replace(/\//g, '/'); // Replace any / if needed (it shouldn't actually change here)
   };
+
 
   const fetchStudentDetails = useCallback(async () => {
     try {
@@ -359,17 +372,21 @@ const StudentDetails = () => {
       onSave={(savedStudent) => {
         // console.log("Saving student data...");
         fetchStudentDetails().then((updatedList) => {
-          if (savedStudent?.id) {
-            setSelectedStudentid(savedStudent.id);
-            setSelectedStudent(savedStudent);
+          if (updatedList && updatedList.length > 0) {
+            const updatedStudent = updatedList[0];
+
+            // Apply date formatting after saving student data
+            Object.keys(updatedStudent).forEach((key) => {
+              if (key.toLowerCase().includes('date_stamp') && updatedStudent[key]) {
+                updatedStudent[key] = formatDate(updatedStudent[key]); // Format the date
+              }
+            });
+
+            setSelectedStudentid(updatedStudent.id);
+            setSelectedStudent(updatedStudent);
           } else {
-            if (updatedList.length > 0) {
-              setSelectedStudent(updatedList[0]);
-              setSelectedStudentid(updatedList[0].id);
-            } else {
-              setSelectedStudent(null);
-              setSelectedStudentid(null);
-            }
+            setSelectedStudent(null);
+            setSelectedStudentid(null);
           }
         });
         setDrawerOpen(false);
@@ -377,6 +394,7 @@ const StudentDetails = () => {
       onDelete={handleDeleteStudent} // Pass the delete handler to the drawer
     />
   );
+
 
   const tabSections = [
     { label: "Show all", key: "show_all" },
@@ -388,9 +406,14 @@ const StudentDetails = () => {
     { label: "Assets & Liabilities", key: "assets-liabilities" },
     { label: "Academic Results", key: "academic-results" },
     { label: "Voluntary Services", key: "voluntary-services" },
-    { label: "Payments", key: "payments" },
-    { label: "Interviews", key: "interviews" }
   ];
+  
+  if (isAdmin) {
+    tabSections.push(
+      { label: "Payments", key: "payments" },
+      { label: "Interviews", key: "interviews" }
+    );
+  }  
 
   const capitalizeWords = (str) => str.replace(/\b\w/g, (char) => char.toUpperCase()).replace(/-/g, ' ');
 
@@ -478,6 +501,9 @@ const StudentDetails = () => {
     const isVoluntaryServices = sectionKey === "voluntary-services";
     const isPayments = sectionKey === "payments";
     const isInterview = sectionKey === "interviews";
+
+    // Ensure only admins can see Payments and Interviews sections
+    if ((isPayments || isInterview) && !isAdmin) return null;
 
     return (
 
@@ -642,13 +668,17 @@ const StudentDetails = () => {
 
   const renderTabContent = (tabValue) => {
     const section = tabSections[tabValue];
+    
     return section.key === "show_all"
       ? tabSections.filter(s => s.key !== "show_all").map((sec, i) => (
-        <TabContent key={i} sectionKey={sec.key} data={dataForSection(sec.key)} />
-      ))
+          // Check if the section is Payments or Interviews, and render only for admin
+          (isAdmin || (sec.key !== 'payments' && sec.key !== 'interviews')) && (
+            <TabContent key={i} sectionKey={sec.key} data={dataForSection(sec.key)} />
+          )
+        ))
       : <TabContent sectionKey={section.key} data={dataForSection(section.key)} />;
   };
-
+  
   return (
     <div>
       {/* style={{ backgroundColor: pageStyle.backgroundColor, color: pageStyle.color }}> */}

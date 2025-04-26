@@ -36,7 +36,7 @@ app.use(
 
 // Use the student routes
 app.use("/api", studentRoutes); 
-app.use("/api", studentRoutesother);
+// app.use("/api", studentRoutesother);
 app.use("/api", aboutMeRoutes);
 app.use("/api", parentsRoutes);
 app.use("/api", universitydetailsroutes);

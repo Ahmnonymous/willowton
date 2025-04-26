@@ -161,6 +161,7 @@ const StudentDetails = () => {
           return updatedItem;
         });
         setAboutMe(formattedData);
+        console.log(formattedData);
       } else {
         setAboutMe([]);
       }

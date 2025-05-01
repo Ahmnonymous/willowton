@@ -78,9 +78,9 @@ const WebNavBar = () => {
       case '/about-us':
         return '#007a4d'; // About Us
       case '/contact-us':
-        return 'black'; // Contact Us
+        return '#de3831'; // Contact Us
       case '/eligibility':
-        return '#de3831'; // Eligibility
+        return 'black'; // Eligibility
       case '/popia':
         return 'white'; // POPIA
       case '/logreg':

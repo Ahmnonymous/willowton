@@ -209,7 +209,7 @@ const ExpenseDetailsDrawer = ({ open, onClose, studentId, expenseDetailsId, onSa
         <Box sx={{ flex: 1, overflowY: 'auto', p: 2 }}>
           <Grid container spacing={2}>
             {/* Income Fields */}
-            {['Father_Monthly_Salary', 'Mother_Monthly_Salary', 'Spouse_Monthly_Salary', 'Applicant_Monthly_Salary', 'Rent_Income', 'Grants', 'Other_Income'].map((key, idx) => {
+            {['Applicant_Monthly_Salary', 'Father_Monthly_Salary', 'Mother_Monthly_Salary', 'Spouse_Monthly_Salary',  'Rent_Income', 'Grants', 'Other_Income'].map((key, idx) => {
               const label = key.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
               return (
                 <Grid item xs={12} key={idx}>

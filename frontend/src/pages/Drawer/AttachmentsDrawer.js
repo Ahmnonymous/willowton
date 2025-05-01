@@ -154,6 +154,27 @@ const AttachmentsDrawer = ({ open, onClose, studentId, attachmentId, onSave }) =
         <Box sx={{ flex: 1, overflowY: "auto", p: 2 }}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
+               <TextField
+                label="Description"
+                name="Attachments_Description"
+                fullWidth
+                value={formData.Attachments_Description || ""}
+                onChange={handleChange}
+                sx={{
+                  backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                  color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                  borderRadius: '8px',
+                  '& .MuiInputBase-input': {
+                    color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                  },
+                  '& .MuiFormLabel-root': {
+                    color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                  },
+                }}
+                InputLabelProps={{ style: { color: isDarkMode ? '#F7FAFC' : '#1E293B' } }}
+              />
+            </Grid>
+            <Grid item xs={12}>
               <TextField
                 label="Attachment Name"
                 name="Attachments_Name"
@@ -175,27 +196,6 @@ const AttachmentsDrawer = ({ open, onClose, studentId, attachmentId, onSave }) =
                     WebkitTextFillColor: isDarkMode ? 'white' : '#1E293B',  // Text color inside the input field when disabled
                   },
 
-                }}
-                InputLabelProps={{ style: { color: isDarkMode ? '#F7FAFC' : '#1E293B' } }}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                label="Description"
-                name="Attachments_Description"
-                fullWidth
-                value={formData.Attachments_Description || ""}
-                onChange={handleChange}
-                sx={{
-                  backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                  color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                  borderRadius: '8px',
-                  '& .MuiInputBase-input': {
-                    color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                  },
-                  '& .MuiFormLabel-root': {
-                    color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                  },
                 }}
                 InputLabelProps={{ style: { color: isDarkMode ? '#F7FAFC' : '#1E293B' } }}
               />

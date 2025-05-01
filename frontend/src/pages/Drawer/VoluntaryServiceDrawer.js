@@ -193,12 +193,16 @@ const VoluntaryServiceDrawer = ({ open, onClose, studentId, recordId, onSave }) 
               />
             </Grid>
             <Grid item xs={12}>
-              <TextField
+            <TextField
                 label="Contact Number"
                 name="Contact_Person_Number"
                 fullWidth
                 value={formData.Contact_Person_Number || ""}
                 onChange={handleChange}
+                inputProps={{
+                  maxLength: 10, // restrict input to 10 digits
+                  pattern: "[0-9]{10}", // allow only 10 digits
+                }}
                 sx={{
                   backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
                   color: isDarkMode ? '#F7FAFC' : '#1E293B',
@@ -208,6 +212,7 @@ const VoluntaryServiceDrawer = ({ open, onClose, studentId, recordId, onSave }) 
                   }
                 }}
                 InputLabelProps={{ style: { color: isDarkMode ? '#F7FAFC' : '#1E293B' } }}
+                helperText="Please enter a 10-digit contact number" // optional helper text
               />
             </Grid>
             <Grid item xs={12}>

@@ -51,7 +51,7 @@ export const semesters = [
 
 export const financeType = [
   "Staff Bursary",
-  "Student Load",
+  "Student Loan",
   "Zakah"
 ];
 

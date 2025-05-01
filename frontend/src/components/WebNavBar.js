@@ -76,11 +76,11 @@ const WebNavBar = () => {
       case '/':
         return 'black'; // Home
       case '/about-us':
-        return 'black'; // About Us
+        return '#007a4d'; // About Us
       case '/contact-us':
         return 'black'; // Contact Us
       case '/eligibility':
-        return 'black'; // Eligibility
+        return '#de3831'; // Eligibility
       case '/popia':
         return 'white'; // POPIA
       case '/logreg':
@@ -232,7 +232,7 @@ const WebNavBar = () => {
   ];
 
   return (
-    <AppBar position="relative" sx={{ backgroundColor: 'transparent', boxShadow: 'none' }}>
+    <AppBar position="relative" sx={{ backgroundColor: getButtonTextbgColor(location.pathname), boxShadow: 'none' }}>
       <Toolbar>
         <Container sx={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%',

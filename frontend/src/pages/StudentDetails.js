@@ -420,8 +420,15 @@ const StudentDetails = () => {
     );
   }
 
-  const capitalizeWords = (str) => str.replace(/\b\w/g, (char) => char.toUpperCase()).replace(/-/g, ' ');
+  // const capitalizeWords = (str) => str.replace(/\b\w/g, (char) => char.toUpperCase()).replace(/-/g, ' ');
 
+  const capitalizeWords = (str) => {
+    // Remove "Student" from the beginning of the string, if it exists
+    const formattedStr = str.replace(/^student_/i, '').replace(/_/g, " "); // Remove "student_" and replace underscores with spaces
+    // Capitalize the first letter of each word
+    return formattedStr.replace(/\b\w/g, (char) => char.toUpperCase());
+  };
+  
   const dataForSection = (key) => {
     const mapping = {
       "about-me": aboutMe,

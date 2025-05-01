@@ -25,7 +25,7 @@ create table Student_Details_Portal (
     Student_Suburb varchar(4000),
     Student_Area_Code varchar(4000),
     Student_Province varchar(4000),
-    Student_DOB date DEFAULT CURRENT_TIMESTAMP,
+    Student_Date_of_Birth date,
     Student_Race varchar(4000),
     Student_Marital_Status varchar(4000),
     Student_Employment_Status varchar(4000),

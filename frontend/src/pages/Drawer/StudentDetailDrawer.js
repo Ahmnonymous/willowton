@@ -63,7 +63,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     student_suburb: "",
     student_area_code: "",
     student_province: "",
-    student_dob: "",
+    student_date_of_birth: "",
     student_race: "",
     student_marital_status: "",
     student_employment_status: "",
@@ -93,12 +93,12 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
           try {
             const response = await fetch(`https://willowtonbursary.co.za/api/student-details/${studentId}`);
             const data = await response.json();
-            const dates = data.student_dob ? parse(data.student_dob, 'MM/dd/yyyy', new Date()) : null;
+            const dates = data.student_date_of_birth ? parse(data.student_date_of_birth, 'MM/dd/yyyy', new Date()) : null;
             setSelectedDate(dates);
             setFormData((prev) => ({
               ...prev,
               ...data,
-              student_dob: dates,
+              student_date_of_birth: dates,
             }));
           } catch (error) {
             console.error("Error fetching student data:", error);
@@ -123,7 +123,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
           student_suburb: '',
           student_area_code: '',
           student_province: '',
-          student_dob: '',
+          student_date_of_birth: '',
           student_race: '',
           student_marital_status: '',
           student_employment_status: '',
@@ -152,7 +152,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
   const handleDateChange = (newDate) => {
     setSelectedDate(newDate);
     const formattedDate = newDate ? format(newDate, 'MM/dd/yyyy') : '';
-    setFormData(prev => ({ ...prev, student_dob: formattedDate }));
+    setFormData(prev => ({ ...prev, student_date_of_birth: formattedDate }));
   };
 
   useEffect(() => {
@@ -254,15 +254,15 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
         <Box sx={{ flex: 1, overflowY: "auto", padding: 2 }}>
           <Grid container spacing={2}>
             {Object.keys(formData).map((key, index) => {
-              if (key === "student_dob") {
+              if (key === "student_date_of_birth") {
                 return (
                   <Grid item xs={12} key={index}>
                     <LocalizationProvider dateAdapter={AdapterDateFns}>
                       <DatePicker
                         wrapperClassName={"datepicker"}
                         className={"datepicker"}
-                        label="Student DOB"
-                        name="student_dob"
+                        label="Student date_of_birth"
+                        name="student_date_of_birth"
                         value={selectedDate}
                         onChange={handleDateChange}
                         format="MM/dd/yyyy"
@@ -291,6 +291,35 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                         }
                       }}
                       InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                    />
+                  </Grid>
+                );
+              }
+
+              if (key === "student_id_passport_number") {
+                return (
+                  <Grid item xs={12} key={index}>
+                    <TextField
+                      label="Student Passport Number"
+                      name="student_id_passport_number"
+                      type="number"
+                      fullWidth
+                      value={formData.student_id_passport_number || ""}
+                      onChange={handleChange}
+                      inputProps={{
+                        maxLength: 13, // Restrict input length to 13 digits
+                        pattern: "[0-9]{13}", // Allow only 13 digits (numeric)
+                      }}
+                      sx={{
+                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        borderRadius: '8px',
+                        '& .MuiInputBase-input': {
+                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        }
+                      }}
+                      InputLabelProps={{ style: { color: isDarkMode ? '#F7FAFC' : '#1E293B' } }}
+                      // helperText="Please enter a 13-digit passport number"
                     />
                   </Grid>
                 );

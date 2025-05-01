@@ -3,8 +3,10 @@ const router = express.Router();
 const pool = require("../db");
 const multer = require("multer");
 
+// Set up multer to store files in memory
 const upload = multer({ storage: multer.memoryStorage() });
 
+// Route to fetch voluntary service data by student ID
 router.get("/voluntary-service/:studentId", async (req, res) => {
   try {
     const result = await pool.query(
@@ -17,6 +19,7 @@ router.get("/voluntary-service/:studentId", async (req, res) => {
   }
 });
 
+// Route to fetch voluntary service data by ID
 router.get("/voluntary-service/id/:id", async (req, res) => {
   try {
     const result = await pool.query(
@@ -29,6 +32,7 @@ router.get("/voluntary-service/id/:id", async (req, res) => {
   }
 });
 
+// Route to fetch file attachment by ID
 router.get("/voluntary-service/view/:id", async (req, res) => {
   try {
     const result = await pool.query(
@@ -52,6 +56,7 @@ router.get("/voluntary-service/view/:id", async (req, res) => {
   }
 });
 
+// Route to insert a new voluntary service record
 router.post("/voluntary-service/insert", upload.single("Proof_of_Service"), async (req, res) => {
   const {
     Organisation,
@@ -73,11 +78,12 @@ router.post("/voluntary-service/insert", upload.single("Proof_of_Service"), asyn
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
-    console.error(err);
+    console.error("Error inserting voluntary service:", err);
     res.status(500).json({ error: "Error inserting voluntary service" });
   }
 });
 
+// Route to update an existing voluntary service record
 router.put("/voluntary-service/update/:id", upload.single("Proof_of_Service"), async (req, res) => {
   const {
     Organisation,
@@ -86,13 +92,14 @@ router.put("/voluntary-service/update/:id", upload.single("Proof_of_Service"), a
     Hours_Contributed
   } = req.body;
 
-  const fileBuffer = req.file?.buffer;
-  const fileName = req.file?.originalname;
+  const fileBuffer = req.file ? req.file.buffer : null;  // Check if a new file is uploaded
+  const fileName = req.file ? req.file.originalname : null;
 
   try {
     let query, values;
 
     if (fileBuffer) {
+      // If there is a new file, update all fields including the file
       query = `UPDATE Student_Portal_Voluntary_Service SET
         Organisation = $1,
         Contact_Person = $2,
@@ -103,6 +110,7 @@ router.put("/voluntary-service/update/:id", upload.single("Proof_of_Service"), a
         WHERE id = $7 RETURNING *`;
       values = [Organisation, Contact_Person, Contact_Person_Number, Hours_Contributed, fileBuffer, fileName, req.params.id];
     } else {
+      // If no file is provided, just update the rest of the fields, leaving the file unchanged
       query = `UPDATE Student_Portal_Voluntary_Service SET
         Organisation = $1,
         Contact_Person = $2,
@@ -115,16 +123,18 @@ router.put("/voluntary-service/update/:id", upload.single("Proof_of_Service"), a
     const result = await pool.query(query, values);
     res.json(result.rows[0]);
   } catch (err) {
-    console.error(err);
+    console.error("Error updating voluntary service:", err);
     res.status(500).json({ error: "Error updating voluntary service" });
   }
 });
 
+// Route to delete a voluntary service record
 router.delete("/voluntary-service/delete/:id", async (req, res) => {
   try {
     await pool.query("DELETE FROM Student_Portal_Voluntary_Service WHERE id = $1", [req.params.id]);
     res.status(200).json({ message: "Deleted successfully" });
   } catch (err) {
+    console.error("Error deleting voluntary service:", err);
     res.status(500).json({ error: "Error deleting voluntary service" });
   }
 });

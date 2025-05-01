@@ -23,11 +23,11 @@ router.get("/student-details", async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM Student_Details_Portal");
 
-    // Format the dob field before sending response
+    // Format the date_of_birth field before sending response
     const formattedResults = result.rows.map(student => {
       return {
         ...student,
-        student_dob: formatDate(student.student_dob),  // Format DOB field
+        student_date_of_birth: formatDate(student.student_date_of_birth),  // Format date_of_birth field
       };
     });
 
@@ -44,10 +44,10 @@ router.get("/student-details/:id", async (req, res) => {
     const { id } = req.params;  // Get the student ID from the request parameters
     const result = await pool.query("SELECT * FROM Student_Details_Portal WHERE id = $1", [id]);
 
-    // Format the dob field before sending response
+    // Format the date_of_birth field before sending response
     if (result.rows.length > 0) {
       const student = result.rows[0];
-      student.student_dob = formatDate(student.student_dob);  // Format DOB field
+      student.student_date_of_birth = formatDate(student.student_date_of_birth);  // Format date_of_birth field
       res.json(student);
     } else {
       res.status(404).json({ error: "Student not found" });
@@ -64,10 +64,10 @@ router.get("/student-detail/:id", async (req, res) => {
     const { id } = req.params;  // Get the student ID from the request parameters
     const result = await pool.query("SELECT * FROM Student_Details_Portal WHERE user_id = $1", [id]);
 
-    // Format the dob field before sending response
+    // Format the date_of_birth field before sending response
     if (result.rows.length > 0) {
       const student = result.rows[0];
-      student.student_dob = formatDate(student.student_dob);  // Format DOB field
+      student.student_date_of_birth = formatDate(student.student_date_of_birth);  // Format date_of_birth field
       res.json(student);
     } else {
       // res.status(404).json({  });
@@ -98,7 +98,7 @@ router.post("/student-details/insert", async (req, res) => {
       student_suburb,
       student_area_code,
       student_province,
-      student_dob,
+      student_date_of_birth,
       student_race,
       student_marital_status,
       student_employment_status,
@@ -121,8 +121,8 @@ router.post("/student-details/insert", async (req, res) => {
       user_id,
     } = req.body;
 
-    // Handle null values for student_dob and student_number_of_siblings
-    const formattedDob = student_dob === "" ? null : student_dob;
+    // Handle null values for student_date_of_birth and student_number_of_siblings
+    const formatteddate_of_birth = student_date_of_birth === "" ? null : student_date_of_birth;
     const formattedSiblings = student_number_of_siblings === "" ? null : student_number_of_siblings;
 
     // Insert into database
@@ -131,7 +131,7 @@ router.post("/student-details/insert", async (req, res) => {
         student_name, student_surname, student_nationality, student_id_passport_number, student_type,
         student_religion, student_finance_type, student_whatsapp_number, student_alternative_number, student_email_address,
         student_highest_education, student_home_address, student_suburb, student_area_code, student_province,
-        student_dob, student_race, student_marital_status, student_employment_status, student_job_title, student_industry,
+        student_date_of_birth, student_race, student_marital_status, student_employment_status, student_job_title, student_industry,
         student_company_of_employment, student_current_salary, student_number_of_siblings, student_siblings_bursary,
         student_willow_relationship, student_relationship_type, student_employee_name, student_employee_designation,
         student_employee_branch, student_employee_number, student_emergency_contact_name, student_emergency_contact_number,
@@ -156,7 +156,7 @@ router.post("/student-details/insert", async (req, res) => {
         student_suburb,
         student_area_code,
         student_province,
-        formattedDob,
+        formatteddate_of_birth,
         student_race,
         student_marital_status,
         student_employment_status,
@@ -185,7 +185,7 @@ router.post("/student-details/insert", async (req, res) => {
 
     if (newStudentResult.rows.length > 0) {
       const student = newStudentResult.rows[0];
-      student.student_dob = formatDate(student.student_dob);
+      student.student_date_of_birth = formatDate(student.student_date_of_birth);
       res.status(201).json(student);
     } else {
       res.status(404).json({ error: "Student created but not found" });
@@ -217,7 +217,7 @@ router.put("/student-details/update/:id", async (req, res) => {
       student_suburb,
       student_area_code,
       student_province,
-      student_dob,
+      student_date_of_birth,
       student_race,
       student_marital_status,
       student_employment_status,
@@ -239,8 +239,8 @@ router.put("/student-details/update/:id", async (req, res) => {
       student_emergency_contact_address,
     } = req.body;
 
-    // Handle null values for student_dob and student_number_of_siblings
-    const formattedDob = student_dob === "" ? null : student_dob;
+    // Handle null values for student_date_of_birth and student_number_of_siblings
+    const formatteddate_of_birth = student_date_of_birth === "" ? null : student_date_of_birth;
     const formattedSiblings = student_number_of_siblings === "" ? null : student_number_of_siblings;
 
     const result = await pool.query(
@@ -260,7 +260,7 @@ router.put("/student-details/update/:id", async (req, res) => {
         student_suburb = $13,
         student_area_code = $14,
         student_province = $15,
-        student_dob = $16,
+        student_date_of_birth = $16,
         student_race = $17,
         student_marital_status = $18,
         student_employment_status = $19,
@@ -297,7 +297,7 @@ router.put("/student-details/update/:id", async (req, res) => {
         student_suburb,
         student_area_code,
         student_province,
-        formattedDob,
+        formatteddate_of_birth,
         student_race,
         student_marital_status,
         student_employment_status,
@@ -326,7 +326,7 @@ router.put("/student-details/update/:id", async (req, res) => {
     const updatedStudent = await pool.query("SELECT * FROM Student_Details_Portal WHERE id = $1", [id]);
     if (updatedStudent.rows.length > 0) {
       const student = updatedStudent.rows[0];
-      student.student_dob = formatDate(student.student_dob);
+      student.student_date_of_birth = formatDate(student.student_date_of_birth);
       res.status(200).json(student);
     } else {
       res.status(404).json({ error: "Student not found after update" });

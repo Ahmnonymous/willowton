@@ -84,17 +84,19 @@ const VoluntaryServiceDrawer = ({ open, onClose, studentId, recordId, onSave }) 
       ? `https://willowtonbursary.co.za/api/voluntary-service/update/${formData.id}`
       : `https://willowtonbursary.co.za/api/voluntary-service/insert`;
     const method = isUpdate ? "PUT" : "POST";
-
+  
     const body = new FormData();
     body.append("Organisation", formData.Organisation);
     body.append("Contact_Person", formData.Contact_Person);
     body.append("Contact_Person_Number", formData.Contact_Person_Number);
     body.append("Hours_Contributed", formData.Hours_Contributed);
     body.append("Student_Details_Portal_id", formData.Student_Details_Portal_id);
+    
+    // If a new file is selected, append it
     if (formData.Proof_of_Service) {
       body.append("Proof_of_Service", formData.Proof_of_Service);
     }
-
+  
     const res = await fetch(url, { method, body });
     if (res.ok) {
       const result = await res.json();
@@ -103,7 +105,7 @@ const VoluntaryServiceDrawer = ({ open, onClose, studentId, recordId, onSave }) 
     } else {
       console.error("Failed to save voluntary service");
     }
-  };
+  };  
 
   const handleDeleteClick = () => {
     setDeleteConfirmationOpen(true); // Open confirmation dialog
@@ -200,8 +202,9 @@ const VoluntaryServiceDrawer = ({ open, onClose, studentId, recordId, onSave }) 
                 value={formData.Contact_Person_Number || ""}
                 onChange={handleChange}
                 inputProps={{
-                  maxLength: 10, // restrict input to 10 digits
-                  pattern: "[0-9]{10}", // allow only 10 digits
+                  type: 'tel', // Allows for easier entry of phone numbers
+                  maxLength: 10, // Restrict input to 10 digits
+                  pattern: "[0-9]{10}", // Only allow numbers, exactly 10 digits
                 }}
                 sx={{
                   backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
@@ -212,7 +215,6 @@ const VoluntaryServiceDrawer = ({ open, onClose, studentId, recordId, onSave }) 
                   }
                 }}
                 InputLabelProps={{ style: { color: isDarkMode ? '#F7FAFC' : '#1E293B' } }}
-                helperText="Please enter a 10-digit contact number" // optional helper text
               />
             </Grid>
             <Grid item xs={12}>

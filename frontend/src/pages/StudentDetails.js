@@ -431,18 +431,16 @@ const StudentDetails = () => {
 
   const capitalizeWords = (str) => {
     // Handle the specific case for "student_id_passport_number"
-    if (str.toLowerCase() === "student_id_passport_number") {
+    if (str.toLowerCase() === "student id passport number") {
       return "ID/Passport Number";
     }
     
-    if (str.toLowerCase() === "student_willow_relationship") {
+    if (str.toLowerCase() === "student willow relationship") {
       return "Willowton Group Relationship";
     }
     
     // Remove "Student" from the beginning of the string, if it exists
-    const formattedStr = str
-      .replace(/^student_/i, "") // Remove "student_" (case-insensitive)
-      .replace(/_/g, " "); // Replace underscores with spaces
+    const formattedStr = str.replace(/^student /i, '').replace(/_/g, "");
   
     // Capitalize the first letter of each word
     return formattedStr.replace(/\b\w/g, (char) => char.toUpperCase());

@@ -157,7 +157,7 @@ const AcademicResultsDrawer = ({ open, onClose, studentId, resultId, onSave }) =
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
-                label="Result Module"
+                label="Module Name"
                 name="Results_Module"
                 fullWidth
                 value={formData.Results_Module || ""}

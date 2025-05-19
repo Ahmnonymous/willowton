@@ -27,18 +27,46 @@ const ParentsDrawer = ({ open, onClose, studentId, parentId, onSave }) => {
   const [formData, setFormData] = useState({});
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const [emailError, setEmailError] = useState(""); // State for email validation error
+  const [cellNumberError, setCellNumberError] = useState(""); // State for cell number validation error
+
   // Check for larger or smaller screen size
   const isLargeScreen = useMediaQuery("(min-width:600px)");
 
   // Drawer width based on screen size
   const drawerWidth = isLargeScreen ? 500 : 330;
 
+  // Email validation function
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // Cell number validation function
+  const validateCellNumber = (number) => {
+    const cellRegex = /^\d{10}$/;
+    return cellRegex.test(number);
+  };
+
   useEffect(() => {
     if (open) {
       if (parentId) {
         fetch(`https://willowtonbursary.co.za/api/parents-details/id/${parentId}`)
           .then((res) => res.json())
-          .then((data) => setFormData(data));
+          .then((data) => {
+            setFormData(data);
+            // Validate email and cell number on load
+            if (data.parent_email_address) {
+              setEmailError(validateEmail(data.parent_email_address) ? "" : "Please enter a valid email address");
+            } else {
+              setEmailError("");
+            }
+            if (data.parent_cell_number) {
+              setCellNumberError(validateCellNumber(data.parent_cell_number) ? "" : "Cell number must be exactly 10 digits");
+            } else {
+              setCellNumberError("");
+            }
+          });
       } else {
         setFormData({
           student_details_portal_id: studentId,
@@ -54,18 +82,45 @@ const ParentsDrawer = ({ open, onClose, studentId, parentId, onSave }) => {
           parent_grant: "",
           parent_other_income: "",
         });
+        setEmailError("");
+        setCellNumberError("");
       }
     } else {
       setFormData({});
+      setEmailError("");
+      setCellNumberError("");
     }
   }, [open, parentId, studentId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+
+    // Validate email on change
+    if (name === "parent_email_address") {
+      setEmailError(value && !validateEmail(value) ? "Please enter a valid email address" : "");
+    }
+
+    // Validate cell number on change
+    if (name === "parent_cell_number") {
+      // Allow only digits and limit to 10
+      const numericValue = value.replace(/\D/g, "").slice(0, 10);
+      setFormData((prev) => ({ ...prev, [name]: numericValue }));
+      setCellNumberError(numericValue && !validateCellNumber(numericValue) ? "Cell number must be exactly 10 digits" : "");
+    }
   };
 
   const handleSave = async () => {
+    // Prevent save if email or cell number is invalid
+    if (formData.parent_email_address && !validateEmail(formData.parent_email_address)) {
+      setEmailError("Please enter a valid email address");
+      return;
+    }
+    if (formData.parent_cell_number && !validateCellNumber(formData.parent_cell_number)) {
+      setCellNumberError("Cell number must be exactly 10 digits");
+      return;
+    }
+
     const isUpdate = !!formData.id;
     const url = isUpdate
       ? `https://willowtonbursary.co.za/api/parents-details/update/${formData.id}`
@@ -111,7 +166,7 @@ const ParentsDrawer = ({ open, onClose, studentId, parentId, onSave }) => {
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        backgroundColor: isDarkMode ? '#2D3748' : '#fff' // Background color based on dark/light mode
+        backgroundColor: isDarkMode ? '#2D3748' : '#fff'
       }}>
         {/* Header */}
         <Box sx={{
@@ -133,14 +188,13 @@ const ParentsDrawer = ({ open, onClose, studentId, parentId, onSave }) => {
         <Box sx={{ flex: 1, overflowY: "auto", p: 2 }}>
           <Grid container spacing={2}>
             {Object.entries(formData).map(([key, value]) => {
-              // Exclude certain fields from rendering
               if (key === "id" || key === "student_details_portal_id" || key === "parent_date_stamp") return null;
 
-              let label = key.replace(/_/g, " ");  // Replace underscores with spaces
+              let label = key.replace(/_/g, " ");
               label = label
-                .split(" ")  // Split by space
-                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))  // Capitalize each word
-                .join(" ");  // Rejoin into a string
+                .split(" ")
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(" ");
 
               if (key === "parent_relationship") {
                 return (
@@ -205,6 +259,60 @@ const ParentsDrawer = ({ open, onClose, studentId, parentId, onSave }) => {
                   </Grid>
                 );
               }
+              if (key === "parent_email_address") {
+                return (
+                  <Grid item xs={12} key={key}>
+                    <TextField
+                      name={key}
+                      label={label}
+                      type="email"
+                      fullWidth
+                      value={value || ""}
+                      onChange={handleChange}
+                      error={!!emailError}
+                      helperText={emailError}
+                      sx={{
+                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        borderRadius: '8px',
+                        '& .MuiInputBase-input': {
+                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        }
+                      }}
+                      InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                    />
+                  </Grid>
+                );
+              }
+              if (key === "parent_cell_number") {
+                return (
+                  <Grid item xs={12} key={key}>
+                    <TextField
+                      name={key}
+                      label={label}
+                      type="tel"
+                      fullWidth
+                      value={value || ""}
+                      onChange={handleChange}
+                      error={!!cellNumberError}
+                      helperText={cellNumberError}
+                      inputProps={{
+                        maxLength: 10,
+                        pattern: "[0-9]*",
+                      }}
+                      sx={{
+                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        borderRadius: '8px',
+                        '& .MuiInputBase-input': {
+                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        }
+                      }}
+                      InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                    />
+                  </Grid>
+                );
+              }
 
               return (
                 <Grid item xs={12} key={key}>
@@ -259,7 +367,7 @@ const ParentsDrawer = ({ open, onClose, studentId, parentId, onSave }) => {
                 variant="outlined"
                 sx={{
                   borderColor: isDarkMode ? '#F7FAFC' : '#1E293B',
-                  color: 'red', // Red text color for delete button
+                  color: 'red',
                 }}
               >
                 Delete

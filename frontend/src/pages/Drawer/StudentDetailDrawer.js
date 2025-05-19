@@ -39,11 +39,16 @@ import { format, parse } from 'date-fns';
 const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => {
   const { isDarkMode } = useContext(ThemeContext);  // Access theme context
   const [selectedDate, setSelectedDate] = useState(null);
+  const [emailError, setEmailError] = useState(""); // State for email validation error
+  const [whatsappError, setWhatsappError] = useState(""); // State for WhatsApp number validation error
+  const [alternativeError, setAlternativeError] = useState(""); // State for alternative number validation error
+  const [emergencyError, setEmergencyError] = useState(""); // State for emergency contact number validation error
 
   // Check for larger or smaller screen size
   const isLargeScreen = useMediaQuery("(min-width:600px)");
 
   // Drawer width based on screen size
+  // const - Drawer width based on screen size
   const drawerWidth = isLargeScreen ? 500 : 330;
 
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
@@ -73,7 +78,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     student_current_salary: "",
     student_number_of_siblings: "",
     student_siblings_bursary: "",
-    student_willow_relationship: "", // Add this here
+    student_willow_relationship: "",
     student_relationship_type: "",
     student_employee_name: "",
     student_employee_designation: "",
@@ -85,6 +90,18 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     student_emergency_contact_address: "",
     student_date_stamp: "",
   });
+
+  // Email validation function
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // Number validation function for 10 digits
+  const validateNumber = (number) => {
+    const numberRegex = /^\d{10}$/;
+    return numberRegex.test(number);
+  };
 
   useEffect(() => {
     if (open) {
@@ -100,6 +117,11 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
               ...data,
               student_date_of_birth: dates,
             }));
+            // Validate fields on load
+            setEmailError(data.student_email_address && !validateEmail(data.student_email_address) ? "Please enter a valid email address" : "");
+            setWhatsappError(data.student_whatsapp_number && !validateNumber(data.student_whatsapp_number) ? "WhatsApp number must be exactly 10 digits" : "");
+            setAlternativeError(data.student_alternative_number && !validateNumber(data.student_alternative_number) ? "Alternative number must be exactly 10 digits" : "");
+            setEmergencyError(data.student_emergency_contact_number && !validateNumber(data.student_emergency_contact_number) ? "Emergency contact number must be exactly 10 digits" : "");
           } catch (error) {
             console.error("Error fetching student data:", error);
           }
@@ -145,6 +167,10 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
           student_emergency_contact_address: '',
           student_date_stamp: ''
         });
+        setEmailError("");
+        setWhatsappError("");
+        setAlternativeError("");
+        setEmergencyError("");
       }
     }
   }, [open, studentId]);
@@ -168,13 +194,53 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     }
   }, [formData.student_willow_relationship]);
 
-
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevState) => ({ ...prevState, [name]: value }));
+    let sanitizedValue = value;
+
+    // Sanitize number inputs to allow only digits and limit to 10
+    if (["student_whatsapp_number", "student_alternative_number", "student_emergency_contact_number"].includes(name)) {
+      sanitizedValue = value.replace(/\D/g, "").slice(0, 10);
+    }
+
+    setFormData((prevState) => ({ ...prevState, [name]: sanitizedValue }));
+
+    // Validate email on change
+    if (name === "student_email_address") {
+      setEmailError(value && !validateEmail(value) ? "Please enter a valid email address" : "");
+    }
+
+    // Validate number fields on change
+    if (name === "student_whatsapp_number") {
+      setWhatsappError(sanitizedValue && !validateNumber(sanitizedValue) ? "WhatsApp number must be exactly 10 digits" : "");
+    }
+    if (name === "student_alternative_number") {
+      setAlternativeError(sanitizedValue && !validateNumber(sanitizedValue) ? "Alternative number must be exactly 10 digits" : "");
+    }
+    if (name === "student_emergency_contact_number") {
+      setEmergencyError(sanitizedValue && !validateNumber(sanitizedValue) ? "Emergency contact number must be exactly 10 digits" : "");
+    }
   };
 
   const handleSave = async () => {
+    // Prevent save if any field is invalid
+    if (formData.student_email_address && !validateEmail(formData.student_email_address)) {
+      setEmailError("Please enter a valid email address");
+      return;
+    }
+    if (formData.student_whatsapp_number && !validateNumber(formData.student_whatsapp_number)) {
+      setWhatsappError("WhatsApp number must be exactly 10 digits");
+      return;
+    }
+    if (formData.student_alternative_number && !validateNumber(formData.student_alternative_number)) {
+      setAlternativeError("Alternative number must be exactly 10 digits");
+      return;
+    }
+    if (formData.student_emergency_contact_number && !validateNumber(formData.student_emergency_contact_number)) {
+      setEmergencyError("Emergency contact number must be exactly 10 digits");
+      return;
+    }
+
     const user = JSON.parse(localStorage.getItem("user"));  // Get user data from localStorage
     const userId = user?.user_id; // Get the user_id from the logged-in user
 
@@ -210,7 +276,6 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     setDeleteConfirmationOpen(true); // Open the dialog
   };
 
-
   const handleDeleteConfirm = async () => {
     if (!studentId) return;
 
@@ -222,11 +287,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
 
       if (response.ok) {
         onDelete(studentId);
-
-        // Close the drawer
         onClose();
-
-        // Close the confirmation dialog
         setDeleteConfirmationOpen(false);
       } else {
         console.error("Failed to delete student");
@@ -236,10 +297,10 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     }
   };
 
-
   const handleDeleteCancel = () => {
     setDeleteConfirmationOpen(false); // Close the confirmation dialog
   };
+
   return (
     <Drawer anchor="right" open={open} onClose={onClose}>
       <Box sx={{ width: drawerWidth, height: "100%", display: "flex", flexDirection: "column", backgroundColor: isDarkMode ? '#2D3748' : '#fff' }}>
@@ -261,11 +322,20 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                       <DatePicker
                         wrapperClassName={"datepicker"}
                         className={"datepicker"}
-                        label="Student date_of_birth"
+                        label="Student Date of Birth"
                         name="student_date_of_birth"
                         value={selectedDate}
                         onChange={handleDateChange}
                         format="MM/dd/yyyy"
+                        sx={{
+                          backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                          borderRadius: '8px',
+                          '& .MuiInputBase-input': {
+                            color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                          }
+                        }}
+                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
                       />
                     </LocalizationProvider>
                   </Grid>
@@ -300,16 +370,12 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                 return (
                   <Grid item xs={12} key={index}>
                     <TextField
-                      label="Student Passport Number"
+                      label="Student ID/Passport Number"
                       name="student_id_passport_number"
-                      type="number"
+                      type="text"
                       fullWidth
                       value={formData.student_id_passport_number || ""}
                       onChange={handleChange}
-                      inputProps={{
-                        maxLength: 13, // Restrict input length to 13 digits
-                        pattern: "[0-9]{13}", // Allow only 13 digits (numeric)
-                      }}
                       sx={{
                         backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
                         color: isDarkMode ? '#F7FAFC' : '#1E293B',
@@ -319,7 +385,122 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                         }
                       }}
                       InputLabelProps={{ style: { color: isDarkMode ? '#F7FAFC' : '#1E293B' } }}
-                      // helperText="Please enter a 13-digit passport number"
+                    />
+                  </Grid>
+                );
+              }
+
+              if (key === "student_email_address") {
+                return (
+                  <Grid item xs={12} key={index}>
+                    <TextField
+                      label="Student Email Address"
+                      name="student_email_address"
+                      type="email"
+                      fullWidth
+                      value={formData.student_email_address || ""}
+                      onChange={handleChange}
+                      error={!!emailError}
+                      helperText={emailError}
+                      sx={{
+                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        borderRadius: '8px',
+                        '& .MuiInputBase-input': {
+                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        }
+                      }}
+                      InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                    />
+                  </Grid>
+                );
+              }
+
+              if (key === "student_whatsapp_number") {
+                return (
+                  <Grid item xs={12} key={index}>
+                    <TextField
+                      label="Student WhatsApp Number"
+                      name="student_whatsapp_number"
+                      type="tel"
+                      fullWidth
+                      value={formData.student_whatsapp_number || ""}
+                      onChange={handleChange}
+                      error={!!whatsappError}
+                      helperText={whatsappError}
+                      inputProps={{
+                        maxLength: 10,
+                        pattern: "[0-9]*",
+                      }}
+                      sx={{
+                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        borderRadius: '8px',
+                        '& .MuiInputBase-input': {
+                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        }
+                      }}
+                      InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                    />
+                  </Grid>
+                );
+              }
+
+              if (key === "student_alternative_number") {
+                return (
+                  <Grid item xs={12} key={index}>
+                    <TextField
+                      label="Student Alternative Number"
+                      name="student_alternative_number"
+                      type="tel"
+                      fullWidth
+                      value={formData.student_alternative_number || ""}
+                      onChange={handleChange}
+                      error={!!alternativeError}
+                      helperText={alternativeError}
+                      inputProps={{
+                        maxLength: 10,
+                        pattern: "[0-9]*",
+                      }}
+                      sx={{
+                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        borderRadius: '8px',
+                        '& .MuiInputBase-input': {
+                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        }
+                      }}
+                      InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                    />
+                  </Grid>
+                );
+              }
+
+              if (key === "student_emergency_contact_number") {
+                return (
+                  <Grid item xs={12} key={index}>
+                    <TextField
+                      label="Student Emergency Contact Number"
+                      name="student_emergency_contact_number"
+                      type="tel"
+                      fullWidth
+                      value={formData.student_emergency_contact_number || ""}
+                      onChange={handleChange}
+                      error={!!emergencyError}
+                      helperText={emergencyError}
+                      inputProps={{
+                        maxLength: 10,
+                        pattern: "[0-9]*",
+                      }}
+                      sx={{
+                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        borderRadius: '8px',
+                        '& .MuiInputBase-input': {
+                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        }
+                      }}
+                      InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
                     />
                   </Grid>
                 );
@@ -349,7 +530,6 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                     </Grid>
                   );
                 } else {
-                  // If `student_willow_relationship` is not 'Yes', don't render these fields
                   return null;
                 }
               }
@@ -363,7 +543,6 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                 .split(" ") // Split by space
                 .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize each word
                 .join(" "); // Rejoin into a string
-
 
               // Handling LOV fields with Autocomplete for other fields
               if (key === "student_nationality") {
@@ -395,7 +574,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                       value={formData[key] || ""}
                       onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
                       options={yes_no}
-                      renderInput={(params) => <TextField {...params} label={label} sx={{
+                      renderInput={(params) => <TextField {...params} label="Does the student have any relationship to the Willowton Group?" sx={{
                         backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
                         color: isDarkMode ? '#F7FAFC' : '#1E293B',
                         borderRadius: '8px',
@@ -432,7 +611,6 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                 );
               }
 
-              // Handling LOV fields with Autocomplete for other fields
               if (key === "student_type") {
                 return (
                   <Grid item xs={12} key={index}>
@@ -621,8 +799,8 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
               variant="outlined"
               size="small"
               sx={{
-                borderColor: isDarkMode ? '#F7FAFC' : '#1E293B', // Border color for dark/light mode
-                color: isDarkMode ? '#F7FAFC' : '#1E293B', // Text color
+                borderColor: isDarkMode ? '#F7FAFC' : '#1E293B',
+                color: isDarkMode ? '#F7FAFC' : '#1E293B',
               }}
               startIcon={<CloseIcon />}
             >
@@ -631,12 +809,12 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
 
             {studentId && (
               <Button
-                onClick={handleDeleteClick} // Open the dialog
+                onClick={handleDeleteClick}
                 variant="outlined"
                 size="small"
                 sx={{
-                  borderColor: isDarkMode ? '#F7FAFC' : '#1E293B', // Red border color for delete button
-                  color: 'red', // Red text color for delete button
+                  borderColor: isDarkMode ? '#F7FAFC' : '#1E293B',
+                  color: 'red',
                 }}
                 startIcon={<DeleteIcon />}
               >
@@ -681,7 +859,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
             Are you sure you want to delete this record?
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleDeleteCancel} color="primary">
+            <Button onClick={!deleteConfirmationOpen} color="primary">
               Cancel
             </Button>
             <Button onClick={handleDeleteConfirm} color="error">

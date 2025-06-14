@@ -731,7 +731,7 @@ const StudentDetails = () => {
             }}
           >
             <AddIcon sx={{ marginRight: 1, fontSize: 'small' }} />
-            Create
+            Start Application
           </Button>
         )}
       </Box>

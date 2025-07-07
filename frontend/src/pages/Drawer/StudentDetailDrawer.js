@@ -44,10 +44,21 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
   const [alternativeError, setAlternativeError] = useState("");
   const [emergencyError, setEmergencyError] = useState("");
   const [emergencyContactOption, setEmergencyContactOption] = useState("");
-  
   const isLargeScreen = useMediaQuery("(min-width:600px)");
   const drawerWidth = isLargeScreen ? 500 : 330;
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
+
+  const user = JSON.parse(localStorage.getItem("user"));
+  const userType = user?.user_type; // student or admin
+  const isAdmin = userType === "admin";
+
+  const relationshipTypes = [
+    "Staff",
+    "Dependent of Staff",
+    "Family",
+    "Referral",
+    "Director/Board Member or stakeholder"
+  ];
 
   const [formData, setFormData] = useState({
     student_name: "",
@@ -75,17 +86,23 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     student_number_of_siblings: "",
     student_siblings_bursary: "",
     student_willow_relationship: "",
-    student_relationship_type: "",
-    student_employee_name: "",
-    student_employee_designation: "",
-    student_employee_branch: "",
-    student_employee_number: "",
+    relation_type: "",
+    relation_hr_contact: "",
+    relation_branch: "",
+    relation_name: "",
+    relation_surname: "",
+    relation_employee_code: "",
+    relation_reference: "",
     student_emergency_contact_name: "",
     student_emergency_contact_number: "",
     student_emergency_contact_relationship: "",
     student_emergency_contact_address: "",
     student_date_stamp: "",
+    student_status: "Pending",
+    student_status_comment: "",
   });
+
+  const statusOptions = ["Received", "Pending", "Approved", "Declined"];
 
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -110,6 +127,15 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
               ...prev,
               ...data,
               student_date_of_birth: dates,
+              student_status: data.student_status || "Pending",
+              student_status_comment: data.student_status_comment || "",
+              relation_type: data.relation_type || "",
+              relation_hr_contact: data.relation_hr_contact || "",
+              relation_branch: data.relation_branch || "",
+              relation_name: data.relation_name || "",
+              relation_surname: data.relation_surname || "",
+              relation_employee_code: data.relation_employee_code || "",
+              relation_reference: data.relation_reference || "",
             }));
             setEmergencyContactOption(data.student_emergency_contact_name ? "Add new" : "");
             setEmailError(data.student_email_address && !validateEmail(data.student_email_address) ? "Please enter a valid email address" : "");
@@ -149,16 +175,20 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
           student_number_of_siblings: '',
           student_siblings_bursary: '',
           student_willow_relationship: '',
-          student_relationship_type: '',
-          student_employee_name: '',
-          student_employee_designation: '',
-          student_employee_branch: '',
-          student_employee_number: '',
+          relation_type: '',
+          relation_hr_contact: '',
+          relation_branch: '',
+          relation_name: '',
+          relation_surname: '',
+          relation_employee_code: '',
+          relation_reference: '',
           student_emergency_contact_name: '',
           student_emergency_contact_number: '',
           student_emergency_contact_relationship: '',
           student_emergency_contact_address: '',
-          student_date_stamp: ''
+          student_date_stamp: '',
+          student_status: 'Pending',
+          student_status_comment: '',
         });
         setEmergencyContactOption("");
         setEmailError("");
@@ -179,11 +209,13 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     if (formData.student_willow_relationship === 'No') {
       setFormData((prevState) => ({
         ...prevState,
-        student_relationship_type: "",
-        student_employee_name: "",
-        student_employee_designation: "",
-        student_employee_branch: "",
-        student_employee_number: "",
+        relation_type: "",
+        relation_hr_contact: "",
+        relation_branch: "",
+        relation_name: "",
+        relation_surname: "",
+        relation_employee_code: "",
+        relation_reference: "",
       }));
     }
   }, [formData.student_willow_relationship]);
@@ -254,7 +286,6 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
       return;
     }
 
-    const user = JSON.parse(localStorage.getItem("user"));
     const userId = user?.user_id;
 
     const url = studentId
@@ -342,7 +373,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                         onChange={handleDateChange}
                         format="MM/dd/yyyy"
                         sx={{
-                          backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                          backgroundColor: isDarkMode ? '#202C' : '#ffffff',
                           color: isDarkMode ? '#F7FAFC' : '#1E293B',
                           borderRadius: '8px',
                           '& .MuiInputBase-input': {
@@ -350,6 +381,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                           }
                         }}
                         InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                        disabled={!isAdmin}
                       />
                     </LocalizationProvider>
                   </Grid>
@@ -375,6 +407,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                         }
                       }}
                       InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                      disabled={!isAdmin}
                     />
                   </Grid>
                 );
@@ -399,6 +432,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                         }
                       }}
                       InputLabelProps={{ style: { color: isDarkMode ? '#F7FAFC' : '#1E293B' } }}
+                      disabled={!isAdmin}
                     />
                   </Grid>
                 );
@@ -425,6 +459,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                         }
                       }}
                       InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                      disabled={!isAdmin}
                     />
                   </Grid>
                 );
@@ -455,6 +490,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                         }
                       }}
                       InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                      disabled={!isAdmin}
                     />
                   </Grid>
                 );
@@ -485,6 +521,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                         }
                       }}
                       InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                      disabled={!isAdmin}
                     />
                   </Grid>
                 );
@@ -507,6 +544,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                       }}
                         InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
                       />}
+                      disabled={!isAdmin}
                     />
                     {emergencyContactOption === "Add new" && (
                       <TextField
@@ -525,6 +563,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                           marginTop: 2
                         }}
                         InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                        disabled={!isAdmin}
                       />
                     )}
                   </Grid>
@@ -556,6 +595,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                         }
                       }}
                       InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                      disabled={!isAdmin}
                     />
                   </Grid>
                 );
@@ -579,6 +619,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                         }
                       }}
                       InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                      disabled={!isAdmin}
                     />
                   </Grid>
                 );
@@ -602,36 +643,208 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                         }
                       }}
                       InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                      disabled={!isAdmin}
                     />
                   </Grid>
                 );
               }
 
-              if (['student_relationship_type', 'student_employee_name', 'student_employee_designation', 'student_employee_branch', 'student_employee_number'].includes(key)) {
-                if (formData.student_willow_relationship === "Yes") {
-                  return (
-                    <Grid item xs={12} key={index}>
-                      <TextField
-                        label={key.replace(/_/g, " ").toLowerCase().split(" ").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")}
-                        name={key}
-                        fullWidth
-                        value={formData[key] || ""}
-                        onChange={handleChange}
-                        sx={{
-                          backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+              if (key === "student_status") {
+                return (
+                  <Grid item xs={12} key={index}>
+                    <Autocomplete
+                      value={formData[key] || "Pending"}
+                      onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
+                      options={statusOptions}
+                      renderInput={(params) => <TextField {...params} label="Student Status" sx={{
+                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        borderRadius: '8px',
+                        '& .MuiInputBase-input': {
                           color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                          borderRadius: '8px',
-                          '& .MuiInputBase-input': {
-                            color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                          }
-                        }}
+                        }
+                      }}
                         InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                      />
-                    </Grid>
-                  );
-                } else {
-                  return null;
-                }
+                      />}
+                      disabled={!isAdmin}
+                    />
+                  </Grid>
+                );
+              }
+
+              if (key === "student_status_comment" && formData.student_status === "Declined") {
+                return (
+                  <Grid item xs={12} key={index}>
+                    <TextField
+                      label="Status Comment"
+                      name="student_status_comment"
+                      fullWidth
+                      multiline
+                      rows={4}
+                      value={formData.student_status_comment || ""}
+                      onChange={handleChange}
+                      sx={{
+                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        borderRadius: '8px',
+                        '& .MuiInputBase-input': {
+                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        }
+                      }}
+                      InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                      disabled={!isAdmin}
+                    />
+                  </Grid>
+                );
+              }
+
+              if (key === "student_willow_relationship") {
+                return (
+                  <Grid item xs={12} key={index}>
+                    <Autocomplete
+                      value={formData[key] || ""}
+                      onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
+                      options={yes_no}
+                      renderInput={(params) => <TextField {...params} label="Does the student have any relationship to the Willowton Group?" sx={{
+                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        borderRadius: '8px',
+                        '& .MuiInputBase-input': {
+                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        }
+                      }}
+                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                      />}
+                      disabled={!isAdmin}
+                    />
+                  </Grid>
+                );
+              }
+
+              if (key === "relation_type" && formData.student_willow_relationship === "Yes") {
+                return (
+                  <Grid item xs={12} key={index}>
+                    <Autocomplete
+                      value={formData[key] || ""}
+                      onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
+                      options={relationshipTypes}
+                      renderInput={(params) => <TextField {...params} label="Relationship Type" sx={{
+                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        borderRadius: '8px',
+                        '& .MuiInputBase-input': {
+                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        }
+                      }}
+                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                      />}
+                      disabled={!isAdmin}
+                    />
+                  </Grid>
+                );
+              }
+
+              if (["Staff", "Dependent of Staff"].includes(formData.relation_type) && 
+                  ["relation_hr_contact", "relation_branch", "relation_name", "relation_surname", "relation_employee_code"].includes(key)) {
+                return (
+                  <Grid item xs={12} key={index}>
+                    <TextField
+                      label={
+                        key === "relation_hr_contact" ? "HR Contact" :
+                        key === "relation_branch" ? "Branch" :
+                        key === "relation_name" ? "Name" :
+                        key === "relation_surname" ? "Surname" :
+                        "Employee Code"
+                      }
+                      name={key}
+                      fullWidth
+                      value={formData[key] || ""}
+                      onChange={handleChange}
+                      sx={{
+                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        borderRadius: '8px',
+                        '& .MuiInputBase-input': {
+                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        }
+                      }}
+                      InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                      disabled={!isAdmin}
+                    />
+                  </Grid>
+                );
+              }
+
+              if (formData.relation_type === "Family" && ["relation_name", "relation_reference"].includes(key)) {
+                return (
+                  <Grid item xs={12} key={index}>
+                    <TextField
+                      label={key === "relation_name" ? "Who are you related to" : "How are you related"}
+                      name={key}
+                      fullWidth
+                      value={formData[key] || ""}
+                      onChange={handleChange}
+                      sx={{
+                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        borderRadius: '8px',
+                        '& .MuiInputBase-input': {
+                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        }
+                      }}
+                      InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                      disabled={!isAdmin}
+                    />
+                  </Grid>
+                );
+              }
+
+              if (formData.relation_type === "Referral" && key === "relation_reference") {
+                return (
+                  <Grid item xs={12} key={index}>
+                    <TextField
+                      label="Who referred you"
+                      name="relation_reference"
+                      fullWidth
+                      value={formData[key] || ""}
+                      onChange={handleChange}
+                      sx={{
+                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        borderRadius: '8px',
+                        '& .MuiInputBase-input': {
+                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        }
+                      }}
+                      InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                      disabled={!isAdmin}
+                    />
+                  </Grid>
+                );
+              }
+
+              if (formData.relation_type === "Director/Board Member or stakeholder" && key === "relation_name") {
+                return (
+                  <Grid item xs={12} key={index}>
+                    <TextField
+                      label="Person's Name"
+                      name="relation_name"
+                      fullWidth
+                      value={formData[key] || ""}
+                      onChange={handleChange}
+                      sx={{
+                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        borderRadius: '8px',
+                        '& .MuiInputBase-input': {
+                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        }
+                      }}
+                      InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                      disabled={!isAdmin}
+                    />
+                  </Grid>
+                );
               }
 
               if (key === "student_date_stamp" || key === "id" || key === "user_id" || key === "student_industry") return null;
@@ -659,28 +872,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                       }}
                         InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
                       />}
-                    />
-                  </Grid>
-                );
-              }
-
-              if (key === "student_willow_relationship") {
-                return (
-                  <Grid item xs={12} key={index}>
-                    <Autocomplete
-                      value={formData[key] || ""}
-                      onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
-                      options={yes_no}
-                      renderInput={(params) => <TextField {...params} label="Does the student have any relationship to the Willowton Group?" sx={{
-                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        borderRadius: '8px',
-                        '& .MuiInputBase-input': {
-                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        }
-                      }}
-                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                      />}
+                      disabled={!isAdmin}
                     />
                   </Grid>
                 );
@@ -703,6 +895,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                       }}
                         InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
                       />}
+                      disabled={!isAdmin}
                     />
                   </Grid>
                 );
@@ -725,6 +918,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                       }}
                         InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
                       />}
+                      disabled={!isAdmin}
                     />
                   </Grid>
                 );
@@ -747,6 +941,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                       }}
                         InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
                       />}
+                      disabled={!isAdmin}
                     />
                   </Grid>
                 );
@@ -769,6 +964,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                       }}
                         InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
                       />}
+                      disabled={!isAdmin}
                     />
                   </Grid>
                 );
@@ -791,6 +987,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                       }}
                         InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
                       />}
+                      disabled={!isAdmin}
                     />
                   </Grid>
                 );
@@ -813,6 +1010,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                       }}
                         InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
                       />}
+                      disabled={!isAdmin}
                     />
                   </Grid>
                 );
@@ -835,6 +1033,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                       }}
                         InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
                       />}
+                      disabled={!isAdmin}
                     />
                   </Grid>
                 );
@@ -857,6 +1056,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                       }}
                         InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
                       />}
+                      disabled={!isAdmin}
                     />
                   </Grid>
                 );
@@ -879,6 +1079,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                       }
                     }}
                     InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                    disabled={!isAdmin}
                   />
                 </Grid>
               );
@@ -902,7 +1103,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
               Close
             </Button>
 
-            {studentId && (
+            {studentId && isAdmin && (
               <Button
                 onClick={handleDeleteClick}
                 variant="outlined"
@@ -919,7 +1120,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
           </Box>
 
           <Box sx={{ display: "flex", gap: 1 }}>
-            {!studentId ? (
+            {isAdmin && !studentId ? (
               <Button
                 onClick={handleSave}
                 variant="contained"
@@ -929,7 +1130,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
               >
                 Create
               </Button>
-            ) : (
+            ) : isAdmin ? (
               <Button
                 onClick={handleSave}
                 variant="contained"
@@ -939,7 +1140,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
               >
                 Save
               </Button>
-            )}
+            ) : null}
           </Box>
         </Box>
 

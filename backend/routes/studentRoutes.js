@@ -11,8 +11,7 @@ const formatDate = (date) => {
     // Handle time zone shift by adding 19 hours (UTC+19) to adjust the time to your desired output.
     formattedDate.setHours(formattedDate.getHours() + 19); // Add 19 hours to the date (adjust as needed)
 
-    // Return the date in ISO format (keeping the date in UTC format)
-    // return formattedDate.toISOString();
+    // Return the date in ISO format (keeping only the date part)
     return formattedDate.toISOString().split('T')[0];
   }
   return null; // If date is null, return null
@@ -58,10 +57,10 @@ router.get("/student-details/:id", async (req, res) => {
   }
 });
 
-// Route to get student details by ID
+// Route to get student details by user ID
 router.get("/student-detail/:id", async (req, res) => {
   try {
-    const { id } = req.params;  // Get the student ID from the request parameters
+    const { id } = req.params;  // Get the user ID from the request parameters
     const result = await pool.query("SELECT * FROM Student_Details_Portal WHERE user_id = $1", [id]);
 
     // Format the date_of_birth field before sending response
@@ -70,8 +69,7 @@ router.get("/student-detail/:id", async (req, res) => {
       student.student_date_of_birth = formatDate(student.student_date_of_birth);  // Format date_of_birth field
       res.json(student);
     } else {
-      // res.status(404).json({  });
-      null;
+      res.status(404).json({ error: "Student not found" });
     }
   } catch (error) {
     console.error("Error fetching student details:", error);
@@ -109,20 +107,24 @@ router.post("/student-details/insert", async (req, res) => {
       student_number_of_siblings,
       student_siblings_bursary,
       student_willow_relationship,
-      student_relationship_type,
-      student_employee_name,
-      student_employee_designation,
-      student_employee_branch,
-      student_employee_number,
+      relation_type,
+      relation_hr_contact,
+      relation_branch,
+      relation_name,
+      relation_surname,
+      relation_employee_code,
+      relation_reference,
       student_emergency_contact_name,
       student_emergency_contact_number,
       student_emergency_contact_relationship,
       student_emergency_contact_address,
       user_id,
+      student_status,
+      student_status_comment,
     } = req.body;
 
     // Handle null values for student_date_of_birth and student_number_of_siblings
-    const formatteddate_of_birth = student_date_of_birth === "" ? null : student_date_of_birth;
+    const formattedDateOfBirth = student_date_of_birth === "" ? null : student_date_of_birth;
     const formattedSiblings = student_number_of_siblings === "" ? null : student_number_of_siblings;
 
     // Insert into database
@@ -133,12 +135,12 @@ router.post("/student-details/insert", async (req, res) => {
         student_highest_education, student_home_address, student_suburb, student_area_code, student_province,
         student_date_of_birth, student_race, student_marital_status, student_employment_status, student_job_title, student_industry,
         student_company_of_employment, student_current_salary, student_number_of_siblings, student_siblings_bursary,
-        student_willow_relationship, student_relationship_type, student_employee_name, student_employee_designation,
-        student_employee_branch, student_employee_number, student_emergency_contact_name, student_emergency_contact_number,
-        student_emergency_contact_relationship, student_emergency_contact_address,user_id
+        student_willow_relationship, relation_type, relation_hr_contact, relation_branch, relation_name, relation_surname,
+        relation_employee_code, relation_reference, student_emergency_contact_name, student_emergency_contact_number,
+        student_emergency_contact_relationship, student_emergency_contact_address, user_id, student_status, student_status_comment
       ) VALUES (
         $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25,
-        $26, $27, $28, $29, $30, $31, $32, $33, $34, $35, $36
+        $26, $27, $28, $29, $30, $31, $32, $33, $34, $35, $36, $37, $38, $39
       ) RETURNING id`,
       [
         student_name,
@@ -156,7 +158,7 @@ router.post("/student-details/insert", async (req, res) => {
         student_suburb,
         student_area_code,
         student_province,
-        formatteddate_of_birth,
+        formattedDateOfBirth,
         student_race,
         student_marital_status,
         student_employment_status,
@@ -167,19 +169,23 @@ router.post("/student-details/insert", async (req, res) => {
         formattedSiblings,
         student_siblings_bursary,
         student_willow_relationship,
-        student_relationship_type,
-        student_employee_name,
-        student_employee_designation,
-        student_employee_branch,
-        student_employee_number,
+        relation_type,
+        relation_hr_contact,
+        relation_branch,
+        relation_name,
+        relation_surname,
+        relation_employee_code,
+        relation_reference,
         student_emergency_contact_name,
         student_emergency_contact_number,
         student_emergency_contact_relationship,
         student_emergency_contact_address,
         user_id,
+        student_status || "Pending",
+        student_status_comment || "",
       ]
     );
-    // res.status(201).json({ message: "Student created successfully", id: result.rows[0].id });
+
     const newStudentId = result.rows[0].id;
     const newStudentResult = await pool.query("SELECT * FROM Student_Details_Portal WHERE id = $1", [newStudentId]);
 
@@ -190,7 +196,6 @@ router.post("/student-details/insert", async (req, res) => {
     } else {
       res.status(404).json({ error: "Student created but not found" });
     }
-
   } catch (error) {
     console.error("Error creating student:", error);
     res.status(500).json({ error: "Failed to create student" });
@@ -228,19 +233,23 @@ router.put("/student-details/update/:id", async (req, res) => {
       student_number_of_siblings,
       student_siblings_bursary,
       student_willow_relationship,
-      student_relationship_type,
-      student_employee_name,
-      student_employee_designation,
-      student_employee_branch,
-      student_employee_number,
+      relation_type,
+      relation_hr_contact,
+      relation_branch,
+      relation_name,
+      relation_surname,
+      relation_employee_code,
+      relation_reference,
       student_emergency_contact_name,
       student_emergency_contact_number,
       student_emergency_contact_relationship,
       student_emergency_contact_address,
+      student_status,
+      student_status_comment,
     } = req.body;
 
     // Handle null values for student_date_of_birth and student_number_of_siblings
-    const formatteddate_of_birth = student_date_of_birth === "" ? null : student_date_of_birth;
+    const formattedDateOfBirth = student_date_of_birth === "" ? null : student_date_of_birth;
     const formattedSiblings = student_number_of_siblings === "" ? null : student_number_of_siblings;
 
     const result = await pool.query(
@@ -271,16 +280,20 @@ router.put("/student-details/update/:id", async (req, res) => {
         student_number_of_siblings = $24,
         student_siblings_bursary = $25,
         student_willow_relationship = $26,
-        student_relationship_type = $27,
-        student_employee_name = $28,
-        student_employee_designation = $29,
-        student_employee_branch = $30,
-        student_employee_number = $31,
-        student_emergency_contact_name = $32,
-        student_emergency_contact_number = $33,
-        student_emergency_contact_relationship = $34,
-        student_emergency_contact_address = $35
-      WHERE id = $36`,
+        relation_type = $27,
+        relation_hr_contact = $28,
+        relation_branch = $29,
+        relation_name = $30,
+        relation_surname = $31,
+        relation_employee_code = $32,
+        relation_reference = $33,
+        student_emergency_contact_name = $34,
+        student_emergency_contact_number = $35,
+        student_emergency_contact_relationship = $36,
+        student_emergency_contact_address = $37,
+        student_status = $38,
+        student_status_comment = $39
+      WHERE id = $40`,
       [
         student_name,
         student_surname,
@@ -297,7 +310,7 @@ router.put("/student-details/update/:id", async (req, res) => {
         student_suburb,
         student_area_code,
         student_province,
-        formatteddate_of_birth,
+        formattedDateOfBirth,
         student_race,
         student_marital_status,
         student_employment_status,
@@ -308,20 +321,23 @@ router.put("/student-details/update/:id", async (req, res) => {
         formattedSiblings,
         student_siblings_bursary,
         student_willow_relationship,
-        student_relationship_type,
-        student_employee_name,
-        student_employee_designation,
-        student_employee_branch,
-        student_employee_number,
+        relation_type,
+        relation_hr_contact,
+        relation_branch,
+        relation_name,
+        relation_surname,
+        relation_employee_code,
+        relation_reference,
         student_emergency_contact_name,
         student_emergency_contact_number,
         student_emergency_contact_relationship,
         student_emergency_contact_address,
+        student_status || "Pending",
+        student_status_comment || "",
         id,  // Student ID from the URL
       ]
     );
 
-    // res.status(200).json({ message: "Student updated successfully" });
     // Fetch and return updated student
     const updatedStudent = await pool.query("SELECT * FROM Student_Details_Portal WHERE id = $1", [id]);
     if (updatedStudent.rows.length > 0) {
@@ -331,7 +347,6 @@ router.put("/student-details/update/:id", async (req, res) => {
     } else {
       res.status(404).json({ error: "Student not found after update" });
     }
-
   } catch (error) {
     console.error("Error updating student:", error);
     res.status(500).json({ error: "Failed to update student" });

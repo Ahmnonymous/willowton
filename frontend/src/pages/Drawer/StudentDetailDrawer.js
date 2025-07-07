@@ -381,7 +381,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                           }
                         }}
                         InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                        disabled={!isAdmin}
+                        // disabled={!isAdmin}
                       />
                     </LocalizationProvider>
                   </Grid>
@@ -407,7 +407,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                         }
                       }}
                       InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                      disabled={!isAdmin}
+                      // disabled={!isAdmin}
                     />
                   </Grid>
                 );
@@ -432,7 +432,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                         }
                       }}
                       InputLabelProps={{ style: { color: isDarkMode ? '#F7FAFC' : '#1E293B' } }}
-                      disabled={!isAdmin}
+                      // disabled={!isAdmin}
                     />
                   </Grid>
                 );
@@ -459,7 +459,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                         }
                       }}
                       InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                      disabled={!isAdmin}
+                      // disabled={!isAdmin}
                     />
                   </Grid>
                 );
@@ -490,7 +490,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                         }
                       }}
                       InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                      disabled={!isAdmin}
+                      // disabled={!isAdmin}
                     />
                   </Grid>
                 );
@@ -521,7 +521,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                         }
                       }}
                       InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                      disabled={!isAdmin}
+                      // disabled={!isAdmin}
                     />
                   </Grid>
                 );
@@ -544,7 +544,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                       }}
                         InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
                       />}
-                      disabled={!isAdmin}
+                      // disabled={!isAdmin}
                     />
                     {emergencyContactOption === "Add new" && (
                       <TextField
@@ -563,7 +563,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                           marginTop: 2
                         }}
                         InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                        disabled={!isAdmin}
+                        // disabled={!isAdmin}
                       />
                     )}
                   </Grid>
@@ -595,7 +595,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                         }
                       }}
                       InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                      disabled={!isAdmin}
+                      // disabled={!isAdmin}
                     />
                   </Grid>
                 );
@@ -619,7 +619,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                         }
                       }}
                       InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                      disabled={!isAdmin}
+                      // disabled={!isAdmin}
                     />
                   </Grid>
                 );
@@ -643,7 +643,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                         }
                       }}
                       InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                      disabled={!isAdmin}
+                      // disabled={!isAdmin}
                     />
                   </Grid>
                 );
@@ -715,7 +715,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                       }}
                         InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
                       />}
-                      disabled={!isAdmin}
+                      // disabled={!isAdmin}
                     />
                   </Grid>
                 );
@@ -738,7 +738,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                       }}
                         InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
                       />}
-                      disabled={!isAdmin}
+                      // disabled={!isAdmin}
                     />
                   </Grid>
                 );
@@ -769,7 +769,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                         }
                       }}
                       InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                      disabled={!isAdmin}
+                      // disabled={!isAdmin}
                     />
                   </Grid>
                 );
@@ -793,7 +793,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                         }
                       }}
                       InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                      disabled={!isAdmin}
+                      // disabled={!isAdmin}
                     />
                   </Grid>
                 );
@@ -817,7 +817,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                         }
                       }}
                       InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                      disabled={!isAdmin}
+                      // disabled={!isAdmin}
                     />
                   </Grid>
                 );
@@ -841,7 +841,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                         }
                       }}
                       InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                      disabled={!isAdmin}
+                      // disabled={!isAdmin}
                     />
                   </Grid>
                 );
@@ -872,7 +872,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                       }}
                         InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
                       />}
-                      disabled={!isAdmin}
+                      // disabled={!isAdmin}
                     />
                   </Grid>
                 );
@@ -895,7 +895,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                       }}
                         InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
                       />}
-                      disabled={!isAdmin}
+                      // disabled={!isAdmin}
                     />
                   </Grid>
                 );
@@ -918,7 +918,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                       }}
                         InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
                       />}
-                      disabled={!isAdmin}
+                      // disabled={!isAdmin}
                     />
                   </Grid>
                 );
@@ -941,7 +941,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                       }}
                         InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
                       />}
-                      disabled={!isAdmin}
+                      // disabled={!isAdmin}
                     />
                   </Grid>
                 );
@@ -964,7 +964,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                       }}
                         InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
                       />}
-                      disabled={!isAdmin}
+                      // disabled={!isAdmin}
                     />
                   </Grid>
                 );
@@ -987,7 +987,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                       }}
                         InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
                       />}
-                      disabled={!isAdmin}
+                      // disabled={!isAdmin}
                     />
                   </Grid>
                 );
@@ -1010,7 +1010,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                       }}
                         InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
                       />}
-                      disabled={!isAdmin}
+                      // disabled={!isAdmin}
                     />
                   </Grid>
                 );
@@ -1033,7 +1033,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                       }}
                         InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
                       />}
-                      disabled={!isAdmin}
+                      // disabled={!isAdmin}
                     />
                   </Grid>
                 );
@@ -1056,7 +1056,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                       }}
                         InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
                       />}
-                      disabled={!isAdmin}
+                      // disabled={!isAdmin}
                     />
                   </Grid>
                 );
@@ -1079,7 +1079,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                       }
                     }}
                     InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                    disabled={!isAdmin}
+                    // disabled={!isAdmin}
                   />
                 </Grid>
               );
@@ -1103,7 +1103,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
               Close
             </Button>
 
-            {studentId && isAdmin && (
+            {studentId && (
               <Button
                 onClick={handleDeleteClick}
                 variant="outlined"
@@ -1120,7 +1120,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
           </Box>
 
           <Box sx={{ display: "flex", gap: 1 }}>
-            {isAdmin && !studentId ? (
+            {!studentId ? (
               <Button
                 onClick={handleSave}
                 variant="contained"
@@ -1130,7 +1130,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
               >
                 Create
               </Button>
-            ) : isAdmin ? (
+            ) : (
               <Button
                 onClick={handleSave}
                 variant="contained"
@@ -1140,7 +1140,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
               >
                 Save
               </Button>
-            ) : null}
+            )}
           </Box>
         </Box>
 

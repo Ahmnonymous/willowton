@@ -29,7 +29,7 @@ import {
   nationality,
   provinces,
   yes_no,
-} from "../../components/lov"; // Import LOVs
+} from "../../components/lov";
 import { ThemeContext } from '../../config/ThemeContext';
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -37,21 +37,18 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { format, parse } from 'date-fns';
 
 const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => {
-  const { isDarkMode } = useContext(ThemeContext);  // Access theme context
+  const { isDarkMode } = useContext(ThemeContext);
   const [selectedDate, setSelectedDate] = useState(null);
-  const [emailError, setEmailError] = useState(""); // State for email validation error
-  const [whatsappError, setWhatsappError] = useState(""); // State for WhatsApp number validation error
-  const [alternativeError, setAlternativeError] = useState(""); // State for alternative number validation error
-  const [emergencyError, setEmergencyError] = useState(""); // State for emergency contact number validation error
-
-  // Check for larger or smaller screen size
+  const [emailError, setEmailError] = useState("");
+  const [whatsappError, setWhatsappError] = useState("");
+  const [alternativeError, setAlternativeError] = useState("");
+  const [emergencyError, setEmergencyError] = useState("");
+  const [emergencyContactOption, setEmergencyContactOption] = useState("");
+  
   const isLargeScreen = useMediaQuery("(min-width:600px)");
-
-  // Drawer width based on screen size
-  // const - Drawer width based on screen size
   const drawerWidth = isLargeScreen ? 500 : 330;
-
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
+
   const [formData, setFormData] = useState({
     student_name: "",
     student_surname: "",
@@ -73,7 +70,6 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     student_marital_status: "",
     student_employment_status: "",
     student_job_title: "",
-    student_industry: "",
     student_company_of_employment: "",
     student_current_salary: "",
     student_number_of_siblings: "",
@@ -91,13 +87,11 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     student_date_stamp: "",
   });
 
-  // Email validation function
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
 
-  // Number validation function for 10 digits
   const validateNumber = (number) => {
     const numberRegex = /^\d{10}$/;
     return numberRegex.test(number);
@@ -117,7 +111,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
               ...data,
               student_date_of_birth: dates,
             }));
-            // Validate fields on load
+            setEmergencyContactOption(data.student_emergency_contact_name ? "Add new" : "");
             setEmailError(data.student_email_address && !validateEmail(data.student_email_address) ? "Please enter a valid email address" : "");
             setWhatsappError(data.student_whatsapp_number && !validateNumber(data.student_whatsapp_number) ? "WhatsApp number must be exactly 10 digits" : "");
             setAlternativeError(data.student_alternative_number && !validateNumber(data.student_alternative_number) ? "Alternative number must be exactly 10 digits" : "");
@@ -150,7 +144,6 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
           student_marital_status: '',
           student_employment_status: '',
           student_job_title: '',
-          student_industry: '',
           student_company_of_employment: '',
           student_current_salary: '',
           student_number_of_siblings: '',
@@ -167,6 +160,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
           student_emergency_contact_address: '',
           student_date_stamp: ''
         });
+        setEmergencyContactOption("");
         setEmailError("");
         setWhatsappError("");
         setAlternativeError("");
@@ -198,19 +192,16 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     const { name, value } = e.target;
     let sanitizedValue = value;
 
-    // Sanitize number inputs to allow only digits and limit to 10
     if (["student_whatsapp_number", "student_alternative_number", "student_emergency_contact_number"].includes(name)) {
       sanitizedValue = value.replace(/\D/g, "").slice(0, 10);
     }
 
     setFormData((prevState) => ({ ...prevState, [name]: sanitizedValue }));
 
-    // Validate email on change
     if (name === "student_email_address") {
       setEmailError(value && !validateEmail(value) ? "Please enter a valid email address" : "");
     }
 
-    // Validate number fields on change
     if (name === "student_whatsapp_number") {
       setWhatsappError(sanitizedValue && !validateNumber(sanitizedValue) ? "WhatsApp number must be exactly 10 digits" : "");
     }
@@ -222,8 +213,30 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     }
   };
 
+  const handleEmergencyContactChange = (e, newValue) => {
+    setEmergencyContactOption(newValue);
+    if (newValue === "Same as above") {
+      setFormData((prevState) => ({
+        ...prevState,
+        student_emergency_contact_name: formData.student_name,
+        student_emergency_contact_number: formData.student_whatsapp_number,
+        student_emergency_contact_relationship: "Self",
+        student_emergency_contact_address: formData.student_home_address,
+      }));
+      setEmergencyError(formData.student_whatsapp_number && !validateNumber(formData.student_whatsapp_number) ? "Emergency contact number must be exactly 10 digits" : "");
+    } else {
+      setFormData((prevState) => ({
+        ...prevState,
+        student_emergency_contact_name: "",
+        student_emergency_contact_number: "",
+        student_emergency_contact_relationship: "",
+        student_emergency_contact_address: "",
+      }));
+      setEmergencyError("");
+    }
+  };
+
   const handleSave = async () => {
-    // Prevent save if any field is invalid
     if (formData.student_email_address && !validateEmail(formData.student_email_address)) {
       setEmailError("Please enter a valid email address");
       return;
@@ -241,29 +254,27 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
       return;
     }
 
-    const user = JSON.parse(localStorage.getItem("user"));  // Get user data from localStorage
-    const userId = user?.user_id; // Get the user_id from the logged-in user
+    const user = JSON.parse(localStorage.getItem("user"));
+    const userId = user?.user_id;
 
     const url = studentId
-      ? `https://willowtonbursary.co.za/api/student-details/update/${studentId}`  // URL for updating the student
-      : `https://willowtonbursary.co.za/api/student-details/insert`;  // URL for inserting a new student
+      ? `https://willowtonbursary.co.za/api/student-details/update/${studentId}`
+      : `https://willowtonbursary.co.za/api/student-details/insert`;
 
-    const method = studentId ? "PUT" : "POST";  // Use PUT for update and POST for insert
-
-    // If creating a new student, add user_id to the formData
+    const method = studentId ? "PUT" : "POST";
     const dataToSend = studentId ? formData : { ...formData, user_id: userId };
 
     try {
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(dataToSend),  // Send the appropriate data for insert or update
+        body: JSON.stringify(dataToSend),
       });
 
       if (response.ok) {
         const savedStudent = await response.json();
-        onSave(savedStudent);  // Callback to parent to handle after saving
-        onClose();  // Close the drawer after saving
+        onSave(savedStudent);
+        onClose();
       } else {
         console.error("Failed to save data");
       }
@@ -273,7 +284,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
   };
 
   const handleDeleteClick = () => {
-    setDeleteConfirmationOpen(true); // Open the dialog
+    setDeleteConfirmationOpen(true);
   };
 
   const handleDeleteConfirm = async () => {
@@ -298,20 +309,23 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
   };
 
   const handleDeleteCancel = () => {
-    setDeleteConfirmationOpen(false); // Close the confirmation dialog
+    setDeleteConfirmationOpen(false);
   };
+
+  // Filter financeType based on religion
+  const filteredFinanceType = formData.student_religion === "Islam" 
+    ? financeType 
+    : financeType.filter(type => type !== "Zakah");
 
   return (
     <Drawer anchor="right" open={open} onClose={onClose}>
       <Box sx={{ width: drawerWidth, height: "100%", display: "flex", flexDirection: "column", backgroundColor: isDarkMode ? '#2D3748' : '#fff' }}>
-        {/* Header */}
         <Box sx={{ padding: 2, borderBottom: "1px solid #ccc", backgroundColor: isDarkMode ? '#1E293B' : '#e1f5fe' }}>
           <Typography variant="h6" sx={{ fontWeight: "bold", color: isDarkMode ? '#F7FAFC' : '#1E293B' }}>
             Student Details
           </Typography>
         </Box>
 
-        {/* Form content */}
         <Box sx={{ flex: 1, overflowY: "auto", padding: 2 }}>
           <Grid container spacing={2}>
             {Object.keys(formData).map((key, index) => {
@@ -476,7 +490,48 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                 );
               }
 
-              if (key === "student_emergency_contact_number") {
+              if (key === "student_emergency_contact_name") {
+                return (
+                  <Grid item xs={12} key={index}>
+                    <Autocomplete
+                      value={emergencyContactOption}
+                      onChange={handleEmergencyContactChange}
+                      options={["Same as above", "Add new"]}
+                      renderInput={(params) => <TextField {...params} label="Emergency Contact" sx={{
+                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        borderRadius: '8px',
+                        '& .MuiInputBase-input': {
+                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        }
+                      }}
+                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                      />}
+                    />
+                    {emergencyContactOption === "Add new" && (
+                      <TextField
+                        label="Student Emergency Contact Name"
+                        name="student_emergency_contact_name"
+                        fullWidth
+                        value={formData.student_emergency_contact_name || ""}
+                        onChange={handleChange}
+                        sx={{
+                          backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                          borderRadius: '8px',
+                          '& .MuiInputBase-input': {
+                            color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                          },
+                          marginTop: 2
+                        }}
+                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                      />
+                    )}
+                  </Grid>
+                );
+              }
+
+              if (key === "student_emergency_contact_number" && emergencyContactOption === "Add new") {
                 return (
                   <Grid item xs={12} key={index}>
                     <TextField
@@ -506,8 +561,53 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                 );
               }
 
+              if (key === "student_emergency_contact_relationship" && emergencyContactOption === "Add new") {
+                return (
+                  <Grid item xs={12} key={index}>
+                    <TextField
+                      label="Student Emergency Contact Relationship"
+                      name="student_emergency_contact_relationship"
+                      fullWidth
+                      value={formData.student_emergency_contact_relationship || ""}
+                      onChange={handleChange}
+                      sx={{
+                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        borderRadius: '8px',
+                        '& .MuiInputBase-input': {
+                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        }
+                      }}
+                      InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                    />
+                  </Grid>
+                );
+              }
+
+              if (key === "student_emergency_contact_address" && emergencyContactOption === "Add new") {
+                return (
+                  <Grid item xs={12} key={index}>
+                    <TextField
+                      label="Student Emergency Contact Address"
+                      name="student_emergency_contact_address"
+                      fullWidth
+                      value={formData.student_emergency_contact_address || ""}
+                      onChange={handleChange}
+                      sx={{
+                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        borderRadius: '8px',
+                        '& .MuiInputBase-input': {
+                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        }
+                      }}
+                      InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                    />
+                  </Grid>
+                );
+              }
+
               if (['student_relationship_type', 'student_employee_name', 'student_employee_designation', 'student_employee_branch', 'student_employee_number'].includes(key)) {
-                // Only render these fields if `student_willow_relationship` is 'Yes'
                 if (formData.student_willow_relationship === "Yes") {
                   return (
                     <Grid item xs={12} key={index}>
@@ -534,17 +634,14 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                 }
               }
 
-              if (
-                key === "student_date_stamp" || key === "id" || key === "user_id"
-              ) return null;
+              if (key === "student_date_stamp" || key === "id" || key === "user_id" || key === "student_industry") return null;
 
               let label = key.replace(/_/g, " ").toLowerCase();
               label = label
-                .split(" ") // Split by space
-                .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize each word
-                .join(" "); // Rejoin into a string
+                .split(" ")
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(" ");
 
-              // Handling LOV fields with Autocomplete for other fields
               if (key === "student_nationality") {
                 return (
                   <Grid item xs={12} key={index}>
@@ -661,7 +758,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                     <Autocomplete
                       value={formData[key] || ""}
                       onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
-                      options={financeType}
+                      options={filteredFinanceType}
                       renderInput={(params) => <TextField {...params} label={label} sx={{
                         backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
                         color: isDarkMode ? '#F7FAFC' : '#1E293B',
@@ -789,10 +886,8 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
           </Grid>
         </Box>
 
-        {/* Footer */}
         <Divider />
         <Box sx={{ padding: 2, borderTop: "1px solid #ccc", display: "flex", justifyContent: "space-between" }}>
-          {/* Left side: Close & Delete */}
           <Box sx={{ display: "flex", gap: 1 }}>
             <Button
               onClick={onClose}
@@ -823,7 +918,6 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
             )}
           </Box>
 
-          {/* Right side: Create or Save */}
           <Box sx={{ display: "flex", gap: 1 }}>
             {!studentId ? (
               <Button
@@ -849,7 +943,6 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
           </Box>
         </Box>
 
-        {/* Confirmation Dialog */}
         <Dialog
           open={deleteConfirmationOpen}
           onClose={handleDeleteCancel}
@@ -859,7 +952,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
             Are you sure you want to delete this record?
           </DialogContent>
           <DialogActions>
-            <Button onClick={!deleteConfirmationOpen} color="primary">
+            <Button onClick={handleDeleteCancel} color="primary">
               Cancel
             </Button>
             <Button onClick={handleDeleteConfirm} color="error">

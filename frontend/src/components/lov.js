@@ -40,9 +40,11 @@ export const employmentStatus = [
 ];
 
 export const highestEducation = [
-  "NQF 1", "NQF 2", "NQF 3", "NQF 4",
-  "NQF 5", "NQF 6", "NQF 7", "NQF 8",
-  "NQF 9", "NQF 10", "Matric"
+  // "NQF 1", "NQF 2", "NQF 3", "NQF 4",
+  // "NQF 5", "NQF 6", "NQF 7", "NQF 8",
+  // "NQF 9", "NQF 10", "Matric",
+  "NQF 5 - Matric/Higher Certificate","NQF 6 - Diploma",
+  "NQF 7 - Degree","NQF 8 - Honors/Postgraduate","NQF 9 - Masters","NQF 10 - PhD/Doctorate"
 ];
 
 export const semesters = [

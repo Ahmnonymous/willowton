@@ -744,7 +744,8 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                 );
               }
 
-              if (["Staff", "Dependent of Staff"].includes(formData.relation_type) && 
+              if (formData.student_willow_relationship === "Yes" && 
+                  ["Staff", "Dependent of Staff"].includes(formData.relation_type) && 
                   ["relation_hr_contact", "relation_branch", "relation_name", "relation_surname", "relation_employee_code"].includes(key)) {
                 return (
                   <Grid item xs={12} key={index}>
@@ -775,7 +776,9 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                 );
               }
 
-              if (formData.relation_type === "Family" && ["relation_name", "relation_reference"].includes(key)) {
+              if (formData.student_willow_relationship === "Yes" && 
+                  formData.relation_type === "Family" && 
+                  ["relation_name", "relation_reference"].includes(key)) {
                 return (
                   <Grid item xs={12} key={index}>
                     <TextField
@@ -799,7 +802,9 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                 );
               }
 
-              if (formData.relation_type === "Referral" && key === "relation_reference") {
+              if (formData.student_willow_relationship === "Yes" && 
+                  formData.relation_type === "Referral" && 
+                  key === "relation_reference") {
                 return (
                   <Grid item xs={12} key={index}>
                     <TextField
@@ -823,7 +828,9 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                 );
               }
 
-              if (formData.relation_type === "Director/Board Member or stakeholder" && key === "relation_name") {
+              if (formData.student_willow_relationship === "Yes" && 
+                  formData.relation_type === "Director/Board Member or stakeholder" && 
+                  key === "relation_name") {
                 return (
                   <Grid item xs={12} key={index}>
                     <TextField

@@ -243,18 +243,17 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
         }));
       }
     }
-    // if (name === "relation_type" && formData.student_willow_relationship === "Yes") {
-    //   // setFormData((prevState) => ({
-    //   //   ...prevState,
-    //   //   relation_hr_contact: "",
-    //   //   relation_branch: "",
-    //   //   relation_name: "",
-    //   //   relation_surname: "",
-    //   //   relation_employee_code: "",
-    //   //   relation_reference: "",
-    //   // }));
-    //   null;
-    // }
+    if (name === "relation_type" && formData.student_willow_relationship === "Yes") {
+      setFormData((prevState) => ({
+        ...prevState,
+        relation_hr_contact: "",
+        relation_branch: "",
+        relation_name: "",
+        relation_surname: "",
+        relation_employee_code: "",
+        relation_reference: "",
+      }));
+    }
   };
 
   const handleEmergencyContactChange = (e, newValue) => {

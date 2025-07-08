@@ -617,9 +617,9 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     }
 
     // Only show relation fields if student_willow_relationship is "Yes"
-    if (formData.student_willow_relationship !== "Yes") {
-      return null;
-    }
+    // if (formData.student_willow_relationship !== "Yes") {
+    //   return null;
+    // }
 
     if (key === "relation_type") {
       return (

@@ -370,21 +370,26 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     };
     const inputLabelProps = { style: { color: isDarkMode ? '#ffffff' : '#000000' } };
     const relationFields = [
-      "relation_type",
-      "relation_hr_contact",
-      "relation_branch",
-      "relation_name",
-      "relation_surname",
-      "relation_employee_code",
-      "relation_reference"
-    ];
+        "relation_type",
+        "relation_hr_contact",
+        "relation_branch",
+        "relation_name",
+        "relation_surname",
+        "relation_employee_code",
+        "relation_reference"
+      ];
 
-    // Only show other relation fields if both student_willow_relationship === "Yes" AND relation_type is selected
-    if (formData.student_willow_relationship !== "Yes") {
-      if (relationFields.includes(key)) return null;
-    } else {
-      if (key !== "relation_type" && !formData.relation_type) return null;
-    }
+      // Handle visibility of relation-related fields only
+      if (relationFields.includes(key)) {
+        if (formData.student_willow_relationship !== "Yes") {
+          return null; // hide all relation fields if "No" or blank
+        }
+
+        // Show only relation_type initially
+        if (key !== "relation_type" && !formData.relation_type) {
+          return null;
+        }
+      }
 
     if (key === "student_date_of_birth") {
       return (

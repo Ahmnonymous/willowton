@@ -369,30 +369,159 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
       },
     };
     const inputLabelProps = { style: { color: isDarkMode ? '#ffffff' : '#000000' } };
-    
     const relationFields = [
-  "relation_type",
-  "relation_hr_contact",
-  "relation_branch",
-  "relation_name",
-  "relation_surname",
-  "relation_employee_code",
-  "relation_reference"
-];
+      "relation_type",
+      "relation_hr_contact",
+      "relation_branch",
+      "relation_name",
+      "relation_surname",
+      "relation_employee_code",
+      "relation_reference",
+    ];
 
-// Only apply the conditional logic to relation fields
-const isRelationField = relationFields.includes(key);
-if (isRelationField) {
-  if (formData.student_willow_relationship !== "Yes") {
-    return null;
-  }
+    // Handle visibility of relation-related fields
+    if (relationFields.includes(key)) {
+      if (formData.student_willow_relationship !== "Yes") {
+        return null; // Hide all relation fields if "No" or blank
+      }
 
-  if (key !== "relation_type" && !formData.relation_type) {
-    return null;
-  }
-}
+      // Show only relation_type initially
+      if (key !== "relation_type" && !formData.relation_type) {
+        return null;
+      }
 
+      // Render specific relation fields based on relation_type
+      if (formData.relation_type === "Staff" || formData.relation_type === "Dependent of Staff") {
+        if (["relation_hr_collection", "relation_branch", "relation_name", "relation_surname", "relation_employee_code"].includes(key)) {
+          const labels = {
+            relation_hr_contact: "HR Contact",
+            relation_branch: "Branch",
+            relation_name: "Name",
+            relation_surname: "Surname",
+            relation_employee_code: "Employee Code",
+          };
+          return (
+            <Grid item xs={12} key={index}>
+              <TextField
+                label={labels[key]}
+                name={key}
+                fullWidth
+                value={formData[key] || ""}
+                onChange={handleChange}
+                sx={fieldStyles}
+                InputLabelProps={inputLabelProps}
+              />
+            </Grid>
+          );
+        }
+        return null; // Hide other relation fields for Staff/Dependent
+      }
 
+      if (formData.relation_type === "Family") {
+        if (key === "relation_name") {
+          return (
+            <Grid item xs={12} key={index}>
+              <TextField
+                label="Who are you related to"
+                name={key}
+                fullWidth
+                value={formData[key] || ""}
+                onChange={handleChange}
+                sx={fieldStyles}
+                InputLabelProps={inputLabelProps}
+              />
+            </Grid>
+          );
+        }
+        if (key === "relation_reference") {
+          return (
+            <Grid item xs={12} key={index}>
+              <TextField
+                label="How are you related"
+                name={key}
+                fullWidth
+                value={formData[key] || ""}
+                onChange={handleChange}
+                sx={fieldStyles}
+                InputLabelProps={inputLabelProps}
+              />
+            </Grid>
+          );
+        }
+        return null; // Hide other relation fields for Family
+      }
+
+      if (formData.relation_type === "Director/Board Member or stakeholder") {
+        if (key === "relation_name") {
+          return (
+            <Grid item xs={12} key={index}>
+              <TextField
+                label="Please provide the person's name"
+                name={key}
+                fullWidth
+                value={formData[key] || ""}
+                onChange={handleChange}
+                sx={fieldStyles}
+                InputLabelProps={inputLabelProps}
+              />
+            </Grid>
+          );
+        }
+        return null; // Hide other relation fields for Director
+      }
+
+      if (formData.relation_type === "Referral") {
+        if (key === "relation_reference") {
+          return (
+            <Grid item xs={12} key={index}>
+              <TextField
+                label="Reference Relation"
+                name={key}
+                fullWidth
+                value={formData[key] || ""}
+                onChange={handleChange}
+                sx={fieldStyles}
+                InputLabelProps={inputLabelProps}
+              />
+            </Grid>
+          );
+        }
+        if (key === "relation_name") {
+          return (
+            <Grid item xs={12} key={index}>
+              <TextField
+                label="Please provide the person's name"
+                name={key}
+                fullWidth
+                value={formData[key] || ""}
+                onChange={handleChange}
+                sx={fieldStyles}
+                InputLabelProps={inputLabelProps}
+              />
+            </Grid>
+          );
+        }
+        return null; // Hide other relation fields for Referral
+      }
+
+      // Render relation_type (since it passed the initial checks)
+      if (key === "relation_type") {
+        return (
+          <Grid item xs={12} key={index}>
+            <Autocomplete
+              value={formData[key] || ""}
+              onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
+              options={relationshipTypes}
+              renderInput={(params) => (
+                <TextField {...params} label="Relationship Type" sx={fieldStyles} InputLabelProps={inputLabelProps} />
+              )}
+            />
+          </Grid>
+        );
+      }
+    }
+
+    // Handle non-relation fields (always render unless explicitly handled)
     if (key === "student_date_of_birth") {
       return (
         <Grid item xs={12} key={index}>
@@ -639,135 +768,6 @@ if (isRelationField) {
       );
     }
 
-    if (key === "relation_type") {
-      return (
-        <Grid item xs={12} key={index}>
-          <Autocomplete
-            value={formData[key] || ""}
-            onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
-            options={relationshipTypes}
-            renderInput={(params) => (
-              <TextField {...params} label="Relationship Type" sx={fieldStyles} InputLabelProps={inputLabelProps} />
-            )}
-          />
-        </Grid>
-      );
-    }
-
-    // Show fields based on relation_type
-    if (formData.relation_type === "Staff" || formData.relation_type === "Dependent of Staff") {
-      if (["relation_hr_contact", "relation_branch", "relation_name", "relation_surname", "relation_employee_code"].includes(key)) {
-        const labels = {
-          relation_hr_contact: "HR Contact",
-          relation_branch: "Branch",
-          relation_name: "Name",
-          relation_surname: "Surname",
-          relation_employee_code: "Employee Code",
-        };
-        return (
-          <Grid item xs={12} key={index}>
-            <TextField
-              label={labels[key]}
-              name={key}
-              fullWidth
-              value={formData[key] || ""}
-              onChange={handleChange}
-              sx={fieldStyles}
-              InputLabelProps={inputLabelProps}
-            />
-          </Grid>
-        );
-      }
-      return null;
-    }
-
-    if (formData.relation_type === "Family") {
-      if (key === "relation_name") {
-        return (
-          <Grid item xs={12} key={index}>
-            <TextField
-              label="Who are you related to"
-              name={key}
-              fullWidth
-              value={formData[key] || ""}
-              onChange={handleChange}
-              sx={fieldStyles}
-              InputLabelProps={inputLabelProps}
-            />
-          </Grid>
-        );
-      }
-      if (key === "relation_reference") {
-        return (
-          <Grid item xs={12} key={index}>
-            <TextField
-              label="How are you related"
-              name={key}
-              fullWidth
-              value={formData[key] || ""}
-              onChange={handleChange}
-              sx={fieldStyles}
-              InputLabelProps={inputLabelProps}
-            />
-          </Grid>
-        );
-      }
-      return null;
-    }
-
-    if (formData.relation_type === "Director/Board Member or stakeholder") {
-      if (key === "relation_name") {
-        return (
-          <Grid item xs={12} key={index}>
-            <TextField
-              label="Please provide the person's name"
-              name={key}
-              fullWidth
-              value={formData[key] || ""}
-              onChange={handleChange}
-              sx={fieldStyles}
-              InputLabelProps={inputLabelProps}
-            />
-          </Grid>
-        );
-      }
-      return null;
-    }
-
-    if (formData.relation_type === "Referral") {
-      if (key === "relation_reference") {
-        return (
-          <Grid item xs={12} key={index}>
-            <TextField
-              label="Reference Relation"
-              name={key}
-              fullWidth
-              value={formData[key] || ""}
-              onChange={handleChange}
-              sx={fieldStyles}
-              InputLabelProps={inputLabelProps}
-            />
-          </Grid>
-        );
-      }
-      if (key === "relation_name") {
-        return (
-          <Grid item xs={12} key={index}>
-            <TextField
-              label="Please provide the person's name"
-              name={key}
-              fullWidth
-              value={formData[key] || ""}
-              onChange={handleChange}
-              sx={fieldStyles}
-              InputLabelProps={inputLabelProps}
-            />
-          </Grid>
-        );
-      }
-      return null;
-    }
-
     if (key === "student_nationality") {
       return (
         <Grid item xs={12} key={index}>
@@ -786,15 +786,15 @@ if (isRelationField) {
     if (key === "student_province") {
       return (
         <Grid item xs={12} key={index}>
-          <Autocomplete
-            value={formData[key] || ""}
-            onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
-            options={provinces}
-            renderInput={(params) => (
-              <TextField {...params} label={key.replace(/_/g, " ").toLowerCase().split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")} sx={fieldStyles} InputLabelProps={inputLabelProps} />
-            )}
-          />
-        </Grid>
+        <Autocomplete
+          value={formData[key] || ""}
+          onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
+          options={provinces}
+          renderInput={(params) => (
+            <TextField {...params} label={key.replace(/_/g, " ").toLowerCase().split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")} sx={fieldStyles} InputLabelProps={inputLabelProps} />
+          )}
+        />
+      </Grid>
       );
     }
 

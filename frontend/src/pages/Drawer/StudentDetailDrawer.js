@@ -379,9 +379,34 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
       "relation_reference"
     ];
 
-    // Hide relation fields unless 'Yes' is selected
-    if (relationFields.includes(key) && formData.student_willow_relationship !== "Yes") {
-      return null;
+    const renderRelationTypeField = (key, index) => (
+      <Grid item xs={12} key={index}>
+        <Autocomplete
+          value={formData[key] || ""}
+          onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
+          options={relationshipTypes}
+          renderInput={(params) => (
+            <TextField {...params} label="Relationship Type" sx={fieldStyles} InputLabelProps={inputLabelProps} />
+          )}
+        />
+      </Grid>
+    );
+
+
+    if (relationFields.includes(key)) {
+      // Always show relation_type if student_willow_relationship is "Yes"
+      if (key === "relation_type") {
+        return formData.student_willow_relationship === "Yes"
+          ? renderRelationTypeField(key, index)
+          : null;
+      }
+
+      // // Only show other relation fields if both student_willow_relationship is "Yes" AND relation_type is selected
+      // if (formData.student_willow_relationship === "Yes" && formData.relation_type) {
+      //   return renderFieldByRelationType(key, index); // Delegate to existing logic
+      // }
+
+      // return null;
     }
 
     if (key === "student_date_of_birth") {

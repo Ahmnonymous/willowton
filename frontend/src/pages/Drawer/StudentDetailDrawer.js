@@ -175,13 +175,13 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
           student_number_of_siblings: '',
           student_siblings_bursary: '',
           student_willow_relationship: '',
-          relation_type: '',
-          relation_hr_contact: '',
-          relation_branch: '',
-          relation_name: '',
-          relation_surname: '',
-          relation_employee_code: '',
-          relation_reference: '',
+          // relation_type: '',
+          // relation_hr_contact: '',
+          // relation_branch: '',
+          // relation_name: '',
+          // relation_surname: '',
+          // relation_employee_code: '',
+          // relation_reference: '',
           student_emergency_contact_name: '',
           student_emergency_contact_number: '',
           student_emergency_contact_relationship: '',
@@ -230,31 +230,31 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     }
 
     // Handle relation field resets
-    if (name === "student_willow_relationship") {
-      if (value === "No") {
-        setFormData((prevState) => ({
-          ...prevState,
-          relation_type: "",
-          relation_hr_contact: "",
-          relation_branch: "",
-          relation_name: "",
-          relation_surname: "",
-          relation_employee_code: "",
-          relation_reference: "",
-        }));
-      }
-    }
-    if (name === "relation_type" && formData.student_willow_relationship === "Yes") {
-      setFormData((prevState) => ({
-        ...prevState,
-        relation_hr_contact: "",
-        relation_branch: "",
-        relation_name: "",
-        relation_surname: "",
-        relation_employee_code: "",
-        relation_reference: "",
-      }));
-    }
+    // if (name === "student_willow_relationship") {
+    //   if (value === "No") {
+    //     setFormData((prevState) => ({
+    //       ...prevState,
+    //       relation_type: "",
+    //       relation_hr_contact: "",
+    //       relation_branch: "",
+    //       relation_name: "",
+    //       relation_surname: "",
+    //       relation_employee_code: "",
+    //       relation_reference: "",
+    //     }));
+    //   }
+    // }
+    // if (name === "relation_type" && formData.student_willow_relationship === "Yes") {
+    //   setFormData((prevState) => ({
+    //     ...prevState,
+    //     relation_hr_contact: "",
+    //     relation_branch: "",
+    //     relation_name: "",
+    //     relation_surname: "",
+    //     relation_employee_code: "",
+    //     relation_reference: "",
+    //   }));
+    // }
   };
 
   const handleEmergencyContactChange = (e, newValue) => {
@@ -616,11 +616,6 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
       );
     }
 
-    // Only show relation fields if student_willow_relationship is "Yes"
-    // if (formData.student_willow_relationship !== "Yes") {
-    //   return null;
-    // }
-
     if (key === "relation_type") {
       return (
         <Grid item xs={12} key={index}>
@@ -722,6 +717,21 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
           <Grid item xs={12} key={index}>
             <TextField
               label="Reference Relation"
+              name={key}
+              fullWidth
+              value={formData[key] || ""}
+              onChange={handleChange}
+              sx={fieldStyles}
+              InputLabelProps={inputLabelProps}
+            />
+          </Grid>
+        );
+      }
+      if (key === "relation_name") {
+        return (
+          <Grid item xs={12} key={index}>
+            <TextField
+              label="Please provide the person's name"
               name={key}
               fullWidth
               value={formData[key] || ""}

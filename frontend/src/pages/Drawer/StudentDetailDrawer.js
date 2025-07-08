@@ -68,6 +68,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     student_type: "",
     student_religion: "",
     student_finance_type: "",
+    student_willow_relationship: "",
     student_whatsapp_number: "",
     student_alternative_number: "",
     student_email_address: "",
@@ -85,7 +86,6 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     student_current_salary: "",
     student_number_of_siblings: "",
     student_siblings_bursary: "",
-    student_willow_relationship: "",
     relation_type: "",
     relation_hr_contact: "",
     relation_branch: "",
@@ -206,7 +206,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
   };
 
   useEffect(() => {
-    if (formData.student_willow_relationship === 'No') {
+    if (formData.student_willow_relationship !== 'Yes') {
       setFormData((prevState) => ({
         ...prevState,
         relation_type: "",
@@ -242,6 +242,19 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     }
     if (name === "student_emergency_contact_number") {
       setEmergencyError(sanitizedValue && !validateNumber(sanitizedValue) ? "Emergency contact number must be exactly 10 digits" : "");
+    }
+
+    if (name === "relation_type") {
+      setFormData((prevState) => ({
+        ...prevState,
+        relation_type: value,
+        relation_hr_contact: "",
+        relation_branch: "",
+        relation_name: "",
+        relation_surname: "",
+        relation_employee_code: "",
+        relation_reference: "",
+      }));
     }
   };
 
@@ -348,6 +361,17 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     ? financeType 
     : financeType.filter(type => type !== "Zakah");
 
+  // Define relation fields to exclude from the generic loop
+  const relationFields = [
+    "relation_type",
+    "relation_hr_contact",
+    "relation_branch",
+    "relation_name",
+    "relation_surname",
+    "relation_employee_code",
+    "relation_reference"
+  ];
+
   return (
     <Drawer anchor="right" open={open} onClose={onClose}>
       <Box sx={{ width: drawerWidth, height: "100%", display: "flex", flexDirection: "column", backgroundColor: isDarkMode ? '#2D3748' : '#fff' }}>
@@ -360,6 +384,11 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
         <Box sx={{ flex: 1, overflowY: "auto", padding: 2 }}>
           <Grid container spacing={2}>
             {Object.keys(formData).map((key, index) => {
+              // Skip relation fields in the generic loop
+              if (relationFields.includes(key)) {
+                return null;
+              }
+
               if (key === "student_date_of_birth") {
                 return (
                   <Grid item xs={12} key={index}>
@@ -721,264 +750,6 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                 );
               }
 
-              if (key === "relation_type" && formData.student_willow_relationship === "Yes") {
-                return (
-                  <Grid item xs={12} key={index}>
-                    <Autocomplete
-                      value={formData[key] || ""}
-                      onChange={(e, newValue) => {
-                        handleChange({ target: { name: key, value: newValue } });
-                        // Reset relation fields when relation_type changes
-                        setFormData((prevState) => ({
-                          ...prevState,
-                          relation_hr_contact: "",
-                          relation_branch: "",
-                          relation_name: "",
-                          relation_surname: "",
-                          relation_employee_code: "",
-                          relation_reference: "",
-                        }));
-                      }}
-                      options={relationshipTypes}
-                      renderInput={(params) => <TextField {...params} label="Relationship Type" sx={{
-                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        borderRadius: '8px',
-                        '& .MuiInputBase-input': {
-                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        }
-                      }}
-                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                      />}
-                      // disabled={!isAdmin}
-                    />
-                  </Grid>
-                );
-              }
-
-              if (formData.student_willow_relationship === "Yes" && 
-                  ["Staff", "Dependent of Staff"].includes(formData.relation_type)) {
-                if (key === "relation_hr_contact") {
-                  return (
-                    <Grid item xs={12} key={index}>
-                      <TextField
-                        label="HR Contact"
-                        name="relation_hr_contact"
-                        fullWidth
-                        value={formData[key] || ""}
-                        onChange={handleChange}
-                        sx={{
-                          backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                          borderRadius: '8px',
-                          '& .MuiInputBase-input': {
-                            color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                          }
-                        }}
-                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                        // disabled={!isAdmin}
-                      />
-                    </Grid>
-                  );
-                }
-                if (key === "relation_branch") {
-                  return (
-                    <Grid item xs={12} key={index}>
-                      <TextField
-                        label="Branch"
-                        name="relation_branch"
-                        fullWidth
-                        value={formData[key] || ""}
-                        onChange={handleChange}
-                        sx={{
-                          backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                          borderRadius: '8px',
-                          '& .MuiInputBase-input': {
-                            color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                          }
-                        }}
-                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                        // disabled={!isAdmin}
-                      />
-                    </Grid>
-                  );
-                }
-                if (key === "relation_name") {
-                  return (
-                    <Grid item xs={12} key={index}>
-                      <TextField
-                        label="Name"
-                        name="relation_name"
-                        fullWidth
-                        value={formData[key] || ""}
-                        onChange={handleChange}
-                        sx={{
-                          backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                          borderRadius: '8px',
-                          '& .MuiInputBase-input': {
-                            color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                          }
-                        }}
-                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                        // disabled={!isAdmin}
-                      />
-                    </Grid>
-                  );
-                }
-                if (key === "relation_surname") {
-                  return (
-                    <Grid item xs={12} key={index}>
-                      <TextField
-                        label="Surname"
-                        name="relation_surname"
-                        fullWidth
-                        value={formData[key] || ""}
-                        onChange={handleChange}
-                        sx={{
-                          backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                          borderRadius: '8px',
-                          '& .MuiInputBase-input': {
-                            color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                          }
-                        }}
-                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                        // disabled={!isAdmin}
-                      />
-                    </Grid>
-                  );
-                }
-                if (key === "relation_employee_code") {
-                  return (
-                    <Grid item xs={12} key={index}>
-                      <TextField
-                        label="Employee Code"
-                        name="relation_employee_code"
-                        fullWidth
-                        value={formData[key] || ""}
-                        onChange={handleChange}
-                        sx={{
-                          backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                          borderRadius: '8px',
-                          '& .MuiInputBase-input': {
-                            color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                          }
-                        }}
-                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                        // disabled={!isAdmin}
-                      />
-                    </Grid>
-                  );
-                }
-              }
-
-              if (formData.student_willow_relationship === "Yes" && 
-                  formData.relation_type === "Family") {
-                if (key === "relation_name") {
-                  return (
-                    <Grid item xs={12} key={index}>
-                      <TextField
-                        label="Who are you related to"
-                        name="relation_name"
-                        fullWidth
-                        value={formData[key] || ""}
-                        onChange={handleChange}
-                        sx={{
-                          backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                          borderRadius: '8px',
-                          '& .MuiInputBase-input': {
-                            color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                          }
-                        }}
-                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                        // disabled={!isAdmin}
-                      />
-                    </Grid>
-                  );
-                }
-                if (key === "relation_reference") {
-                  return (
-                    <Grid item xs={12} key={index}>
-                      <TextField
-                        label="How are you related"
-                        name="relation_reference"
-                        fullWidth
-                        value={formData[key] || ""}
-                        onChange={handleChange}
-                        sx={{
-                          backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                          borderRadius: '8px',
-                          '& .MuiInputBase-input': {
-                            color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                          }
-                        }}
-                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                        // disabled={!isAdmin}
-                      />
-                    </Grid>
-                  );
-                }
-              }
-
-              if (formData.student_willow_relationship === "Yes" && 
-                  formData.relation_type === "Referral") {
-                if (key === "relation_reference") {
-                  return (
-                    <Grid item xs={12} key={index}>
-                      <TextField
-                        label="Were you referred by a family member, staff member, Director/Board Member or stakeholder. Please provide the person's name"
-                        name="relation_reference"
-                        fullWidth
-                        value={formData[key] || ""}
-                        onChange={handleChange}
-                        sx={{
-                          backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                          borderRadius: '8px',
-                          '& .MuiInputBase-input': {
-                            color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                          }
-                        }}
-                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                        // disabled={!isAdmin}
-                      />
-                    </Grid>
-                  );
-                }
-              }
-
-              if (formData.student_willow_relationship === "Yes" && 
-                  formData.relation_type === "Director/Board Member or stakeholder") {
-                if (key === "relation_name") {
-                  return (
-                    <Grid item xs={12} key={index}>
-                      <TextField
-                        label="Please provide the person's name"
-                        name="relation_name"
-                        fullWidth
-                        value={formData[key] || ""}
-                        onChange={handleChange}
-                        sx={{
-                          backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                          borderRadius: '8px',
-                          '& .MuiInputBase-input': {
-                            color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                          }
-                        }}
-                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                        // disabled={!isAdmin}
-                      />
-                    </Grid>
-                  );
-                }
-              }
-
               if (key === "student_date_stamp" || key === "id" || key === "user_id" || key === "student_industry") return null;
 
               let label = key.replace(/_/g, " ").toLowerCase();
@@ -1216,6 +987,223 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                 </Grid>
               );
             })}
+
+            {/* Render relation_type field */}
+            {formData.student_willow_relationship === "Yes" && (
+              <Grid item xs={12}>
+                <Autocomplete
+                  value={formData.relation_type || ""}
+                  onChange={(e, newValue) => handleChange({ target: { name: "relation_type", value: newValue } })}
+                  options={relationshipTypes}
+                  renderInput={(params) => <TextField {...params} label="Relationship Type" sx={{
+                    backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                    color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                    borderRadius: '8px',
+                    '& .MuiInputBase-input': {
+                      color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                    }
+                  }}
+                    InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                  />}
+                  // disabled={!isAdmin}
+                />
+              </Grid>
+            )}
+
+            {/* Render fields for Staff or Dependent of Staff */}
+            {formData.student_willow_relationship === "Yes" && 
+             ["Staff", "Dependent of Staff"].includes(formData.relation_type) && (
+              <>
+                <Grid item xs={12}>
+                  <TextField
+                    label="HR Contact"
+                    name="relation_hr_contact"
+                    fullWidth
+                    value={formData.relation_hr_contact || ""}
+                    onChange={handleChange}
+                    sx={{
+                      backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                      color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                      borderRadius: '8px',
+                      '& .MuiInputBase-input': {
+                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                      }
+                    }}
+                    InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                    // disabled={!isAdmin}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    label="Branch"
+                    name="relation_branch"
+                    fullWidth
+                    value={formData.relation_branch || ""}
+                    onChange={handleChange}
+                    sx={{
+                      backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                      color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                      borderRadius: '8px',
+                      '& .MuiInputBase-input': {
+                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                      }
+                    }}
+                    InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                    // disabled={!isAdmin}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    label="Name"
+                    name="relation_name"
+                    fullWidth
+                    value={formData.relation_name || ""}
+                    onChange={handleChange}
+                    sx={{
+                      backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                      color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                      borderRadius: '8px',
+                      '& .MuiInputBase-input': {
+                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                      }
+                    }}
+                    InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                    // disabled={!isAdmin}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    label="Surname"
+                    name="relation_surname"
+                    fullWidth
+                    value={formData.relation_surname || ""}
+                    onChange={handleChange}
+                    sx={{
+                      backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                      color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                      borderRadius: '8px',
+                      '& .MuiInputBase-input': {
+                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                      }
+                    }}
+                    InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                    // disabled={!isAdmin}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    label="Employee Code"
+                    name="relation_employee_code"
+                    fullWidth
+                    value={formData.relation_employee_code || ""}
+                    onChange={handleChange}
+                    sx={{
+                      backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                      color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                      borderRadius: '8px',
+                      '& .MuiInputBase-input': {
+                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                      }
+                    }}
+                    InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                    // disabled={!isAdmin}
+                  />
+                </Grid>
+              </>
+            )}
+
+            {/* Render fields for Family */}
+            {formData.student_willow_relationship === "Yes" && 
+             formData.relation_type === "Family" && (
+              <>
+                <Grid item xs={12}>
+                  <TextField
+                    label="Who are you related to"
+                    name="relation_name"
+                    fullWidth
+                    value={formData.relation_name || ""}
+                    onChange={handleChange}
+                    sx={{
+                      backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                      color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                      borderRadius: '8px',
+                      '& .MuiInputBase-input': {
+                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                      }
+                    }}
+                    InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                    // disabled={!isAdmin}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    label="How are you related"
+                    name="relation_reference"
+                    fullWidth
+                    value={formData.relation_reference || ""}
+                    onChange={handleChange}
+                    sx={{
+                      backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                      color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                      borderRadius: '8px',
+                      '& .MuiInputBase-input': {
+                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                      }
+                    }}
+                    InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                    // disabled={!isAdmin}
+                  />
+                </Grid>
+              </>
+            )}
+
+            {/* Render field for Referral */}
+            {formData.student_willow_relationship === "Yes" && 
+             formData.relation_type === "Referral" && (
+              <Grid item xs={12}>
+                <TextField
+                  label="Were you referred by a family member, staff member, Director/Board Member or stakeholder. Please provide the person's name"
+                  name="relation_reference"
+                  fullWidth
+                  value={formData.relation_reference || ""}
+                  onChange={handleChange}
+                  sx={{
+                    backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                    color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                    borderRadius: '8px',
+                    '& .MuiInputBase-input': {
+                      color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                    }
+                  }}
+                  InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                  // disabled={!isAdmin}
+                />
+              </Grid>
+            )}
+
+            {/* Render field for Director/Board Member or stakeholder */}
+            {formData.student_willow_relationship === "Yes" && 
+             formData.relation_type === "Director/Board Member or stakeholder" && (
+              <Grid item xs={12}>
+                <TextField
+                  label="Please provide the person's name"
+                  name="relation_name"
+                  fullWidth
+                  value={formData.relation_name || ""}
+                  onChange={handleChange}
+                  sx={{
+                    backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                    color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                    borderRadius: '8px',
+                    '& .MuiInputBase-input': {
+                      color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                    }
+                  }}
+                  InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                  // disabled={!isAdmin}
+                />
+              </Grid>
+            )}
           </Grid>
         </Box>
 
@@ -1262,7 +1250,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
               >
                 Create
               </Button>
-            ) :  (
+            ) : (
               <Button
                 onClick={handleSave}
                 variant="contained"

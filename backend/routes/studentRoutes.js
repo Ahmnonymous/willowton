@@ -38,7 +38,7 @@ router.get("/student-details", async (req, res) => {
 });
 
 // Route to get student details by ID
-router.get("/student-detail/:id", async (req, res) => {
+router.get("/student-details/:id", async (req, res) => {
   try {
     const { id } = req.params;  // Get the student ID from the request parameters
     const result = await pool.query("SELECT * FROM Student_Details_Portal WHERE user_id = $1", [id]);

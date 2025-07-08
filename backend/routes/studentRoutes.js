@@ -38,10 +38,30 @@ router.get("/student-details", async (req, res) => {
 });
 
 // Route to get student details by ID
-router.get("/student-details/:id", async (req, res) => {
+router.get("/student-detail/:id", async (req, res) => {
   try {
     const { id } = req.params;  // Get the student ID from the request parameters
     const result = await pool.query("SELECT * FROM Student_Details_Portal WHERE user_id = $1", [id]);
+
+    // Format the date_of_birth field before sending response
+    if (result.rows.length > 0) {
+      const student = result.rows[0];
+      student.student_date_of_birth = formatDate(student.student_date_of_birth);  // Format date_of_birth field
+      res.json(student);
+    } else {
+      null;
+    }
+  } catch (error) {
+    console.error("Error fetching student details:", error);
+    res.status(500).json({ error: "Failed to fetch student details" });
+  }
+});
+
+// Route to get student details by ID
+router.get("/student-details/:id", async (req, res) => {
+  try {
+    const { id } = req.params;  // Get the student ID from the request parameters
+    const result = await pool.query("SELECT * FROM Student_Details_Portal WHERE id = $1", [id]);
 
     // Format the date_of_birth field before sending response
     if (result.rows.length > 0) {

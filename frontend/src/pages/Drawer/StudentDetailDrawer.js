@@ -379,14 +379,11 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
       "relation_reference"
     ];
 
-    // Hide relation fields unless 'Yes' is selected
-    if (relationFields.includes(key) && formData.student_willow_relationship !== "Yes") {
-      return null;
-    }
-
-    // When student_willow_relationship is "Yes" but no relation_type is selected, only show relation_type
-    if (relationFields.includes(key) && formData.student_willow_relationship === "Yes" && !formData.relation_type) {
-      return null;
+    // Only show other relation fields if both student_willow_relationship === "Yes" AND relation_type is selected
+    if (formData.student_willow_relationship !== "Yes") {
+      if (relationFields.includes(key)) return null;
+    } else {
+      if (key !== "relation_type" && !formData.relation_type) return null;
     }
 
     if (key === "student_date_of_birth") {

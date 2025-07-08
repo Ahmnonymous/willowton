@@ -52,18 +52,6 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
   const userType = user?.user_type; // student or admin
   const isAdmin = userType === "admin";
 
-  // const renderField = (key, index) => {
-    // Common styling for TextField and Autocomplete
-    const fieldStyles = {
-      backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-      color: isDarkMode ? '#F7FAFC' : '#1E293B',
-      borderRadius: '8px',
-      '& .MuiInputBase-input': {
-        color: isDarkMode ? '#F7FAFC' : '#1E293B',
-      },
-    };
-    const inputLabelProps = { style: { color: isDarkMode ? '#ffffff' : '#000000' } };
-
   const relationshipTypes = [
     "Staff",
     "Dependent of Staff",
@@ -360,6 +348,607 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     ? financeType 
     : financeType.filter(type => type !== "Zakah");
 
+  const renderField = (key, index) => {
+    const fieldStyles = {
+      backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+      color: isDarkMode ? '#F7FAFC' : '#1E293B',
+      borderRadius: '8px',
+      '& .MuiInputBase-input': {
+        color: isDarkMode ? '#F7FAFC' : '#1E293B',
+      },
+    };
+    const inputLabelProps = { style: { color: isDarkMode ? '#ffffff' : '#000000' } };
+
+    if (key === "student_date_of_birth") {
+      return (
+        <Grid item xs={12} key={index}>
+          <LocalizationProvider dateAdapter={AdapterDateFns}>
+            <DatePicker
+              wrapperClassName={"datepicker"}
+              className={"datepicker"}
+              label="Student Date of Birth"
+              name="student_date_of_birth"
+              value={selectedDate}
+              onChange={handleDateChange}
+              format="MM/dd/yyyy"
+              sx={fieldStyles}
+              InputLabelProps={inputLabelProps}
+            />
+          </LocalizationProvider>
+        </Grid>
+      );
+    }
+
+    if (key === "student_number_of_siblings") {
+      return (
+        <Grid item xs={12} key={index}>
+          <TextField
+            label="Number of Siblings"
+            name="student_number_of_siblings"
+            type="number"
+            fullWidth
+            value={formData.student_number_of_siblings || ""}
+            onChange={handleChange}
+            sx={fieldStyles}
+            InputLabelProps={inputLabelProps}
+          />
+        </Grid>
+      );
+    }
+
+    if (key === "student_id_passport_number") {
+      return (
+        <Grid item xs={12} key={index}>
+          <TextField
+            label="Student ID/Passport Number"
+            name="student_id_passport_number"
+            type="text"
+            fullWidth
+            value={formData.student_id_passport_number || ""}
+            onChange={handleChange}
+            sx={fieldStyles}
+            InputLabelProps={inputLabelProps}
+          />
+        </Grid>
+      );
+    }
+
+    if (key === "student_email_address") {
+      return (
+        <Grid item xs={12} key={index}>
+          <TextField
+            label="Student Email Address"
+            name="student_email_address"
+            type="email"
+            fullWidth
+            value={formData.student_email_address || ""}
+            onChange={handleChange}
+            error={!!emailError}
+            helperText={emailError}
+            sx={fieldStyles}
+            InputLabelProps={inputLabelProps}
+          />
+        </Grid>
+      );
+    }
+
+    if (key === "student_whatsapp_number") {
+      return (
+        <Grid item xs={12} key={index}>
+          <TextField
+            label="Student WhatsApp Number"
+            name="student_whatsapp_number"
+            type="tel"
+            fullWidth
+            value={formData.student_whatsapp_number || ""}
+            onChange={handleChange}
+            error={!!whatsappError}
+            helperText={whatsappError}
+            inputProps={{ maxLength: 10, pattern: "[0-9]*" }}
+            sx={fieldStyles}
+            InputLabelProps={inputLabelProps}
+          />
+        </Grid>
+      );
+    }
+
+    if (key === "student_alternative_number") {
+      return (
+        <Grid item xs={12} key={index}>
+          <TextField
+            label="Student Alternative Number"
+            name="student_alternative_number"
+            type="tel"
+            fullWidth
+            value={formData.student_alternative_number || ""}
+            onChange={handleChange}
+            error={!!alternativeError}
+            helperText={alternativeError}
+            inputProps={{ maxLength: 10, pattern: "[0-9]*" }}
+            sx={fieldStyles}
+            InputLabelProps={inputLabelProps}
+          />
+        </Grid>
+      );
+    }
+
+    if (key === "student_emergency_contact_name") {
+      return (
+        <Grid item xs={12} key={index}>
+          <Autocomplete
+            value={emergencyContactOption}
+            onChange={handleEmergencyContactChange}
+            options={["Same as above", "Add new"]}
+            renderInput={(params) => (
+              <TextField {...params} label="Emergency Contact" sx={fieldStyles} InputLabelProps={inputLabelProps} />
+            )}
+          />
+          {emergencyContactOption === "Add new" && (
+            <TextField
+              label="Student Emergency Contact Name"
+              name="student_emergency_contact_name"
+              fullWidth
+              value={formData.student_emergency_contact_name || ""}
+              onChange={handleChange}
+              sx={{ ...fieldStyles, marginTop: 2 }}
+              InputLabelProps={inputLabelProps}
+            />
+          )}
+        </Grid>
+      );
+    }
+
+    if (key === "student_emergency_contact_number" && emergencyContactOption === "Add new") {
+      return (
+        <Grid item xs={12} key={index}>
+          <TextField
+            label="Student Emergency Contact Number"
+            name="student_emergency_contact_number"
+            type="tel"
+            fullWidth
+            value={formData.student_emergency_contact_number || ""}
+            onChange={handleChange}
+            error={!!emergencyError}
+            helperText={emergencyError}
+            inputProps={{ maxLength: 10, pattern: "[0-9]*" }}
+            sx={fieldStyles}
+            InputLabelProps={inputLabelProps}
+          />
+        </Grid>
+      );
+    }
+
+    if (key === "student_emergency_contact_relationship" && emergencyContactOption === "Add new") {
+      return (
+        <Grid item xs={12} key={index}>
+          <TextField
+            label="Student Emergency Contact Relationship"
+            name="student_emergency_contact_relationship"
+            fullWidth
+            value={formData.student_emergency_contact_relationship || ""}
+            onChange={handleChange}
+            sx={fieldStyles}
+            InputLabelProps={inputLabelProps}
+          />
+        </Grid>
+      );
+    }
+
+    if (key === "student_emergency_contact_address" && emergencyContactOption === "Add new") {
+      return (
+        <Grid item xs={12} key={index}>
+          <TextField
+            label="Student Emergency Contact Address"
+            name="student_emergency_contact_address"
+            fullWidth
+            value={formData.student_emergency_contact_address || ""}
+            onChange={handleChange}
+            sx={fieldStyles}
+            InputLabelProps={inputLabelProps}
+          />
+        </Grid>
+      );
+    }
+
+    if (key === "student_status") {
+      return (
+        <Grid item xs={12} key={index}>
+          <Autocomplete
+            value={formData[key] || "Pending"}
+            onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
+            options={statusOptions}
+            renderInput={(params) => (
+              <TextField {...params} label="Student Status" sx={fieldStyles} InputLabelProps={inputLabelProps} />
+            )}
+            disabled={!isAdmin}
+          />
+        </Grid>
+      );
+    }
+
+    if (key === "student_status_comment") {
+      return (
+        <Grid item xs={12} key={index}>
+          <TextField
+            label="Status Comment"
+            name="student_status_comment"
+            fullWidth
+            multiline
+            rows={4}
+            value={formData.student_status_comment || ""}
+            onChange={handleChange}
+            sx={fieldStyles}
+            InputLabelProps={inputLabelProps}
+            disabled={!isAdmin}
+          />
+        </Grid>
+      );
+    }
+
+    if (key === "student_willow_relationship") {
+      return (
+        <Grid item xs={12} key={index}>
+          <Autocomplete
+            value={formData[key] || ""}
+            onChange={(e, newValue) => {
+              handleChange({ target: { name: key, value: newValue } });
+              if (newValue === "No") {
+                setFormData((prevState) => ({
+                  ...prevState,
+                  relation_type: "",
+                  relation_hr_contact: "",
+                  relation_branch: "",
+                  relation_name: "",
+                  relation_surname: "",
+                  relation_employee_code: "",
+                  relation_reference: "",
+                }));
+              }
+            }}
+            options={yes_no}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Does the student have any relationship to the Willowton Group?"
+                sx={fieldStyles}
+                InputLabelProps={inputLabelProps}
+              />
+            )}
+          />
+        </Grid>
+      );
+    }
+
+    if (key === "relation_type" && formData.student_willow_relationship === "Yes") {
+      return (
+        <Grid item xs={12} key={index}>
+          <Autocomplete
+            value={formData[key] || ""}
+            onChange={(e, newValue) => {
+              handleChange({ target: { name: key, value: newValue } });
+              setFormData((prevState) => ({
+                ...prevState,
+                relation_hr_contact: "",
+                relation_branch: "",
+                relation_name: "",
+                relation_surname: "",
+                relation_employee_code: "",
+                relation_reference: "",
+              }));
+            }}
+            options={relationshipTypes}
+            renderInput={(params) => (
+              <TextField {...params} label="Relationship Type" sx={fieldStyles} InputLabelProps={inputLabelProps} />
+            )}
+          />
+        </Grid>
+      );
+    }
+
+    if (
+      formData.student_willow_relationship === "Yes" &&
+      ["Staff", "Dependent of Staff"].includes(formData.relation_type)
+    ) {
+      if (key === "relation_hr_contact") {
+        return (
+          <Grid item xs={12} key={index}>
+            <TextField
+              label="HR Contact"
+              name="relation_hr_contact"
+              fullWidth
+              value={formData[key] || ""}
+              onChange={handleChange}
+              sx={fieldStyles}
+              InputLabelProps={inputLabelProps}
+            />
+          </Grid>
+        );
+      }
+      if (key === "relation_branch") {
+        return (
+          <Grid item xs={12} key={index}>
+            <TextField
+              label="Branch"
+              name="relation_branch"
+              fullWidth
+              value={formData[key] || ""}
+              onChange={handleChange}
+              sx={fieldStyles}
+              InputLabelProps={inputLabelProps}
+            />
+          </Grid>
+        );
+      }
+      if (key === "relation_name") {
+        return (
+          <Grid item xs={12} key={index}>
+            <TextField
+              label="Name"
+              name="relation_name"
+              fullWidth
+              value={formData[key] || ""}
+              onChange={handleChange}
+              sx={fieldStyles}
+              InputLabelProps={inputLabelProps}
+            />
+          </Grid>
+        );
+      }
+      if (key === "relation_surname") {
+        return (
+          <Grid item xs={12} key={index}>
+            <TextField
+              label="Surname"
+              name="relation_surname"
+              fullWidth
+              value={formData[key] || ""}
+              onChange={handleChange}
+              sx={fieldStyles}
+              InputLabelProps={inputLabelProps}
+            />
+          </Grid>
+        );
+      }
+      if (key === "relation_employee_code") {
+        return (
+          <Grid item xs={12} key={index}>
+            <TextField
+              label="Employee Code"
+              name="relation_employee_code"
+              fullWidth
+              value={formData[key] || ""}
+              onChange={handleChange}
+              sx={fieldStyles}
+              InputLabelProps={inputLabelProps}
+            />
+          </Grid>
+        );
+      }
+    }
+
+    if (formData.student_willow_relationship === "Yes" && formData.relation_type === "Family") {
+      if (key === "relation_name") {
+        return (
+          <Grid item xs={12} key={index}>
+            <TextField
+              label="Who are you related to"
+              name="relation_name"
+              fullWidth
+              value={formData[key] || ""}
+              onChange={handleChange}
+              sx={fieldStyles}
+              InputLabelProps={inputLabelProps}
+            />
+          </Grid>
+        );
+      }
+      if (key === "relation_reference") {
+        return (
+          <Grid item xs={12} key={index}>
+            <TextField
+              label="How are you related"
+              name="relation_reference"
+              fullWidth
+              value={formData[key] || ""}
+              onChange={handleChange}
+              sx={fieldStyles}
+              InputLabelProps={inputLabelProps}
+            />
+          </Grid>
+        );
+      }
+    }
+
+    if (formData.student_willow_relationship === "Yes" && formData.relation_type === "Referral") {
+      if (key === "relation_reference") {
+        return (
+          <Grid item xs={12} key={index}>
+            <TextField
+              label="Were you referred by a family member, staff member, Director/Board Member or stakeholder. Please provide the person's name"
+              name="relation_reference"
+              fullWidth
+              value={formData[key] || ""}
+              onChange={handleChange}
+              sx={fieldStyles}
+              InputLabelProps={inputLabelProps}
+            />
+          </Grid>
+        );
+      }
+    }
+
+    if (
+      formData.student_willow_relationship === "Yes" &&
+      formData.relation_type === "Director/Board Member or stakeholder"
+    ) {
+      if (key === "relation_name") {
+        return (
+          <Grid item xs={12} key={index}>
+            <TextField
+              label="Please provide the person's name"
+              name="relation_name"
+              fullWidth
+              value={formData[key] || ""}
+              onChange={handleChange}
+              sx={fieldStyles}
+              InputLabelProps={inputLabelProps}
+            />
+          </Grid>
+        );
+      }
+    }
+
+    if (key === "student_nationality") {
+      return (
+        <Grid item xs={12} key={index}>
+          <Autocomplete
+            value={formData[key] || ""}
+            onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
+            options={nationality}
+            renderInput={(params) => (
+              <TextField {...params} label={key.replace(/_/g, " ").toLowerCase().split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")} sx={fieldStyles} InputLabelProps={inputLabelProps} />
+            )}
+          />
+        </Grid>
+      );
+    }
+
+    if (key === "student_province") {
+      return (
+        <Grid item xs={12} key={index}>
+          <Autocomplete
+            value={formData[key] || ""}
+            onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
+            options={provinces}
+            renderInput={(params) => (
+              <TextField {...params} label={key.replace(/_/g, " ").toLowerCase().split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")} sx={fieldStyles} InputLabelProps={inputLabelProps} />
+            )}
+          />
+        </Grid>
+      );
+    }
+
+    if (key === "student_type") {
+      return (
+        <Grid item xs={12} key={index}>
+          <Autocomplete
+            value={formData[key] || ""}
+            onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
+            options={studentType}
+            renderInput={(params) => (
+              <TextField {...params} label={key.replace(/_/g, " ").toLowerCase().split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")} sx={fieldStyles} InputLabelProps={inputLabelProps} />
+            )}
+          />
+        </Grid>
+      );
+    }
+
+    if (key === "student_religion") {
+      return (
+        <Grid item xs={12} key={index}>
+          <Autocomplete
+            value={formData[key] || ""}
+            onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
+            options={religions}
+            renderInput={(params) => (
+              <TextField {...params} label={key.replace(/_/g, " ").toLowerCase().split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")} sx={fieldStyles} InputLabelProps={inputLabelProps} />
+            )}
+          />
+        </Grid>
+      );
+    }
+
+    if (key === "student_finance_type") {
+      return (
+        <Grid item xs={12} key={index}>
+          <Autocomplete
+            value={formData[key] || ""}
+            onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
+            options={filteredFinanceType}
+            renderInput={(params) => (
+              <TextField {...params} label={key.replace(/_/g, " ").toLowerCase().split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")} sx={fieldStyles} InputLabelProps={inputLabelProps} />
+            )}
+          />
+        </Grid>
+      );
+    }
+
+    if (key === "student_race") {
+      return (
+        <Grid item xs={12} key={index}>
+          <Autocomplete
+            value={formData[key] || ""}
+            onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
+            options={races}
+            renderInput={(params) => (
+              <TextField {...params} label={key.replace(/_/g, " ").toLowerCase().split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")} sx={fieldStyles} InputLabelProps={inputLabelProps} />
+            )}
+          />
+        </Grid>
+      );
+    }
+
+    if (key === "student_marital_status") {
+      return (
+        <Grid item xs={12} key={index}>
+          <Autocomplete
+            value={formData[key] || ""}
+            onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
+            options={maritalStatus}
+            renderInput={(params) => (
+              <TextField {...params} label={key.replace(/_/g, " ").toLowerCase().split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")} sx={fieldStyles} InputLabelProps={inputLabelProps} />
+            )}
+          />
+        </Grid>
+      );
+    }
+
+    if (key === "student_employment_status") {
+      return (
+        <Grid item xs={12} key={index}>
+          <Autocomplete
+            value={formData[key] || ""}
+            onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
+            options={employmentStatus}
+            renderInput={(params) => (
+              <TextField {...params} label={key.replace(/_/g, " ").toLowerCase().split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")} sx={fieldStyles} InputLabelProps={inputLabelProps} />
+            )}
+          />
+        </Grid>
+      );
+    }
+
+    if (key === "student_highest_education") {
+      return (
+        <Grid item xs={12} key={index}>
+          <Autocomplete
+            value={formData[key] || ""}
+            onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
+            options={highestEducation}
+            renderInput={(params) => (
+              <TextField {...params} label={key.replace(/_/g, " ").toLowerCase().split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")} sx={fieldStyles} InputLabelProps={inputLabelProps} />
+            )}
+          />
+        </Grid>
+      );
+    }
+
+    let label = key.replace(/_/g, " ").toLowerCase().split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
+    return (
+      <Grid item xs={12} key={index}>
+        <TextField
+          label={label}
+          name={key}
+          fullWidth
+          value={formData[key] || ""}
+          onChange={handleChange}
+          sx={fieldStyles}
+          InputLabelProps={inputLabelProps}
+        />
+      </Grid>
+    );
+  };
+
   return (
     <Drawer anchor="right" open={open} onClose={onClose}>
       <Box sx={{ width: drawerWidth, height: "100%", display: "flex", flexDirection: "column", backgroundColor: isDarkMode ? '#2D3748' : '#fff' }}>
@@ -371,803 +960,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
 
         <Box sx={{ flex: 1, overflowY: "auto", padding: 2 }}>
           <Grid container spacing={2}>
-            {Object.keys(formData).map((key, index) => {
-              if (key === "student_date_of_birth") {
-                return (
-                  <Grid item xs={12} key={index}>
-                    <LocalizationProvider dateAdapter={AdapterDateFns}>
-                      <DatePicker
-                        wrapperClassName={"datepicker"}
-                        className={"datepicker"}
-                        label="Student Date of Birth"
-                        name="student_date_of_birth"
-                        value={selectedDate}
-                        onChange={handleDateChange}
-                        format="MM/dd/yyyy"
-                        sx={{
-                          backgroundColor: isDarkMode ? '#202C' : '#ffffff',
-                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                          borderRadius: '8px',
-                          '& .MuiInputBase-input': {
-                            color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                          }
-                        }}
-                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                        // disabled={!isAdmin}
-                      />
-                    </LocalizationProvider>
-                  </Grid>
-                );
-              }
-
-              if (key === "student_number_of_siblings") {
-                return (
-                  <Grid item xs={12} key={index}>
-                    <TextField
-                      label="Number of Siblings"
-                      name="student_number_of_siblings"
-                      type="number"
-                      fullWidth
-                      value={formData.student_number_of_siblings || ""}
-                      onChange={handleChange}
-                      sx={{
-                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        borderRadius: '8px',
-                        '& .MuiInputBase-input': {
-                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        }
-                      }}
-                      InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                      // disabled={!isAdmin}
-                    />
-                  </Grid>
-                );
-              }
-
-              if (key === "student_id_passport_number") {
-                return (
-                  <Grid item xs={12} key={index}>
-                    <TextField
-                      label="Student ID/Passport Number"
-                      name="student_id_passport_number"
-                      type="text"
-                      fullWidth
-                      value={formData.student_id_passport_number || ""}
-                      onChange={handleChange}
-                      sx={{
-                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        borderRadius: '8px',
-                        '& .MuiInputBase-input': {
-                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        }
-                      }}
-                      InputLabelProps={{ style: { color: isDarkMode ? '#F7FAFC' : '#1E293B' } }}
-                      // disabled={!isAdmin}
-                    />
-                  </Grid>
-                );
-              }
-
-              if (key === "student_email_address") {
-                return (
-                  <Grid item xs={12} key={index}>
-                    <TextField
-                      label="Student Email Address"
-                      name="student_email_address"
-                      type="email"
-                      fullWidth
-                      value={formData.student_email_address || ""}
-                      onChange={handleChange}
-                      error={!!emailError}
-                      helperText={emailError}
-                      sx={{
-                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        borderRadius: '8px',
-                        '& .MuiInputBase-input': {
-                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        }
-                      }}
-                      InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                      // disabled={!isAdmin}
-                    />
-                  </Grid>
-                );
-              }
-
-              if (key === "student_whatsapp_number") {
-                return (
-                  <Grid item xs={12} key={index}>
-                    <TextField
-                      label="Student WhatsApp Number"
-                      name="student_whatsapp_number"
-                      type="tel"
-                      fullWidth
-                      value={formData.student_whatsapp_number || ""}
-                      onChange={handleChange}
-                      error={!!whatsappError}
-                      helperText={whatsappError}
-                      inputProps={{
-                        maxLength: 10,
-                        pattern: "[0-9]*",
-                      }}
-                      sx={{
-                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        borderRadius: '8px',
-                        '& .MuiInputBase-input': {
-                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        }
-                      }}
-                      InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                      // disabled={!isAdmin}
-                    />
-                  </Grid>
-                );
-              }
-
-              if (key === "student_alternative_number") {
-                return (
-                  <Grid item xs={12} key={index}>
-                    <TextField
-                      label="Student Alternative Number"
-                      name="student_alternative_number"
-                      type="tel"
-                      fullWidth
-                      value={formData.student_alternative_number || ""}
-                      onChange={handleChange}
-                      error={!!alternativeError}
-                      helperText={alternativeError}
-                      inputProps={{
-                        maxLength: 10,
-                        pattern: "[0-9]*",
-                      }}
-                      sx={{
-                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        borderRadius: '8px',
-                        '& .MuiInputBase-input': {
-                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        }
-                      }}
-                      InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                      // disabled={!isAdmin}
-                    />
-                  </Grid>
-                );
-              }
-
-              if (key === "student_emergency_contact_name") {
-                return (
-                  <Grid item xs={12} key={index}>
-                    <Autocomplete
-                      value={emergencyContactOption}
-                      onChange={handleEmergencyContactChange}
-                      options={["Same as above", "Add new"]}
-                      renderInput={(params) => <TextField {...params} label="Emergency Contact" sx={{
-                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        borderRadius: '8px',
-                        '& .MuiInputBase-input': {
-                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        }
-                      }}
-                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                      />}
-                      // disabled={!isAdmin}
-                    />
-                    {emergencyContactOption === "Add new" && (
-                      <TextField
-                        label="Student Emergency Contact Name"
-                        name="student_emergency_contact_name"
-                        fullWidth
-                        value={formData.student_emergency_contact_name || ""}
-                        onChange={handleChange}
-                        sx={{
-                          backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                          borderRadius: '8px',
-                          '& .MuiInputBase-input': {
-                            color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                          },
-                          marginTop: 2
-                        }}
-                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                        // disabled={!isAdmin}
-                      />
-                    )}
-                  </Grid>
-                );
-              }
-
-              if (key === "student_emergency_contact_number" && emergencyContactOption === "Add new") {
-                return (
-                  <Grid item xs={12} key={index}>
-                    <TextField
-                      label="Student Emergency Contact Number"
-                      name="student_emergency_contact_number"
-                      type="tel"
-                      fullWidth
-                      value={formData.student_emergency_contact_number || ""}
-                      onChange={handleChange}
-                      error={!!emergencyError}
-                      helperText={emergencyError}
-                      inputProps={{
-                        maxLength: 10,
-                        pattern: "[0-9]*",
-                      }}
-                      sx={{
-                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        borderRadius: '8px',
-                        '& .MuiInputBase-input': {
-                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        }
-                      }}
-                      InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                      // disabled={!isAdmin}
-                    />
-                  </Grid>
-                );
-              }
-
-              if (key === "student_emergency_contact_relationship" && emergencyContactOption === "Add new") {
-                return (
-                  <Grid item xs={12} key={index}>
-                    <TextField
-                      label="Student Emergency Contact Relationship"
-                      name="student_emergency_contact_relationship"
-                      fullWidth
-                      value={formData.student_emergency_contact_relationship || ""}
-                      onChange={handleChange}
-                      sx={{
-                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        borderRadius: '8px',
-                        '& .MuiInputBase-input': {
-                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        }
-                      }}
-                      InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                      // disabled={!isAdmin}
-                    />
-                  </Grid>
-                );
-              }
-
-              if (key === "student_emergency_contact_address" && emergencyContactOption === "Add new") {
-                return (
-                  <Grid item xs={12} key={index}>
-                    <TextField
-                      label="Student Emergency Contact Address"
-                      name="student_emergency_contact_address"
-                      fullWidth
-                      value={formData.student_emergency_contact_address || ""}
-                      onChange={handleChange}
-                      sx={{
-                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        borderRadius: '8px',
-                        '& .MuiInputBase-input': {
-                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        }
-                      }}
-                      InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                      // disabled={!isAdmin}
-                    />
-                  </Grid>
-                );
-              }
-
-              if (key === "student_status") {
-                return (
-                  <Grid item xs={12} key={index}>
-                    <Autocomplete
-                      value={formData[key] || "Pending"}
-                      onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
-                      options={statusOptions}
-                      renderInput={(params) => <TextField {...params} label="Student Status" sx={{
-                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        borderRadius: '8px',
-                        '& .MuiInputBase-input': {
-                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        }
-                      }}
-                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                      />}
-                      disabled={!isAdmin}
-                    />
-                  </Grid>
-                );
-              }
-
-              if (key === "student_status_comment") {
-                return (
-                  <Grid item xs={12} key={index}>
-                    <TextField
-                      label="Status Comment"
-                      name="student_status_comment"
-                      fullWidth
-                      multiline
-                      rows={4}
-                      value={formData.student_status_comment || ""}
-                      onChange={handleChange}
-                      sx={{
-                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        borderRadius: '8px',
-                        '& .MuiInputBase-input': {
-                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        }
-                      }}
-                      InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                      disabled={!isAdmin}
-                    />
-                  </Grid>
-                );
-              }
-
-              // Handle student_willow_relationship field
-              if (key === "student_willow_relationship") {
-                return (
-                  <Grid item xs={12} key={index}>
-                    <Autocomplete
-                      value={formData[key] || ""}
-                      onChange={(e, newValue) => {
-                        handleChange({ target: { name: key, value: newValue } });
-                        // Reset all relation fields when student_willow_relationship changes
-                        if (newValue === "No") {
-                          setFormData((prevState) => ({
-                            ...prevState,
-                            relation_type: "",
-                            relation_hr_contact: "",
-                            relation_branch: "",
-                            relation_name: "",
-                            relation_surname: "",
-                            relation_employee_code: "",
-                            relation_reference: "",
-                          }));
-                        }
-                      }}
-                      options={yes_no}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label="Does the student have any relationship to the Willowton Group?"
-                          sx={fieldStyles}
-                          InputLabelProps={inputLabelProps}
-                        />
-                      )}
-                    />
-                  </Grid>
-                );
-              }
-
-              // Show relation_type only if student_willow_relationship is Yes
-              if (key === "relation_type" && formData.student_willow_relationship === "Yes") {
-                return (
-                  <Grid item xs={12} key={index}>
-                    <Autocomplete
-                      value={formData[key] || ""}
-                      onChange={(e, newValue) => {
-                        handleChange({ target: { name: key, value: newValue } });
-                        // Reset all relation fields when relation_type changes
-                        setFormData((prevState) => ({
-                          ...prevState,
-                          relation_hr_contact: "",
-                          relation_branch: "",
-                          relation_name: "",
-                          relation_surname: "",
-                          relation_employee_code: "",
-                          relation_reference: "",
-                        }));
-                      }}
-                      options={relationshipTypes}
-                      renderInput={(params) => (
-                        <TextField {...params} label="Relationship Type" sx={fieldStyles} InputLabelProps={inputLabelProps} />
-                      )}
-                    />
-                  </Grid>
-                );
-              }
-
-              // Fields for Staff and Dependent of Staff
-              if (
-                formData.student_willow_relationship === "Yes" &&
-                ["Staff", "Dependent of Staff"].includes(formData.relation_type)
-              ) {
-                if (key === "relation_hr_contact") {
-                  return (
-                    <Grid item xs={12} key={index}>
-                      <TextField
-                        label="HR Contact"
-                        name="relation_hr_contact"
-                        fullWidth
-                        value={formData[key] || ""}
-                        onChange={handleChange}
-                        sx={fieldStyles}
-                        InputLabelProps={inputLabelProps}
-                      />
-                    </Grid>
-                  );
-                }
-                if (key === "relation_branch") {
-                  return (
-                    <Grid item xs={12} key={index}>
-                      <TextField
-                        label="Branch"
-                        name="relation_branch"
-                        fullWidth
-                        value={formData[key] || ""}
-                        onChange={handleChange}
-                        sx={fieldStyles}
-                        InputLabelProps={inputLabelProps}
-                      />
-                    </Grid>
-                  );
-                }
-                if (key === "relation_name") {
-                  return (
-                    <Grid item xs={12} key={index}>
-                      <TextField
-                        label="Name"
-                        name="relation_name"
-                        fullWidth
-                        value={formData[key] || ""}
-                        onChange={handleChange}
-                        sx={fieldStyles}
-                        InputLabelProps={inputLabelProps}
-                      />
-                    </Grid>
-                  );
-                }
-                if (key === "relation_surname") {
-                  return (
-                    <Grid item xs={12} key={index}>
-                      <TextField
-                        label="Surname"
-                        name="relation_surname"
-                        fullWidth
-                        value={formData[key] || ""}
-                        onChange={handleChange}
-                        sx={fieldStyles}
-                        InputLabelProps={inputLabelProps}
-                      />
-                    </Grid>
-                  );
-                }
-                if (key === "relation_employee_code") {
-                  return (
-                    <Grid item xs={12} key={index}>
-                      <TextField
-                        label="Employee Code"
-                        name="relation_employee_code"
-                        fullWidth
-                        value={formData[key] || ""}
-                        onChange={handleChange}
-                        sx={fieldStyles}
-                        InputLabelProps={inputLabelProps}
-                      />
-                    </Grid>
-                  );
-                }
-              }
-
-              // Fields for Family
-              if (formData.student_willow_relationship === "Yes" && formData.relation_type === "Family") {
-                if (key === "relation_name") {
-                  return (
-                    <Grid item xs={12} key={index}>
-                      <TextField
-                        label="Who are you related to"
-                        name="relation_name"
-                        fullWidth
-                        value={formData[key] || ""}
-                        onChange={handleChange}
-                        sx={fieldStyles}
-                        InputLabelProps={inputLabelProps}
-                      />
-                    </Grid>
-                  );
-                }
-                if (key === "relation_reference") {
-                  return (
-                    <Grid item xs={12} key={index}>
-                      <TextField
-                        label="How are you related"
-                        name="relation_reference"
-                        fullWidth
-                        value={formData[key] || ""}
-                        onChange={handleChange}
-                        sx={fieldStyles}
-                        InputLabelProps={inputLabelProps}
-                      />
-                    </Grid>
-                  );
-                }
-              }
-
-              // Fields for Referral
-              if (formData.student_willow_relationship === "Yes" && formData.relation_type === "Referral") {
-                if (key === "relation_reference") {
-                  return (
-                    <Grid item xs={12} key={index}>
-                      <TextField
-                        label="Were you referred by a family member, staff member, Director/Board Member or stakeholder. Please provide the person's name"
-                        name="relation_reference"
-                        fullWidth
-                        value={formData[key] || ""}
-                        onChange={handleChange}
-                        sx={fieldStyles}
-                        InputLabelProps={inputLabelProps}
-                      />
-                    </Grid>
-                  );
-                }
-              }
-
-              // Fields for Director/Board Member or stakeholder
-              if (
-                formData.student_willow_relationship === "Yes" &&
-                formData.relation_type === "Director/Board Member or stakeholder"
-              ) {
-                if (key === "relation_name") {
-                  return (
-                    <Grid item xs={12} key={index}>
-                      <TextField
-                        label="Please provide the person's name"
-                        name="relation_name"
-                        fullWidth
-                        value={formData[key] || ""}
-                        onChange={handleChange}
-                        sx={fieldStyles}
-                        InputLabelProps={inputLabelProps}
-                      />
-                    </Grid>
-                  );
-                }
-              }
-
-              if (key === "student_date_stamp" || key === "id" || key === "user_id" || key === "student_industry") return null;
-
-              let label = key.replace(/_/g, " ").toLowerCase();
-              label = label
-                .split(" ")
-                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                .join(" ");
-
-              if (key === "student_nationality") {
-                return (
-                  <Grid item xs={12} key={index}>
-                    <Autocomplete
-                      value={formData[key] || ""}
-                      onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
-                      options={nationality}
-                      renderInput={(params) => <TextField {...params} label={label} sx={{
-                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        borderRadius: '8px',
-                        '& .MuiInputBase-input': {
-                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        }
-                      }}
-                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                      />}
-                      // disabled={!isAdmin}
-                    />
-                  </Grid>
-                );
-              }
-
-              if (key === "student_province") {
-                return (
-                  <Grid item xs={12} key={index}>
-                    <Autocomplete
-                      value={formData[key] || ""}
-                      onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
-                      options={provinces}
-                      renderInput={(params) => <TextField {...params} label={label} sx={{
-                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        borderRadius: '8px',
-                        '& .MuiInputBase-input': {
-                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        }
-                      }}
-                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                      />}
-                      // disabled={!isAdmin}
-                    />
-                  </Grid>
-                );
-              }
-
-              if (key === "student_type") {
-                return (
-                  <Grid item xs={12} key={index}>
-                    <Autocomplete
-                      value={formData[key] || ""}
-                      onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
-                      options={studentType}
-                      renderInput={(params) => <TextField {...params} label={label} sx={{
-                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        borderRadius: '8px',
-                        '& .MuiInputBase-input': {
-                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        }
-                      }}
-                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                      />}
-                      // disabled={!isAdmin}
-                    />
-                  </Grid>
-                );
-              }
-
-              if (key === "student_religion") {
-                return (
-                  <Grid item xs={12} key={index}>
-                    <Autocomplete
-                      value={formData[key] || ""}
-                      onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
-                      options={religions}
-                      renderInput={(params) => <TextField {...params} label={label} sx={{
-                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        borderRadius: '8px',
-                        '& .MuiInputBase-input': {
-                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        }
-                      }}
-                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                      />}
-                      // disabled={!isAdmin}
-                    />
-                  </Grid>
-                );
-              }
-
-              if (key === "student_finance_type") {
-                return (
-                  <Grid item xs={12} key={index}>
-                    <Autocomplete
-                      value={formData[key] || ""}
-                      onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
-                      options={filteredFinanceType}
-                      renderInput={(params) => <TextField {...params} label={label} sx={{
-                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        borderRadius: '8px',
-                        '& .MuiInputBase-input': {
-                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        }
-                      }}
-                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                      />}
-                      // disabled={!isAdmin}
-                    />
-                  </Grid>
-                );
-              }
-
-              if (key === "student_race") {
-                return (
-                  <Grid item xs={12} key={index}>
-                    <Autocomplete
-                      value={formData[key] || ""}
-                      onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
-                      options={races}
-                      renderInput={(params) => <TextField {...params} label={label} sx={{
-                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        borderRadius: '8px',
-                        '& .MuiInputBase-input': {
-                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        }
-                      }}
-                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                      />}
-                      // disabled={!isAdmin}
-                    />
-                  </Grid>
-                );
-              }
-
-              if (key === "student_marital_status") {
-                return (
-                  <Grid item xs={12} key={index}>
-                    <Autocomplete
-                      value={formData[key] || ""}
-                      onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
-                      options={maritalStatus}
-                      renderInput={(params) => <TextField {...params} label={label} sx={{
-                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                        borderRadius: '8px',
-                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        '& .MuiInputBase-input': {
-                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        }
-                      }}
-                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                      />}
-                      // disabled={!isAdmin}
-                    />
-                  </Grid>
-                );
-              }
-
-              if (key === "student_employment_status") {
-                return (
-                  <Grid item xs={12} key={index}>
-                    <Autocomplete
-                      value={formData[key] || ""}
-                      onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
-                      options={employmentStatus}
-                      renderInput={(params) => <TextField {...params} label={label} sx={{
-                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                        borderRadius: '8px',
-                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        '& .MuiInputBase-input': {
-                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        }
-                      }}
-                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                      />}
-                      // disabled={!isAdmin}
-                    />
-                  </Grid>
-                );
-              }
-
-              if (key === "student_highest_education") {
-                return (
-                  <Grid item xs={12} key={index}>
-                    <Autocomplete
-                      value={formData[key] || ""}
-                      onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
-                      options={highestEducation}
-                      renderInput={(params) => <TextField {...params} label={label} sx={{
-                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                        borderRadius: '8px',
-                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        '& .MuiInputBase-input': {
-                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                        }
-                      }}
-                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                      />}
-                      // disabled={!isAdmin}
-                    />
-                  </Grid>
-                );
-              }
-
-              return (
-                <Grid item xs={12} key={index}>
-                  <TextField
-                    label={label}
-                    name={key}
-                    fullWidth
-                    value={formData[key] || ""}
-                    onChange={handleChange}
-                    sx={{
-                      backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                      color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                      borderRadius: '8px',
-                      '& .MuiInputBase-input': {
-                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                      }
-                    }}
-                    InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
-                    // disabled={!isAdmin}
-                  />
-                </Grid>
-              );
-            })}
+            {Object.keys(formData).map((key, index) => renderField(key, index))}
           </Grid>
         </Box>
 
@@ -1178,10 +971,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
               onClick={onClose}
               variant="outlined"
               size="small"
-              sx={{
-                borderColor: isDarkMode ? '#F7FAFC' : '#1E293B',
-                color: isDarkMode ? '#F7FAFC' : '#1E293B',
-              }}
+              sx={{ borderColor: isDarkMode ? '#F7FAFC' : '#1E293B', color: isDarkMode ? '#F7FAFC' : '#1E293B' }}
               startIcon={<CloseIcon />}
             >
               Close
@@ -1192,10 +982,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                 onClick={handleDeleteClick}
                 variant="outlined"
                 size="small"
-                sx={{
-                  borderColor: isDarkMode ? '#F7FAFC' : '#1E293B',
-                  color: 'red',
-                }}
+                sx={{ borderColor: isDarkMode ? '#F7FAFC' : '#1E293B', color: 'red' }}
                 startIcon={<DeleteIcon />}
               >
                 Delete
@@ -1214,7 +1001,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
               >
                 Create
               </Button>
-            ) :  (
+            ) : (
               <Button
                 onClick={handleSave}
                 variant="contained"

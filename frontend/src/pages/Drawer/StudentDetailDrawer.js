@@ -618,13 +618,13 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     // Hide relation fields unless student_willow_relationship is "Yes"
     if (formData.student_willow_relationship !== "Yes") {
       if ([
-        "relation_type",
-        "relation_hr_contact",
-        "relation_branch",
-        "relation_name",
-        "relation_surname",
-        "relation_employee_code",
-        "relation_reference"
+        "relation_type"//,
+        // "relation_hr_contact",
+        // "relation_branch",
+        // "relation_name",
+        // "relation_surname",
+        // "relation_employee_code",
+        // "relation_reference"
       ].includes(key)) {
         return null;
       }

@@ -97,7 +97,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     student_emergency_contact_number: "",
     student_emergency_contact_relationship: "",
     student_emergency_contact_address: "",
-    student_date_stamp: "",
+    // student_date_stamp: "",
     student_status: "Pending",
     student_status_comment: "",
   });
@@ -186,7 +186,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
           student_emergency_contact_number: '',
           student_emergency_contact_relationship: '',
           student_emergency_contact_address: '',
-          student_date_stamp: '',
+          // student_date_stamp: '',
           student_status: 'Pending',
           student_status_comment: '',
         });

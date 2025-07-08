@@ -369,6 +369,20 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
       },
     };
     const inputLabelProps = { style: { color: isDarkMode ? '#ffffff' : '#000000' } };
+    const relationFields = [
+      "relation_type",
+      "relation_hr_contact",
+      "relation_branch",
+      "relation_name",
+      "relation_surname",
+      "relation_employee_code",
+      "relation_reference"
+    ];
+
+    // Hide relation fields unless 'Yes' is selected
+    if (relationFields.includes(key) && formData.student_willow_relationship !== "Yes") {
+      return null;
+    }
 
     if (key === "student_date_of_birth") {
       return (

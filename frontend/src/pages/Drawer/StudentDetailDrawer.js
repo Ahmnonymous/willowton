@@ -380,8 +380,9 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
   "relation_reference"
 ];
 
-// Restrict conditional hiding only to relation fields
-if (relationFields.includes(key)) {
+// Only apply the conditional logic to relation fields
+const isRelationField = relationFields.includes(key);
+if (isRelationField) {
   if (formData.student_willow_relationship !== "Yes") {
     return null;
   }

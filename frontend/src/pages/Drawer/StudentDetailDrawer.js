@@ -205,21 +205,6 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     setFormData(prev => ({ ...prev, student_date_of_birth: formattedDate }));
   };
 
-  useEffect(() => {
-    if (formData.student_willow_relationship === 'No') {
-      setFormData((prevState) => ({
-        ...prevState,
-        relation_type: "",
-        relation_hr_contact: "",
-        relation_branch: "",
-        relation_name: "",
-        relation_surname: "",
-        relation_employee_code: "",
-        relation_reference: "",
-      }));
-    }
-  }, [formData.student_willow_relationship]);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     let sanitizedValue = value;
@@ -242,6 +227,33 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     }
     if (name === "student_emergency_contact_number") {
       setEmergencyError(sanitizedValue && !validateNumber(sanitizedValue) ? "Emergency contact number must be exactly 10 digits" : "");
+    }
+
+    // Handle relation field resets
+    if (name === "student_willow_relationship") {
+      if (value === "No") {
+        setFormData((prevState) => ({
+          ...prevState,
+          relation_type: "",
+          relation_hr_contact: "",
+          relation_branch: "",
+          relation_name: "",
+          relation_surname: "",
+          relation_employee_code: "",
+          relation_reference: "",
+        }));
+      }
+    }
+    if (name === "relation_type" && formData.student_willow_relationship === "Yes") {
+      setFormData((prevState) => ({
+        ...prevState,
+        relation_hr_contact: "",
+        relation_branch: "",
+        relation_name: "",
+        relation_surname: "",
+        relation_employee_code: "",
+        relation_reference: "",
+      }));
     }
   };
 
@@ -343,7 +355,6 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     setDeleteConfirmationOpen(false);
   };
 
-  // Filter financeType based on religion
   const filteredFinanceType = formData.student_religion === "Islam" 
     ? financeType 
     : financeType.filter(type => type !== "Zakah");
@@ -590,21 +601,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
         <Grid item xs={12} key={index}>
           <Autocomplete
             value={formData[key] || ""}
-            onChange={(e, newValue) => {
-              handleChange({ target: { name: key, value: newValue } });
-              if (newValue === "No") {
-                setFormData((prevState) => ({
-                  ...prevState,
-                  relation_type: "",
-                  relation_hr_contact: "",
-                  relation_branch: "",
-                  relation_name: "",
-                  relation_surname: "",
-                  relation_employee_code: "",
-                  relation_reference: "",
-                }));
-              }
-            }}
+            onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
             options={yes_no}
             renderInput={(params) => (
               <TextField
@@ -619,23 +616,17 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
       );
     }
 
-    if (key === "relation_type" && formData.student_willow_relationship === "Yes") {
+    // Only show relation fields if student_willow_relationship is "Yes"
+    if (formData.student_willow_relationship !== "Yes") {
+      return null;
+    }
+
+    if (key === "relation_type") {
       return (
         <Grid item xs={12} key={index}>
           <Autocomplete
             value={formData[key] || ""}
-            onChange={(e, newValue) => {
-              handleChange({ target: { name: key, value: newValue } });
-              setFormData((prevState) => ({
-                ...prevState,
-                relation_hr_contact: "",
-                relation_branch: "",
-                relation_name: "",
-                relation_surname: "",
-                relation_employee_code: "",
-                relation_reference: "",
-              }));
-            }}
+            onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
             options={relationshipTypes}
             renderInput={(params) => (
               <TextField {...params} label="Relationship Type" sx={fieldStyles} InputLabelProps={inputLabelProps} />
@@ -645,16 +636,21 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
       );
     }
 
-    if (
-      formData.student_willow_relationship === "Yes" &&
-      ["Staff", "Dependent of Staff"].includes(formData.relation_type)
-    ) {
-      if (key === "relation_hr_contact") {
+    // Show fields based on relation_type
+    if (formData.relation_type === "Staff" || formData.relation_type === "Dependent of Staff") {
+      if (["relation_hr_contact", "relation_branch", "relation_name", "relation_surname", "relation_employee_code"].includes(key)) {
+        const labels = {
+          relation_hr_contact: "HR Contact",
+          relation_branch: "Branch",
+          relation_name: "Name",
+          relation_surname: "Surname",
+          relation_employee_code: "Employee Code",
+        };
         return (
           <Grid item xs={12} key={index}>
             <TextField
-              label="HR Contact"
-              name="relation_hr_contact"
+              label={labels[key]}
+              name={key}
               fullWidth
               value={formData[key] || ""}
               onChange={handleChange}
@@ -664,75 +660,16 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
           </Grid>
         );
       }
-      if (key === "relation_branch") {
-        return (
-          <Grid item xs={12} key={index}>
-            <TextField
-              label="Branch"
-              name="relation_branch"
-              fullWidth
-              value={formData[key] || ""}
-              onChange={handleChange}
-              sx={fieldStyles}
-              InputLabelProps={inputLabelProps}
-            />
-          </Grid>
-        );
-      }
-      if (key === "relation_name") {
-        return (
-          <Grid item xs={12} key={index}>
-            <TextField
-              label="Name"
-              name="relation_name"
-              fullWidth
-              value={formData[key] || ""}
-              onChange={handleChange}
-              sx={fieldStyles}
-              InputLabelProps={inputLabelProps}
-            />
-          </Grid>
-        );
-      }
-      if (key === "relation_surname") {
-        return (
-          <Grid item xs={12} key={index}>
-            <TextField
-              label="Surname"
-              name="relation_surname"
-              fullWidth
-              value={formData[key] || ""}
-              onChange={handleChange}
-              sx={fieldStyles}
-              InputLabelProps={inputLabelProps}
-            />
-          </Grid>
-        );
-      }
-      if (key === "relation_employee_code") {
-        return (
-          <Grid item xs={12} key={index}>
-            <TextField
-              label="Employee Code"
-              name="relation_employee_code"
-              fullWidth
-              value={formData[key] || ""}
-              onChange={handleChange}
-              sx={fieldStyles}
-              InputLabelProps={inputLabelProps}
-            />
-          </Grid>
-        );
-      }
+      return null;
     }
 
-    if (formData.student_willow_relationship === "Yes" && formData.relation_type === "Family") {
+    if (formData.relation_type === "Family") {
       if (key === "relation_name") {
         return (
           <Grid item xs={12} key={index}>
             <TextField
               label="Who are you related to"
-              name="relation_name"
+              name={key}
               fullWidth
               value={formData[key] || ""}
               onChange={handleChange}
@@ -747,7 +684,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
           <Grid item xs={12} key={index}>
             <TextField
               label="How are you related"
-              name="relation_reference"
+              name={key}
               fullWidth
               value={formData[key] || ""}
               onChange={handleChange}
@@ -757,36 +694,16 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
           </Grid>
         );
       }
+      return null;
     }
 
-    if (formData.student_willow_relationship === "Yes" && formData.relation_type === "Referral") {
-      if (key === "relation_reference") {
-        return (
-          <Grid item xs={12} key={index}>
-            <TextField
-              label="Were you referred by a family member, staff member, Director/Board Member or stakeholder. Please provide the person's name"
-              name="relation_reference"
-              fullWidth
-              value={formData[key] || ""}
-              onChange={handleChange}
-              sx={fieldStyles}
-              InputLabelProps={inputLabelProps}
-            />
-          </Grid>
-        );
-      }
-    }
-
-    if (
-      formData.student_willow_relationship === "Yes" &&
-      formData.relation_type === "Director/Board Member or stakeholder"
-    ) {
+    if (formData.relation_type === "Director/Board Member or stakeholder") {
       if (key === "relation_name") {
         return (
           <Grid item xs={12} key={index}>
             <TextField
               label="Please provide the person's name"
-              name="relation_name"
+              name={key}
               fullWidth
               value={formData[key] || ""}
               onChange={handleChange}
@@ -796,6 +713,26 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
           </Grid>
         );
       }
+      return null;
+    }
+
+    if (formData.relation_type === "Referral") {
+      if (key === "relation_reference") {
+        return (
+          <Grid item xs={12} key={index}>
+            <TextField
+              label="Reference Relation"
+              name={key}
+              fullWidth
+              value={formData[key] || ""}
+              onChange={handleChange}
+              sx={fieldStyles}
+              InputLabelProps={inputLabelProps}
+            />
+          </Grid>
+        );
+      }
+      return null;
     }
 
     if (key === "student_nationality") {

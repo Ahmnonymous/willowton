@@ -49,28 +49,6 @@ router.get("/student-detail/:id", async (req, res) => {
       student.student_date_of_birth = formatDate(student.student_date_of_birth);  // Format date_of_birth field
       res.json(student);
     } else {
-      // res.status(404).json({  });
-      null;
-    }
-  } catch (error) {
-    console.error("Error fetching student details:", error);
-    res.status(500).json({ error: "Failed to fetch student details" });
-  }
-});
-
-// Route to get student details by user ID
-router.get("/student-detail/:id", async (req, res) => {
-  try {
-    const { id } = req.params;  // Get the user ID from the request parameters
-    const result = await pool.query("SELECT * FROM Student_Details_Portal WHERE user_id = $1", [id]);
-
-    // Format the date_of_birth field before sending response
-    if (result.rows.length > 0) {
-      const student = result.rows[0];
-      student.student_date_of_birth = formatDate(student.student_date_of_birth);  // Format date_of_birth field
-      res.json(student);
-    } else {
-      // res.status(404).json({ error: "Student not found" });
       null;
     }
   } catch (error) {
@@ -103,7 +81,6 @@ router.post("/student-details/insert", async (req, res) => {
       student_marital_status,
       student_employment_status,
       student_job_title,
-      student_industry,
       student_company_of_employment,
       student_current_salary,
       student_number_of_siblings,
@@ -135,14 +112,14 @@ router.post("/student-details/insert", async (req, res) => {
         student_name, student_surname, student_nationality, student_id_passport_number, student_type,
         student_religion, student_finance_type, student_whatsapp_number, student_alternative_number, student_email_address,
         student_highest_education, student_home_address, student_suburb, student_area_code, student_province,
-        student_date_of_birth, student_race, student_marital_status, student_employment_status, student_job_title, student_industry,
+        student_date_of_birth, student_race, student_marital_status, student_employment_status, student_job_title,
         student_company_of_employment, student_current_salary, student_number_of_siblings, student_siblings_bursary,
         student_willow_relationship, relation_type, relation_hr_contact, relation_branch, relation_name, relation_surname,
         relation_employee_code, relation_reference, student_emergency_contact_name, student_emergency_contact_number,
         student_emergency_contact_relationship, student_emergency_contact_address, user_id, student_status, student_status_comment
       ) VALUES (
-        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25,
-        $26, $27, $28, $29, $30, $31, $32, $33, $34, $35, $36, $37, $38, $39
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, 
+        $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34, $35, $36, $37, $38
       ) RETURNING id`,
       [
         student_name,
@@ -165,7 +142,6 @@ router.post("/student-details/insert", async (req, res) => {
         student_marital_status,
         student_employment_status,
         student_job_title,
-        student_industry,
         student_company_of_employment,
         student_current_salary,
         formattedSiblings,
@@ -229,7 +205,6 @@ router.put("/student-details/update/:id", async (req, res) => {
       student_marital_status,
       student_employment_status,
       student_job_title,
-      student_industry,
       student_company_of_employment,
       student_current_salary,
       student_number_of_siblings,
@@ -276,26 +251,25 @@ router.put("/student-details/update/:id", async (req, res) => {
         student_marital_status = $18,
         student_employment_status = $19,
         student_job_title = $20,
-        student_industry = $21,
-        student_company_of_employment = $22,
-        student_current_salary = $23,
-        student_number_of_siblings = $24,
-        student_siblings_bursary = $25,
-        student_willow_relationship = $26,
-        relation_type = $27,
-        relation_hr_contact = $28,
-        relation_branch = $29,
-        relation_name = $30,
-        relation_surname = $31,
-        relation_employee_code = $32,
-        relation_reference = $33,
-        student_emergency_contact_name = $34,
-        student_emergency_contact_number = $35,
-        student_emergency_contact_relationship = $36,
-        student_emergency_contact_address = $37,
-        student_status = $38,
-        student_status_comment = $39
-      WHERE id = $40`,
+        student_company_of_employment = $21,
+        student_current_salary = $22,
+        student_number_of_siblings = $23,
+        student_siblings_bursary = $24,
+        student_willow_relationship = $25,
+        relation_type = $26,
+        relation_hr_contact = $27,
+        relation_branch = $28,
+        relation_name = $29,
+        relation_surname = $30,
+        relation_employee_code = $31,
+        relation_reference = $32,
+        student_emergency_contact_name = $33,
+        student_emergency_contact_number = $34,
+        student_emergency_contact_relationship = $35,
+        student_emergency_contact_address = $36,
+        student_status = $37,
+        student_status_comment = $38
+      WHERE id = $39`,
       [
         student_name,
         student_surname,
@@ -317,7 +291,6 @@ router.put("/student-details/update/:id", async (req, res) => {
         student_marital_status,
         student_employment_status,
         student_job_title,
-        student_industry,
         student_company_of_employment,
         student_current_salary,
         formattedSiblings,

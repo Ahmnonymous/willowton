@@ -385,14 +385,30 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
         return null; // Hide all relation fields if "No" or blank
       }
 
-      // Show only relation_type initially
-      if (key !== "relation_type" && !formData.relation_type) {
+      // Render relation_type field whenever student_willow_relationship is "Yes"
+      if (key === "relation_type") {
+        return (
+          <Grid item xs={12} key={index}>
+            <Autocomplete
+              value={formData[key] || ""}
+              onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
+              options={relationshipTypes}
+              renderInput={(params) => (
+                <TextField {...params} label="Relationship Type" sx={fieldStyles} InputLabelProps={inputLabelProps} />
+              )}
+            />
+          </Grid>
+        );
+      }
+
+      // Show other relation fields only if relation_type is selected
+      if (!formData.relation_type) {
         return null;
       }
 
       // Render specific relation fields based on relation_type
       if (formData.relation_type === "Staff" || formData.relation_type === "Dependent of Staff") {
-        if (["relation_hr_collection", "relation_branch", "relation_name", "relation_surname", "relation_employee_code"].includes(key)) {
+        if (["relation_hr_contact", "relation_branch", "relation_name", "relation_surname", "relation_employee_code"].includes(key)) {
           const labels = {
             relation_hr_contact: "HR Contact",
             relation_branch: "Branch",
@@ -502,22 +518,6 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
           );
         }
         return null; // Hide other relation fields for Referral
-      }
-
-      // Render relation_type (since it passed the initial checks)
-      if (key === "relation_type") {
-        return (
-          <Grid item xs={12} key={index}>
-            <Autocomplete
-              value={formData[key] || ""}
-              onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
-              options={relationshipTypes}
-              renderInput={(params) => (
-                <TextField {...params} label="Relationship Type" sx={fieldStyles} InputLabelProps={inputLabelProps} />
-              )}
-            />
-          </Grid>
-        );
       }
     }
 
@@ -786,15 +786,15 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     if (key === "student_province") {
       return (
         <Grid item xs={12} key={index}>
-        <Autocomplete
-          value={formData[key] || ""}
-          onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
-          options={provinces}
-          renderInput={(params) => (
-            <TextField {...params} label={key.replace(/_/g, " ").toLowerCase().split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")} sx={fieldStyles} InputLabelProps={inputLabelProps} />
-          )}
-        />
-      </Grid>
+          <Autocomplete
+            value={formData[key] || ""}
+            onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
+            options={provinces}
+            renderInput={(params) => (
+              <TextField {...params} label={key.replace(/_/g, " ").toLowerCase().split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")} sx={fieldStyles} InputLabelProps={inputLabelProps} />
+            )}
+          />
+        </Grid>
       );
     }
 

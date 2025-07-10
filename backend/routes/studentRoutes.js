@@ -7,7 +7,6 @@ const multer = require("multer");
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-// Utility function to format date to MM/dd/yyyy
 const formatDate = (date) => {
   if (date) {
     const formattedDate = new Date(date);
@@ -22,19 +21,19 @@ const formatDate = (date) => {
   return null;
 };
 
-const formatDates = (date) => {
+const formatDateForDB = (date) => {
   if (date) {
-    // Convert the date to a Date object
     const formattedDate = new Date(date);
-
-    // Handle time zone shift by adding 19 hours (UTC+19) to adjust the time to your desired output.
-    formattedDate.setHours(formattedDate.getHours() + 19); // Add 19 hours to the date (adjust as needed)
-
-    // Return the date in ISO format (keeping the date in UTC format)
-    // return formattedDate.toISOString();
-    return formattedDate.toISOString().split('T')[0];
+    if (isNaN(formattedDate.getTime())) {
+      return null;
+    }
+    // Return date in YYYY-MM-DD format for PostgreSQL
+    const year = formattedDate.getFullYear();
+    const month = String(formattedDate.getMonth() + 1).padStart(2, '0');
+    const day = String(formattedDate.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
-  return null; // If date is null, return null
+  return null;
 };
 
 // Route to get all student details
@@ -288,7 +287,7 @@ router.put("/student-details/update/:id", upload.single('employment_status_attac
     } = req.body;
 
     const attachmentBuffer = req.file ? req.file.buffer : null;
-    const formattedDateOfBirth = student_date_of_birth === "" ? null : student_date_of_birth;
+    const formattedDateOfBirth = student_date_of_birth === "" ? null : formatDateForDB(student_date_of_birth);
     const formattedSiblings = student_number_of_siblings === "" ? null : student_number_of_siblings;
 
     const result = await pool.query(
@@ -382,7 +381,7 @@ router.put("/student-details/update/:id", upload.single('employment_status_attac
 
     if (result.rows.length > 0) {
       const student = result.rows[0];
-      student.student_date_of_birth = formatDates(student.student_date_of_birth);
+      student.student_date_of_birth = formatDate(student.student_date_of_birth); // Format for response
       res.status(200).json(student);
     } else {
       res.status(404).json({ error: "Student not found after update" });

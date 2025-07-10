@@ -18,8 +18,8 @@ import { useMediaQuery } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { ThemeContext } from '../../config/ThemeContext';  // Import ThemeContext
-import { semesters, highestEducation } from "../../components/lov"; // Import LOVs
+import { ThemeContext } from '../../config/ThemeContext';
+import { semesters, highestEducation } from "../../components/lov";
 
 const UniversityDetailsDrawer = ({
   open,
@@ -28,11 +28,8 @@ const UniversityDetailsDrawer = ({
   universityDetailsId,
   onSave,
 }) => {
-  const { isDarkMode } = useContext(ThemeContext);  // Access theme context
-  // Check for larger or smaller screen size
+  const { isDarkMode } = useContext(ThemeContext);
   const isLargeScreen = useMediaQuery("(min-width:600px)");
-
-  // Drawer width based on screen size
   const drawerWidth = isLargeScreen ? 500 : 330;
 
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
@@ -42,14 +39,12 @@ const UniversityDetailsDrawer = ({
   useEffect(() => {
     if (open) {
       if (universityDetailsId) {
-        // Editing mode
         fetch(`https://willowtonbursary.co.za/api/university-details/id/${universityDetailsId}`)
           .then((res) => res.json())
           .then((data) => {
             setFormData(data);
           });
       } else {
-        // Creating new entry
         const initialData = {
           student_details_portal_id: studentId,
           Institution_Name: "",
@@ -99,6 +94,10 @@ const UniversityDetailsDrawer = ({
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleAutocompleteChange = (name, value) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
   const handleSave = async () => {
     const isUpdate = !!formData.id;
     const url = isUpdate
@@ -126,10 +125,9 @@ const UniversityDetailsDrawer = ({
   };
 
   const handleDeleteClick = () => {
-    setDeleteConfirmationOpen(true); // Open the dialog
+    setDeleteConfirmationOpen(true);
   };
 
-  // Handle the confirmation delete
   const handleDeleteConfirm = async () => {
     if (!formData.id) return;
 
@@ -143,7 +141,7 @@ const UniversityDetailsDrawer = ({
         onSave(null);
         setSuccessMessage("Deleted successfully!");
         onClose();
-        setDeleteConfirmationOpen(false); // Close the confirmation dialog
+        setDeleteConfirmationOpen(false);
       } else {
         console.error("Failed to delete University Details");
       }
@@ -152,10 +150,19 @@ const UniversityDetailsDrawer = ({
     }
   };
 
-  // Handle cancel delete
   const handleDeleteCancel = () => {
-    setDeleteConfirmationOpen(false); // Close the confirmation dialog
+    setDeleteConfirmationOpen(false);
   };
+
+  const yesNoOptions = ["Yes", "No"];
+
+  const conditionalFields = [
+    { select: "Previously_Funded", amount: "Previously_Funded_Amount" },
+    { select: "Tuition", amount: "Tuition_Amount" },
+    { select: "Accommodation", amount: "Accommodation_Fee" },
+    { select: "Textbooks", amount: "Textbooks_Fee" },
+    { select: "Travel", amount: "Travel_Fee" },
+  ];
 
   return (
     <Drawer anchor="right" open={open} onClose={onClose}>
@@ -164,9 +171,8 @@ const UniversityDetailsDrawer = ({
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        backgroundColor: isDarkMode ? '#2D3748' : '#fff' // Background color based on dark/light mode
+        backgroundColor: isDarkMode ? '#2D3748' : '#fff'
       }}>
-        {/* Header */}
         <Box sx={{
           p: 2,
           borderBottom: "1px solid #ccc",
@@ -182,31 +188,32 @@ const UniversityDetailsDrawer = ({
           )}
         </Box>
 
-        {/* Form Content */}
         <Box sx={{ flex: 1, overflowY: "auto", p: 2 }}>
           <Grid container spacing={2}>
             {Object.entries(formData).map(([key, value]) => {
               if (
                 key === "id" ||
                 key === "student_details_portal_id" ||
-                key === "University_Details_Date_Stamp" // Exclude date_stamp field
+                key === "University_Details_Date_Stamp"
               )
                 return null;
 
-              let label = key.replace(/_/g, " ");  // Replace underscores with spaces
+              let label = key.replace(/_/g, " ");
               label = label
-                .split(" ")  // Split by space
-                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))  // Capitalize each word
-                .join(" ");  // Rejoin into a string
+                .split(" ")
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(" ");
 
-              // Handling LOV fields with Autocomplete (e.g., Semester, NQF_Level)
+              const isConditionalSelect = conditionalFields.some(field => field.select === key);
+              const conditionalField = conditionalFields.find(field => field.select === key);
+
               if (key === "Semester" || key === "semester") {
                 return (
                   <Grid item xs={12} key={key}>
                     <Autocomplete
-                      value={value || ""} // Ensure proper population for update
-                      onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
-                      options={semesters} // List of semesters
+                      value={value || ""}
+                      onChange={(e, newValue) => handleAutocompleteChange(key, newValue)}
+                      options={semesters}
                       renderInput={(params) => <TextField {...params} label={label} sx={{
                         backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
                         color: isDarkMode ? '#F7FAFC' : '#1E293B',
@@ -226,9 +233,9 @@ const UniversityDetailsDrawer = ({
                 return (
                   <Grid item xs={12} key={key}>
                     <Autocomplete
-                      value={value || ""} // Ensure proper population for update
-                      onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
-                      options={highestEducation} // List of NQF levels
+                      value={value || ""}
+                      onChange={(e, newValue) => handleAutocompleteChange(key, newValue)}
+                      options={highestEducation}
                       renderInput={(params) => <TextField {...params} label={label} sx={{
                         backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
                         color: isDarkMode ? '#F7FAFC' : '#1E293B',
@@ -242,6 +249,34 @@ const UniversityDetailsDrawer = ({
                     />
                   </Grid>
                 );
+              }
+
+              if (isConditionalSelect) {
+                return (
+                  <Grid item xs={12} key={key}>
+                    <Autocomplete
+                      value={value || ""}
+                      onChange={(e, newValue) => handleAutocompleteChange(key, newValue)}
+                      options={yesNoOptions}
+                      renderInput={(params) => <TextField {...params} label={label} sx={{
+                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        borderRadius: '8px',
+                        '& .MuiInputBase-input': {
+                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        }
+                      }}
+                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                      />}
+                    />
+                  </Grid>
+                );
+              }
+
+              const isConditionalAmount = conditionalFields.some(field => field.amount === key);
+              if (isConditionalAmount) {
+                const relatedSelect = conditionalFields.find(field => field.amount === key).select;
+                if (formData[relatedSelect] !== "Yes") return null;
               }
 
               return (
@@ -292,7 +327,7 @@ const UniversityDetailsDrawer = ({
                 variant="outlined"
                 sx={{
                   borderColor: isDarkMode ? '#F7FAFC' : '#1E293B',
-                  color: 'red', // Red text color for delete button
+                  color: 'red',
                 }}
               >
                 Delete
@@ -310,7 +345,6 @@ const UniversityDetailsDrawer = ({
         </Box>
       </Box>
 
-      {/* Confirmation Dialog */}
       <Dialog open={deleteConfirmationOpen} onClose={handleDeleteCancel}>
         <DialogTitle>Confirm Deletion</DialogTitle>
         <DialogContent>

@@ -11,7 +11,8 @@ const formatDate = (date) => {
     // Handle time zone shift by adding 19 hours (UTC+19) to adjust the time to your desired output.
     formattedDate.setHours(formattedDate.getHours() + 19); // Add 19 hours to the date (adjust as needed)
 
-    // Return the date in ISO format (keeping only the date part)
+    // Return the date in ISO format (keeping the date in UTC format)
+    // return formattedDate.toISOString();
     return formattedDate.toISOString().split('T')[0];
   }
   return null; // If date is null, return null
@@ -38,26 +39,6 @@ router.get("/student-details", async (req, res) => {
 });
 
 // Route to get student details by ID
-router.get("/student-detail/:id", async (req, res) => {
-  try {
-    const { id } = req.params;  // Get the student ID from the request parameters
-    const result = await pool.query("SELECT * FROM Student_Details_Portal WHERE user_id = $1", [id]);
-
-    // Format the date_of_birth field before sending response
-    if (result.rows.length > 0) {
-      const student = result.rows[0];
-      student.student_date_of_birth = formatDate(student.student_date_of_birth);  // Format date_of_birth field
-      res.json(student);
-    } else {
-      null;
-    }
-  } catch (error) {
-    console.error("Error fetching student details:", error);
-    res.status(500).json({ error: "Failed to fetch student details" });
-  }
-});
-
-// Route to get student details by ID
 router.get("/student-details/:id", async (req, res) => {
   try {
     const { id } = req.params;  // Get the student ID from the request parameters
@@ -69,6 +50,27 @@ router.get("/student-details/:id", async (req, res) => {
       student.student_date_of_birth = formatDate(student.student_date_of_birth);  // Format date_of_birth field
       res.json(student);
     } else {
+      res.status(404).json({ error: "Student not found" });
+    }
+  } catch (error) {
+    console.error("Error fetching student details:", error);
+    res.status(500).json({ error: "Failed to fetch student details" });
+  }
+});
+
+// Route to get student details by ID
+router.get("/student-detail/:id", async (req, res) => {
+  try {
+    const { id } = req.params;  // Get the student ID from the request parameters
+    const result = await pool.query("SELECT * FROM Student_Details_Portal WHERE user_id = $1", [id]);
+
+    // Format the date_of_birth field before sending response
+    if (result.rows.length > 0) {
+      const student = result.rows[0];
+      student.student_date_of_birth = formatDate(student.student_date_of_birth);  // Format date_of_birth field
+      res.json(student);
+    } else {
+      // res.status(404).json({  });
       null;
     }
   } catch (error) {

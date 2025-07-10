@@ -903,6 +903,8 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
       );
     }
 
+    if (key === "student_date_stamp" || key === "id" || key === "user_id" || key === "student_industry") return null;
+    
     let label = key.replace(/_/g, " ").toLowerCase().split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
     return (
       <Grid item xs={12} key={index}>

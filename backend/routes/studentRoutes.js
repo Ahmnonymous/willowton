@@ -77,7 +77,7 @@ router.get("/student-details/:id", async (req, res) => {
       student.student_date_of_birth = formatDate(student.student_date_of_birth);
       res.json(student);
     } else {
-      res.status(404).json({ error: "Student not found" });
+      null;
     }
   } catch (error) {
     console.error("Error fetching student details:", error);
@@ -111,7 +111,7 @@ router.get("/student-detail/:id", async (req, res) => {
       student.student_date_of_birth = formatDate(student.student_date_of_birth);
       res.json(student);
     } else {
-      res.status(404).json({});
+      null;
     }
   } catch (error) {
     console.error("Error fetching student details:", error);

@@ -12,9 +12,10 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  CircularProgress,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
 import { useMediaQuery } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import SaveIcon from "@mui/icons-material/Save";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -48,6 +49,8 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
   const [deleteAttachmentConfirmationOpen, setDeleteAttachmentConfirmationOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState(""); // Added for error feedback
+  const [isLoading, setIsLoading] = useState(false); // Added for loading state
   const isLargeScreen = useMediaQuery("(min-width:600px)");
   const drawerWidth = isLargeScreen ? 500 : 330;
 
@@ -102,8 +105,8 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     student_emergency_contact_address: "",
     student_status: "Pending",
     student_status_comment: "",
-    employment_status_attachment: null, // New field for attachment
-    employment_status_attachment_name: "", // New field for attachment name
+    employment_status_attachment: null,
+    employment_status_attachment_name: "",
   });
 
   const statusOptions = ["Received", "Pending", "Approved", "Declined"];
@@ -122,8 +125,12 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     if (open) {
       if (studentId) {
         const fetchStudentData = async () => {
+          setIsLoading(true);
           try {
             const response = await fetch(`https://willowtonbursary.co.za/api/student-details/${studentId}`);
+            if (!response.ok) {
+              throw new Error(`Failed to fetch student data: ${response.statusText}`);
+            }
             const data = await response.json();
             const dates = data.student_date_of_birth ? parse(data.student_date_of_birth, 'MM/dd/yyyy', new Date()) : null;
             setSelectedDate(dates);
@@ -150,6 +157,9 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
             setEmergencyError(data.student_emergency_contact_number && !validateNumber(data.student_emergency_contact_number) ? "Emergency contact number must be exactly 10 digits" : "");
           } catch (error) {
             console.error("Error fetching student data:", error);
+            setErrorMessage("Failed to load student data. Please try again.");
+          } finally {
+            setIsLoading(false);
           }
         };
         fetchStudentData();
@@ -202,6 +212,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
         setWhatsappError("");
         setAlternativeError("");
         setEmergencyError("");
+        setErrorMessage("");
       }
     }
   }, [open, studentId]);
@@ -287,6 +298,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
 
   const handleDeleteAttachmentConfirm = async () => {
     if (!studentId) return;
+    setIsLoading(true);
     try {
       const response = await fetch(`https://willowtonbursary.co.za/api/student-details/delete-attachment/${studentId}`, {
         method: "PUT",
@@ -300,10 +312,13 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
         setSuccessMessage("Attachment deleted successfully!");
         setDeleteAttachmentConfirmationOpen(false);
       } else {
-        console.error("Failed to delete attachment");
+        setErrorMessage("Failed to delete attachment. Please try again.");
       }
     } catch (err) {
       console.error("Error deleting attachment:", err);
+      setErrorMessage("Error deleting attachment. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -335,6 +350,11 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
   };
 
   const handleSave = async () => {
+    // Reset messages
+    setSuccessMessage("");
+    setErrorMessage("");
+
+    // Validate inputs
     if (formData.student_email_address && !validateEmail(formData.student_email_address)) {
       setEmailError("Please enter a valid email address");
       return;
@@ -348,45 +368,49 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
       return;
     }
     if (formData.student_emergency_contact_number && !validateNumber(formData.student_emergency_contact_number)) {
-      setEmergencyError("Emergency contact.refactor the number must be exactly 10 digits");
+      setEmergencyError("Emergency contact number must be exactly 10 digits");
       return;
     }
 
-    const userId = user?.user_id;
-    const url = studentId
-      ? `https://willowtonbursary.co.za/api/student-details/update/${studentId}`
-      : `https://willowtonbursary.co.za/api/student-details/insert`;
-    const method = studentId ? "PUT" : "POST";
-
-    const body = new FormData();
-    Object.keys(formData).forEach((key) => {
-      if (key !== "employment_status_attachment" && formData[key] !== null && formData[key] !== undefined) {
-        body.append(key, formData[key]);
-      }
-    });
-    if (formData.employment_status_attachment) {
-      body.append("employment_status_attachment", formData.employment_status_attachment);
-    }
-    if (!studentId) {
-      body.append("user_id", userId);
-    }
-
+    setIsLoading(true);
     try {
+      const userId = user?.user_id;
+      const url = studentId
+        ? `https://willowtonbursary.co.za/api/student-details/update/${studentId}`
+        : `https://willowtonbursary.co.za/api/student-details/insert`;
+      const method = studentId ? "PUT" : "POST";
+
+      const body = new FormData();
+      Object.keys(formData).forEach((key) => {
+        if (key !== "employment_status_attachment" && formData[key] !== null && formData[key] !== undefined) {
+          body.append(key, formData[key]);
+        }
+      });
+      if (formData.employment_status_attachment) {
+        body.append("employment_status_attachment", formData.employment_status_attachment);
+      }
+      if (!studentId) {
+        body.append("user_id", userId);
+      }
+
       const response = await fetch(url, {
         method,
         body,
       });
 
-      if (response.ok) {
-        const savedStudent = await response.json();
-        setSuccessMessage(studentId ? "Updated successfully!" : "Created successfully!");
-        onSave(savedStudent);
-        onClose();
-      } else {
-        console.error("Failed to save data");
+      if (!response.ok) {
+        throw new Error(`Failed to save student data: ${response.statusText}`);
       }
+
+      const savedStudent = await response.json();
+      setSuccessMessage(studentId ? "Updated successfully!" : "Created successfully!");
+      onSave(savedStudent); // Update parent component
+      onClose(); // Close the drawer
     } catch (error) {
       console.error("Error saving student data:", error);
+      setErrorMessage("Failed to save student data. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -396,22 +420,25 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
 
   const handleDeleteConfirm = async () => {
     if (!studentId) return;
-
+    setIsLoading(true);
     try {
       const response = await fetch(
         `https://willowtonbursary.co.za/api/student-details/delete/${studentId}`,
         { method: "DELETE" }
       );
 
-      if (response.ok) {
-        onDelete(studentId);
-        onClose();
-        setDeleteConfirmationOpen(false);
-      } else {
-        console.error("Failed to delete student");
+      if (!response.ok) {
+        throw new Error(`Failed to delete student: ${response.statusText}`);
       }
+
+      onDelete(studentId);
+      onClose();
+      setDeleteConfirmationOpen(false);
     } catch (error) {
       console.error("Error deleting student:", error);
+      setErrorMessage("Failed to delete student. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -1037,12 +1064,23 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
               {successMessage}
             </Typography>
           )}
+          {errorMessage && (
+            <Typography variant="body2" color="error.main" sx={{ mt: 1 }}>
+              {errorMessage}
+            </Typography>
+          )}
         </Box>
 
         <Box sx={{ flex: 1, overflowY: "auto", padding: 2 }}>
-          <Grid container spacing={2}>
-            {Object.keys(formData).map((key, index) => renderField(key, index))}
-          </Grid>
+          {isLoading ? (
+            <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
+              <CircularProgress />
+            </Box>
+          ) : (
+            <Grid container spacing={2}>
+              {Object.keys(formData).map((key, index) => renderField(key, index))}
+            </Grid>
+          )}
         </Box>
 
         <Divider />
@@ -1054,6 +1092,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
               size="small"
               sx={{ borderColor: isDarkMode ? '#F7FAFC' : '#1E293B', color: isDarkMode ? '#F7FAFC' : '#1E293B' }}
               startIcon={<CloseIcon />}
+              disabled={isLoading}
             >
               Close
             </Button>
@@ -1065,6 +1104,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                 size="small"
                 sx={{ borderColor: isDarkMode ? '#F7FAFC' : '#1E293B', color: 'red' }}
                 startIcon={<DeleteIcon />}
+                disabled={isLoading}
               >
                 Delete
               </Button>
@@ -1079,8 +1119,9 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                 size="small"
                 color="primary"
                 startIcon={<AddIcon />}
+                disabled={isLoading}
               >
-                Create
+                {isLoading ? <CircularProgress size={20} /> : "Create"}
               </Button>
             ) : (
               <Button
@@ -1089,8 +1130,9 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                 size="small"
                 color="primary"
                 startIcon={<SaveIcon />}
+                disabled={isLoading}
               >
-                Save
+                {isLoading ? <CircularProgress size={20} /> : "Save"}
               </Button>
             )}
           </Box>
@@ -1105,11 +1147,11 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
             Are you sure you want to delete this record?
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleDeleteCancel} color="primary">
+            <Button onClick={handleDeleteCancel} color="primary" disabled={isLoading}>
               Cancel
             </Button>
-            <Button onClick={handleDeleteConfirm} color="error">
-              Delete
+            <Button onClick={handleDeleteConfirm} color="error" disabled={isLoading}>
+              {isLoading ? <CircularProgress size={20} /> : "Delete"}
             </Button>
           </DialogActions>
         </Dialog>
@@ -1123,11 +1165,11 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
             Are you sure you want to delete the employment status attachment?
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleDeleteAttachmentCancel} color="primary">
+            <Button onClick={handleDeleteAttachmentCancel} color="primary" disabled={isLoading}>
               Cancel
             </Button>
-            <Button onClick={handleDeleteAttachmentConfirm} color="error">
-              Delete
+            <Button onClick={handleDeleteAttachmentConfirm} color="error" disabled={isLoading}>
+              {isLoading ? <CircularProgress size={20} /> : "Delete"}
             </Button>
           </DialogActions>
         </Dialog>

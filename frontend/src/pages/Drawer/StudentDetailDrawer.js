@@ -309,7 +309,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
           employment_status_attachment: null,
           employment_status_attachment_name: "",
         }));
-        setSuccessMessage("Attachment deleted successfully!");
+        // setSuccessMessage("Attachment deleted successfully!");
         setDeleteAttachmentConfirmationOpen(false);
       } else {
         setErrorMessage("Failed to delete attachment. Please try again.");
@@ -402,7 +402,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
         employment_status_attachment: null,
         employment_status_attachment_name: savedStudent.employment_status_attachment_name || "",
       };
-      setSuccessMessage(studentId ? "Updated successfully!" : "Created successfully!");
+      // setSuccessMessage(studentId ? "Updated successfully!" : "Created successfully!");
       onSave(cleanStudent); // Pass cleaned student data
       onClose(); // Close the drawer
     } else {

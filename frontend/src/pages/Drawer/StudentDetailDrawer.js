@@ -49,13 +49,13 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
   const [deleteAttachmentConfirmationOpen, setDeleteAttachmentConfirmationOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState(""); // Added for error feedback
-  const [isLoading, setIsLoading] = useState(false); // Added for loading state
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const isLargeScreen = useMediaQuery("(min-width:600px)");
   const drawerWidth = isLargeScreen ? 500 : 330;
 
   const user = JSON.parse(localStorage.getItem("user"));
-  const userType = user?.user_type; // student or admin
+  const userType = user?.user_type;
   const isAdmin = userType === "admin";
 
   const relationshipTypes = [
@@ -122,99 +122,104 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
   };
 
   useEffect(() => {
-    if (open) {
-      if (studentId) {
-        const fetchStudentData = async () => {
-          setIsLoading(true);
-          try {
-            const response = await fetch(`https://willowtonbursary.co.za/api/student-details/${studentId}`);
-            if (!response.ok) {
-              throw new Error(`Failed to fetch student data: ${response.statusText}`);
-            }
-            const data = await response.json();
-            const dates = data.student_date_of_birth ? parse(data.student_date_of_birth, 'MM/dd/yyyy', new Date()) : null;
-            setSelectedDate(dates);
-            setFormData((prev) => ({
-              ...prev,
-              ...data,
-              student_date_of_birth: dates,
-              student_status: data.student_status || "Pending",
-              student_status_comment: data.student_status_comment || "",
-              relation_type: data.relation_type || "",
-              relation_hr_contact: data.relation_hr_contact || "",
-              relation_branch: data.relation_branch || "",
-              relation_name: data.relation_name || "",
-              relation_surname: data.relation_surname || "",
-              relation_employee_code: data.relation_employee_code || "",
-              relation_reference: data.relation_reference || "",
-              employment_status_attachment: null, // Don't preload binary data
-              employment_status_attachment_name: data.employment_status_attachment_name || "",
-            }));
-            setEmergencyContactOption(data.student_emergency_contact_name ? "Add new" : "");
-            setEmailError(data.student_email_address && !validateEmail(data.student_email_address) ? "Please enter a valid email address" : "");
-            setWhatsappError(data.student_whatsapp_number && !validateNumber(data.student_whatsapp_number) ? "WhatsApp number must be exactly 10 digits" : "");
-            setAlternativeError(data.student_alternative_number && !validateNumber(data.student_alternative_number) ? "Alternative number must be exactly 10 digits" : "");
-            setEmergencyError(data.student_emergency_contact_number && !validateNumber(data.student_emergency_contact_number) ? "Emergency contact number must be exactly 10 digits" : "");
-          } catch (error) {
-            console.error("Error fetching student data:", error);
-            setErrorMessage("Failed to load student data. Please try again.");
-          } finally {
-            setIsLoading(false);
-          }
-        };
-        fetchStudentData();
-      } else {
-        setSelectedDate(null);
-        setFormData({
-          student_name: '',
-          student_surname: '',
-          student_nationality: '',
-          student_id_passport_number: '',
-          student_type: '',
-          student_religion: '',
-          student_finance_type: '',
-          student_whatsapp_number: '',
-          student_alternative_number: '',
-          student_email_address: '',
-          student_highest_education: '',
-          student_home_address: '',
-          student_suburb: '',
-          student_area_code: '',
-          student_province: '',
-          student_date_of_birth: '',
-          student_race: '',
-          student_marital_status: '',
-          student_employment_status: '',
-          student_job_title: '',
-          student_company_of_employment: '',
-          student_current_salary: '',
-          student_number_of_siblings: '',
-          student_siblings_bursary: '',
-          student_willow_relationship: '',
-          relation_type: '',
-          relation_hr_contact: '',
-          relation_branch: '',
-          relation_name: '',
-          relation_surname: '',
-          relation_employee_code: '',
-          relation_reference: '',
-          student_emergency_contact_name: '',
-          student_emergency_contact_number: '',
-          student_emergency_contact_relationship: '',
-          student_emergency_contact_address: '',
-          student_status: 'Pending',
-          student_status_comment: '',
-          employment_status_attachment: null,
-          employment_status_attachment_name: '',
-        });
-        setEmergencyContactOption("");
-        setEmailError("");
-        setWhatsappError("");
-        setAlternativeError("");
-        setEmergencyError("");
-        setErrorMessage("");
-      }
+    if (!open) {
+      setFormData({});
+      setSelectedDate(null);
+      setEmergencyContactOption("");
+      setEmailError("");
+      setWhatsappError("");
+      setAlternativeError("");
+      setEmergencyError("");
+      setSuccessMessage("");
+      setErrorMessage("");
+      return;
     }
+
+    if (!studentId) {
+      setFormData({
+        student_name: "",
+        student_surname: "",
+        student_nationality: "",
+        student_id_passport_number: "",
+        student_type: "",
+        student_religion: "",
+        student_finance_type: "",
+        student_whatsapp_number: "",
+        student_alternative_number: "",
+        student_email_address: "",
+        student_highest_education: "",
+        student_home_address: "",
+        student_suburb: "",
+        student_area_code: "",
+        student_province: "",
+        student_date_of_birth: "",
+        student_race: "",
+        student_marital_status: "",
+        student_employment_status: "",
+        student_job_title: "",
+        student_company_of_employment: "",
+        student_current_salary: "",
+        student_number_of_siblings: "",
+        student_siblings_bursary: "",
+        student_willow_relationship: "",
+        relation_type: "",
+        relation_hr_contact: "",
+        relation_branch: "",
+        relation_name: "",
+        relation_surname: "",
+        relation_employee_code: "",
+        relation_reference: "",
+        student_emergency_contact_name: "",
+        student_emergency_contact_number: "",
+        student_emergency_contact_relationship: "",
+        student_emergency_contact_address: "",
+        student_status: "Pending",
+        student_status_comment: "",
+        employment_status_attachment: null,
+        employment_status_attachment_name: "",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    fetch(`https://willowtonbursary.co.za/api/student-details/${studentId}`)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`Failed to fetch student data: ${res.statusText}`);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        const dates = data.student_date_of_birth ? parse(data.student_date_of_birth, 'MM/dd/yyyy', new Date()) : null;
+        setSelectedDate(dates);
+        setFormData({
+          ...data,
+          student_date_of_birth: data.student_date_of_birth || "",
+          student_status: data.student_status || "Pending",
+          student_status_comment: data.student_status_comment || "",
+          relation_type: data.relation_type || "",
+          relation_hr_contact: data.relation_hr_contact || "",
+          relation_branch: data.relation_branch || "",
+          relation_name: data.relation_name || "",
+          relation_surname: data.relation_surname || "",
+          relation_employee_code: data.relation_employee_code || "",
+          relation_reference: data.relation_reference || "",
+          employment_status_attachment: null,
+          employment_status_attachment_name: data.employment_status_attachment_name || "",
+        });
+        setEmergencyContactOption(data.student_emergency_contact_name ? "Add new" : "");
+        setEmailError(data.student_email_address && !validateEmail(data.student_email_address) ? "Please enter a valid email address" : "");
+        setWhatsappError(data.student_whatsapp_number && !validateNumber(data.student_whatsapp_number) ? "WhatsApp number must be exactly 10 digits" : "");
+        setAlternativeError(data.student_alternative_number && !validateNumber(data.student_alternative_number) ? "Alternative number must be exactly 10 digits" : "");
+        setEmergencyError(data.student_emergency_contact_number && !validateNumber(data.student_emergency_contact_number) ? "Emergency contact number must be exactly 10 digits" : "");
+      })
+      .catch((error) => {
+        console.error("Error fetching student data:", error);
+        setErrorMessage("Failed to load student data. Please try again.");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }, [open, studentId]);
 
   const handleDateChange = (newDate) => {
@@ -350,11 +355,9 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
   };
 
   const handleSave = async () => {
-    // Reset messages
     setSuccessMessage("");
     setErrorMessage("");
 
-    // Validate inputs
     if (formData.student_email_address && !validateEmail(formData.student_email_address)) {
       setEmailError("Please enter a valid email address");
       return;
@@ -375,10 +378,11 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     setIsLoading(true);
     try {
       const userId = user?.user_id;
-      const url = studentId
+      const isUpdate = !!studentId;
+      const url = isUpdate
         ? `https://willowtonbursary.co.za/api/student-details/update/${studentId}`
         : `https://willowtonbursary.co.za/api/student-details/insert`;
-      const method = studentId ? "PUT" : "POST";
+      const method = isUpdate ? "PUT" : "POST";
 
       const body = new FormData();
       Object.keys(formData).forEach((key) => {
@@ -389,7 +393,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
       if (formData.employment_status_attachment) {
         body.append("employment_status_attachment", formData.employment_status_attachment);
       }
-      if (!studentId) {
+      if (!isUpdate) {
         body.append("user_id", userId);
       }
 
@@ -403,9 +407,9 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
       }
 
       const savedStudent = await response.json();
-      setSuccessMessage(studentId ? "Updated successfully!" : "Created successfully!");
-      onSave(savedStudent); // Update parent component
-      onClose(); // Close the drawer
+      setSuccessMessage(isUpdate ? "Updated successfully!" : "Created successfully!");
+      onSave(savedStudent);
+      onClose();
     } catch (error) {
       console.error("Error saving student data:", error);
       setErrorMessage("Failed to save student data. Please try again.");

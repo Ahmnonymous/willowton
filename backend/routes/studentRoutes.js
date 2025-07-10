@@ -8,12 +8,18 @@ const formatDate = (date) => {
     // Convert the date to a Date object
     const formattedDate = new Date(date);
 
-    // Handle time zone shift by adding 19 hours (UTC+19) to adjust the time to your desired output.
-    formattedDate.setHours(formattedDate.getHours() + 19); // Add 19 hours to the date (adjust as needed)
+    // Validate the date
+    if (isNaN(formattedDate.getTime())) {
+      return null; // Return null for invalid dates
+    }
 
-    // Return the date in ISO format (keeping the date in UTC format)
-    // return formattedDate.toISOString();
-    return formattedDate.toISOString().split('T')[0];
+    // Extract month, day, and year
+    const month = String(formattedDate.getMonth() + 1).padStart(2, '0'); // Months are 0-based, so add 1
+    const day = String(formattedDate.getDate()).padStart(2, '0');
+    const year = formattedDate.getFullYear();
+
+    // Return formatted date as MM/DD/YYYY
+    return `${month}/${day}/${year}`;
   }
   return null; // If date is null, return null
 };

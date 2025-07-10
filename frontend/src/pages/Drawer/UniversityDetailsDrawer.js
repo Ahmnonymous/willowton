@@ -95,7 +95,15 @@ const UniversityDetailsDrawer = ({
   };
 
   const handleAutocompleteChange = (name, value) => {
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => {
+      const newFormData = { ...prev, [name]: value };
+      // Clear the corresponding amount field if the selection is "No"
+      const conditionalField = conditionalFields.find(field => field.select === name);
+      if (conditionalField && value === "No") {
+        newFormData[conditionalField.amount] = "";
+      }
+      return newFormData;
+    });
   };
 
   const handleSave = async () => {

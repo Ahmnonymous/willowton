@@ -369,37 +369,90 @@ const StudentDetails = () => {
 
   const handleTabChange = (event, newValue) => setTabValue(newValue);
 
+  // const renderDrawer = () => (
+  //   <DrawerForm
+  //     open={drawerOpen}
+  //     onClose={() => setDrawerOpen(false)}
+  //     studentId={selectedStudentid}
+  //     onSave={(savedStudent) => {
+  //       console.log("Saving student data...");
+
+  //       // Use savedStudent directly to update the state
+  //       if (savedStudent) {
+  //         // Apply date formatting after saving student data
+  //         Object.keys(savedStudent).forEach((key) => {
+  //           if (key.toLowerCase().includes('date_stamp') && savedStudent[key]) {
+  //             savedStudent[key] = formatDate(savedStudent[key]); // Format the date
+  //           }
+  //         });
+
+  //         // Update the selected student and student ID state
+  //         setSelectedStudentid(savedStudent.id);
+  //         setSelectedStudent(savedStudent);
+  //       } else {
+  //         setSelectedStudent(null);
+  //         setSelectedStudentid(null);
+  //       }
+
+  //       // Close the drawer
+  //       setDrawerOpen(false);
+  //     }}
+  //     onDelete={handleDeleteStudent} // Pass the delete handler to the drawer
+  //   />
+  // );
+
   const renderDrawer = () => (
-    <DrawerForm
-      open={drawerOpen}
-      onClose={() => setDrawerOpen(false)}
-      studentId={selectedStudentid}
-      onSave={(savedStudent) => {
-        console.log("Saving student data...");
+  <DrawerForm
+    open={drawerOpen}
+    onClose={() => setDrawerOpen(false)}
+    studentId={selectedStudentid}
+    onSave={(savedStudent) => {
+      console.log("Saving student data...", savedStudent);
 
-        // Use savedStudent directly to update the state
-        if (savedStudent) {
-          // Apply date formatting after saving student data
-          Object.keys(savedStudent).forEach((key) => {
-            if (key.toLowerCase().includes('date_stamp') && savedStudent[key]) {
-              savedStudent[key] = formatDate(savedStudent[key]); // Format the date
+      if (savedStudent && typeof savedStudent === "object" && savedStudent.id) {
+        // Format date fields in savedStudent
+        const formattedStudent = {
+          ...savedStudent,
+          ...Object.keys(savedStudent).reduce((acc, key) => {
+            if (key.toLowerCase().includes("date") && savedStudent[key]) {
+              acc[key] = formatDate(savedStudent[key]);
+            } else {
+              acc[key] = savedStudent[key];
             }
-          });
+            return acc;
+          }, {}),
+        };
 
-          // Update the selected student and student ID state
-          setSelectedStudentid(savedStudent.id);
-          setSelectedStudent(savedStudent);
-        } else {
-          setSelectedStudent(null);
-          setSelectedStudentid(null);
-        }
+        // Update studentDetails state
+        setStudentDetails((prev) => {
+          const existingIndex = prev.findIndex((s) => s.id === savedStudent.id);
+          if (existingIndex >= 0) {
+            // Update existing student
+            const updatedDetails = [...prev];
+            updatedDetails[existingIndex] = formattedStudent;
+            return updatedDetails;
+          } else {
+            // Add new student
+            return [...prev, formattedStudent];
+          }
+        });
 
-        // Close the drawer
-        setDrawerOpen(false);
-      }}
-      onDelete={handleDeleteStudent} // Pass the delete handler to the drawer
-    />
-  );
+        // Update selected student
+        setSelectedStudent(formattedStudent);
+        setSelectedStudentid(formattedStudent.id);
+      } else {
+        console.error("Invalid savedStudent data:", savedStudent);
+      }
+
+      // Close the drawer
+      setDrawerOpen(false);
+
+      // Refresh student details to ensure consistency
+      fetchStudentDetails();
+    }}
+    onDelete={handleDeleteStudent}
+  />
+);
 
   const tabSections = [
     { label: "Show all", key: "show_all" },

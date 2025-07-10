@@ -55,7 +55,23 @@ router.get("/student-details", async (req, res) => {
 router.get("/student-details/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await pool.query("SELECT * FROM Student_Details_Portal WHERE id = $1", [id]);
+    const result = await pool.query(
+      `SELECT id, student_name, student_surname, student_nationality, student_id_passport_number, 
+              student_type, student_religion, student_finance_type, student_whatsapp_number, 
+              student_alternative_number, student_email_address, student_highest_education, 
+              student_home_address, student_suburb, student_area_code, student_province, 
+              student_date_of_birth, student_race, student_marital_status, student_employment_status, 
+              student_job_title, student_company_of_employment, student_current_salary, 
+              student_number_of_siblings, student_siblings_bursary, student_willow_relationship, 
+              relation_type, relation_hr_contact, relation_branch, relation_name, relation_surname, 
+              relation_employee_code, relation_reference, student_emergency_contact_name, 
+              student_emergency_contact_number, student_emergency_contact_relationship, 
+              student_emergency_contact_address, user_id, student_status, student_status_comment, 
+              employment_status_attachment_name, student_date_stamp 
+       FROM Student_Details_Portal 
+       WHERE id = $1`,
+      [id]
+    );
     if (result.rows.length > 0) {
       const student = result.rows[0];
       student.student_date_of_birth = formatDate(student.student_date_of_birth);
@@ -73,7 +89,23 @@ router.get("/student-details/:id", async (req, res) => {
 router.get("/student-detail/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await pool.query("SELECT * FROM Student_Details_Portal WHERE user_id = $1", [id]);
+    const result = await pool.query(
+      `SELECT id, student_name, student_surname, student_nationality, student_id_passport_number, 
+              student_type, student_religion, student_finance_type, student_whatsapp_number, 
+              student_alternative_number, student_email_address, student_highest_education, 
+              student_home_address, student_suburb, student_area_code, student_province, 
+              student_date_of_birth, student_race, student_marital_status, student_employment_status, 
+              student_job_title, student_company_of_employment, student_current_salary, 
+              student_number_of_siblings, student_siblings_bursary, student_willow_relationship, 
+              relation_type, relation_hr_contact, relation_branch, relation_name, relation_surname, 
+              relation_employee_code, relation_reference, student_emergency_contact_name, 
+              student_emergency_contact_number, student_emergency_contact_relationship, 
+              student_emergency_contact_address, user_id, student_status, student_status_comment, 
+              employment_status_attachment_name, student_date_stamp 
+       FROM Student_Details_Portal 
+       WHERE user_id = $1`,
+      [id]
+    );
     if (result.rows.length > 0) {
       const student = result.rows[0];
       student.student_date_of_birth = formatDate(student.student_date_of_birth);

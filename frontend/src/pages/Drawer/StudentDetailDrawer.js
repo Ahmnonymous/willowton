@@ -18,6 +18,7 @@ import { useMediaQuery } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import {
   studentType,
   religions,
@@ -44,9 +45,11 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
   const [alternativeError, setAlternativeError] = useState("");
   const [emergencyError, setEmergencyError] = useState("");
   const [emergencyContactOption, setEmergencyContactOption] = useState("");
+  const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
+  const [deleteAttachmentConfirmationOpen, setDeleteAttachmentConfirmationOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
   const isLargeScreen = useMediaQuery("(min-width:600px)");
   const drawerWidth = isLargeScreen ? 500 : 330;
-  const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
 
   const user = JSON.parse(localStorage.getItem("user"));
   const userType = user?.user_type; // student or admin
@@ -97,9 +100,10 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     student_emergency_contact_number: "",
     student_emergency_contact_relationship: "",
     student_emergency_contact_address: "",
-    // student_date_stamp: "",
     student_status: "Pending",
     student_status_comment: "",
+    employment_status_attachment: null, // New field for attachment
+    employment_status_attachment_name: "", // New field for attachment name
   });
 
   const statusOptions = ["Received", "Pending", "Approved", "Declined"];
@@ -136,6 +140,8 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
               relation_surname: data.relation_surname || "",
               relation_employee_code: data.relation_employee_code || "",
               relation_reference: data.relation_reference || "",
+              employment_status_attachment: null, // Don't preload binary data
+              employment_status_attachment_name: data.employment_status_attachment_name || "",
             }));
             setEmergencyContactOption(data.student_emergency_contact_name ? "Add new" : "");
             setEmailError(data.student_email_address && !validateEmail(data.student_email_address) ? "Please enter a valid email address" : "");
@@ -186,9 +192,10 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
           student_emergency_contact_number: '',
           student_emergency_contact_relationship: '',
           student_emergency_contact_address: '',
-          // student_date_stamp: '',
           student_status: 'Pending',
           student_status_comment: '',
+          employment_status_attachment: null,
+          employment_status_attachment_name: '',
         });
         setEmergencyContactOption("");
         setEmailError("");
@@ -229,7 +236,6 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
       setEmergencyError(sanitizedValue && !validateNumber(sanitizedValue) ? "Emergency contact number must be exactly 10 digits" : "");
     }
 
-    // Handle relation field resets
     if (name === "student_willow_relationship") {
       if (value === "No") {
         setFormData((prevState) => ({
@@ -255,6 +261,54 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
         relation_reference: "",
       }));
     }
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const fileNameWithoutExtension = file.name;
+      setFormData((prev) => ({
+        ...prev,
+        employment_status_attachment_name: fileNameWithoutExtension,
+        employment_status_attachment: file,
+      }));
+    }
+  };
+
+  const handleViewFile = () => {
+    if (studentId) {
+      window.open(`https://willowtonbursary.co.za/api/student-details/view-attachment/${studentId}`, "_blank");
+    }
+  };
+
+  const handleDeleteAttachmentClick = () => {
+    setDeleteAttachmentConfirmationOpen(true);
+  };
+
+  const handleDeleteAttachmentConfirm = async () => {
+    if (!studentId) return;
+    try {
+      const response = await fetch(`https://willowtonbursary.co.za/api/student-details/delete-attachment/${studentId}`, {
+        method: "PUT",
+      });
+      if (response.ok) {
+        setFormData((prev) => ({
+          ...prev,
+          employment_status_attachment: null,
+          employment_status_attachment_name: "",
+        }));
+        setSuccessMessage("Attachment deleted successfully!");
+        setDeleteAttachmentConfirmationOpen(false);
+      } else {
+        console.error("Failed to delete attachment");
+      }
+    } catch (err) {
+      console.error("Error deleting attachment:", err);
+    }
+  };
+
+  const handleDeleteAttachmentCancel = () => {
+    setDeleteAttachmentConfirmationOpen(false);
   };
 
   const handleEmergencyContactChange = (e, newValue) => {
@@ -294,28 +348,38 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
       return;
     }
     if (formData.student_emergency_contact_number && !validateNumber(formData.student_emergency_contact_number)) {
-      setEmergencyError("Emergency contact number must be exactly 10 digits");
+      setEmergencyError("Emergency contact.refactor the number must be exactly 10 digits");
       return;
     }
 
     const userId = user?.user_id;
-
     const url = studentId
       ? `https://willowtonbursary.co.za/api/student-details/update/${studentId}`
       : `https://willowtonbursary.co.za/api/student-details/insert`;
-
     const method = studentId ? "PUT" : "POST";
-    const dataToSend = studentId ? formData : { ...formData, user_id: userId };
+
+    const body = new FormData();
+    Object.keys(formData).forEach((key) => {
+      if (key !== "employment_status_attachment" && formData[key] !== null && formData[key] !== undefined) {
+        body.append(key, formData[key]);
+      }
+    });
+    if (formData.employment_status_attachment) {
+      body.append("employment_status_attachment", formData.employment_status_attachment);
+    }
+    if (!studentId) {
+      body.append("user_id", userId);
+    }
 
     try {
       const response = await fetch(url, {
         method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(dataToSend),
+        body,
       });
 
       if (response.ok) {
         const savedStudent = await response.json();
+        setSuccessMessage(studentId ? "Updated successfully!" : "Created successfully!");
         onSave(savedStudent);
         onClose();
       } else {
@@ -367,8 +431,12 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
       '& .MuiInputBase-input': {
         color: isDarkMode ? '#F7FAFC' : '#1E293B',
       },
+      '& .MuiFormLabel-root': {
+        color: isDarkMode ? '#F7FAFC' : '#1E293B',
+      },
     };
-    const inputLabelProps = { style: { color: isDarkMode ? '#ffffff' : '#000000' } };
+    const inputLabelProps = { style: { color: isDarkMode ? '#F7FAFC' : '#1E293B' } };
+
     const relationFields = [
       "relation_type",
       "relation_hr_contact",
@@ -379,13 +447,10 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
       "relation_reference",
     ];
 
-    // Handle visibility of relation-related fields
     if (relationFields.includes(key)) {
       if (formData.student_willow_relationship !== "Yes") {
-        return null; // Hide all relation fields if "No" or blank
+        return null;
       }
-
-      // Render relation_type field whenever student_willow_relationship is "Yes"
       if (key === "relation_type") {
         return (
           <Grid item xs={12} key={index}>
@@ -400,13 +465,9 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
           </Grid>
         );
       }
-
-      // Show other relation fields only if relation_type is selected
       if (!formData.relation_type) {
         return null;
       }
-
-      // Render specific relation fields based on relation_type
       if (formData.relation_type === "Staff" || formData.relation_type === "Dependent of Staff") {
         if (["relation_hr_contact", "relation_branch", "relation_name", "relation_surname", "relation_employee_code"].includes(key)) {
           const labels = {
@@ -430,9 +491,8 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
             </Grid>
           );
         }
-        return null; // Hide other relation fields for Staff/Dependent
+        return null;
       }
-
       if (formData.relation_type === "Family") {
         if (key === "relation_name") {
           return (
@@ -464,9 +524,8 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
             </Grid>
           );
         }
-        return null; // Hide other relation fields for Family
+        return null;
       }
-
       if (formData.relation_type === "Director/Board Member or stakeholder") {
         if (key === "relation_name") {
           return (
@@ -483,9 +542,8 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
             </Grid>
           );
         }
-        return null; // Hide other relation fields for Director
+        return null;
       }
-
       if (formData.relation_type === "Referral") {
         if (key === "relation_reference") {
           return (
@@ -517,11 +575,10 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
             </Grid>
           );
         }
-        return null; // Hide other relation fields for Referral
+        return null;
       }
     }
 
-    // Handle non-relation fields (always render unless explicitly handled)
     if (key === "student_date_of_birth") {
       return (
         <Grid item xs={12} key={index}>
@@ -776,7 +833,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
             onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
             options={nationality}
             renderInput={(params) => (
-              <TextField {...params} label={key.replace(/_/g, " ").toLowerCase().split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")} sx={fieldStyles} InputLabelProps={inputLabelProps} />
+              <TextField {...params} label="Student Nationality" sx={fieldStyles} InputLabelProps={inputLabelProps} />
             )}
           />
         </Grid>
@@ -791,7 +848,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
             onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
             options={provinces}
             renderInput={(params) => (
-              <TextField {...params} label={key.replace(/_/g, " ").toLowerCase().split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")} sx={fieldStyles} InputLabelProps={inputLabelProps} />
+              <TextField {...params} label="Student Province" sx={fieldStyles} InputLabelProps={inputLabelProps} />
             )}
           />
         </Grid>
@@ -806,7 +863,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
             onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
             options={studentType}
             renderInput={(params) => (
-              <TextField {...params} label={key.replace(/_/g, " ").toLowerCase().split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")} sx={fieldStyles} InputLabelProps={inputLabelProps} />
+              <TextField {...params} label="Student Type" sx={fieldStyles} InputLabelProps={inputLabelProps} />
             )}
           />
         </Grid>
@@ -821,7 +878,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
             onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
             options={religions}
             renderInput={(params) => (
-              <TextField {...params} label={key.replace(/_/g, " ").toLowerCase().split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")} sx={fieldStyles} InputLabelProps={inputLabelProps} />
+              <TextField {...params} label="Student Religion" sx={fieldStyles} InputLabelProps={inputLabelProps} />
             )}
           />
         </Grid>
@@ -836,7 +893,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
             onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
             options={filteredFinanceType}
             renderInput={(params) => (
-              <TextField {...params} label={key.replace(/_/g, " ").toLowerCase().split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")} sx={fieldStyles} InputLabelProps={inputLabelProps} />
+              <TextField {...params} label="Student Finance Type" sx={fieldStyles} InputLabelProps={inputLabelProps} />
             )}
           />
         </Grid>
@@ -851,7 +908,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
             onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
             options={races}
             renderInput={(params) => (
-              <TextField {...params} label={key.replace(/_/g, " ").toLowerCase().split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")} sx={fieldStyles} InputLabelProps={inputLabelProps} />
+              <TextField {...params} label="Student Race" sx={fieldStyles} InputLabelProps={inputLabelProps} />
             )}
           />
         </Grid>
@@ -866,7 +923,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
             onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
             options={maritalStatus}
             renderInput={(params) => (
-              <TextField {...params} label={key.replace(/_/g, " ").toLowerCase().split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")} sx={fieldStyles} InputLabelProps={inputLabelProps} />
+              <TextField {...params} label="Student Marital Status" sx={fieldStyles} InputLabelProps={inputLabelProps} />
             )}
           />
         </Grid>
@@ -881,9 +938,54 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
             onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
             options={employmentStatus}
             renderInput={(params) => (
-              <TextField {...params} label={key.replace(/_/g, " ").toLowerCase().split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")} sx={fieldStyles} InputLabelProps={inputLabelProps} />
+              <TextField {...params} label="Student Employment Status" sx={fieldStyles} InputLabelProps={inputLabelProps} />
             )}
           />
+          <TextField
+            label="Employment Status Attachment Name"
+            name="employment_status_attachment_name"
+            fullWidth
+            disabled
+            value={formData.employment_status_attachment_name || ""}
+            sx={{
+              ...fieldStyles,
+              marginTop: 2,
+              '& .MuiInputBase-input.Mui-disabled': {
+                WebkitTextFillColor: isDarkMode ? '#F7FAFC' : '#1E293B',
+              },
+            }}
+            InputLabelProps={inputLabelProps}
+          />
+          <Button
+            variant="outlined"
+            component="label"
+            sx={{ ...fieldStyles, width: "100%", marginTop: 1, borderColor: isDarkMode ? '#F7FAFC' : '#1E293B' }}
+          >
+            Upload Employment Status Attachment
+            <input type="file" hidden onChange={handleFileChange} />
+          </Button>
+          {formData.employment_status_attachment_name && studentId && (
+            <>
+              <Button
+                variant="text"
+                color="primary"
+                onClick={handleViewFile}
+                startIcon={<VisibilityIcon />}
+                sx={{ width: "100%", marginTop: 1, color: isDarkMode ? '#F7FAFC' : '#1E293B' }}
+              >
+                View/Download Attachment
+              </Button>
+              <Button
+                variant="outlined"
+                color="error"
+                onClick={handleDeleteAttachmentClick}
+                startIcon={<DeleteIcon />}
+                sx={{ width: "100%", marginTop: 1, borderColor: isDarkMode ? '#F7FAFC' : '#1E293B', color: 'red' }}
+              >
+                Delete Attachment
+              </Button>
+            </>
+          )}
         </Grid>
       );
     }
@@ -896,15 +998,17 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
             onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
             options={highestEducation}
             renderInput={(params) => (
-              <TextField {...params} label={key.replace(/_/g, " ").toLowerCase().split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")} sx={fieldStyles} InputLabelProps={inputLabelProps} />
+              <TextField {...params} label="Student Highest Education" sx={fieldStyles} InputLabelProps={inputLabelProps} />
             )}
           />
         </Grid>
       );
     }
 
-    if (key === "student_date_stamp" || key === "id" || key === "user_id" || key === "student_industry") return null;
-    
+    if (key === "student_date_stamp" || key === "id" || key === "user_id" || key === "student_industry" || key === "employment_status_attachment" || key === "employment_status_attachment_name") {
+      return null;
+    }
+
     let label = key.replace(/_/g, " ").toLowerCase().split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
     return (
       <Grid item xs={12} key={index}>
@@ -928,6 +1032,11 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
           <Typography variant="h6" sx={{ fontWeight: "bold", color: isDarkMode ? '#F7FAFC' : '#1E293B' }}>
             Student Details
           </Typography>
+          {successMessage && (
+            <Typography variant="body2" color="success.main" sx={{ mt: 1 }}>
+              {successMessage}
+            </Typography>
+          )}
         </Box>
 
         <Box sx={{ flex: 1, overflowY: "auto", padding: 2 }}>
@@ -1000,6 +1109,24 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
               Cancel
             </Button>
             <Button onClick={handleDeleteConfirm} color="error">
+              Delete
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        <Dialog
+          open={deleteAttachmentConfirmationOpen}
+          onClose={handleDeleteAttachmentCancel}
+        >
+          <DialogTitle>Confirm Attachment Deletion</DialogTitle>
+          <DialogContent>
+            Are you sure you want to delete the employment status attachment?
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleDeleteAttachmentCancel} color="primary">
+              Cancel
+            </Button>
+            <Button onClick={handleDeleteAttachmentConfirm} color="error">
               Delete
             </Button>
           </DialogActions>

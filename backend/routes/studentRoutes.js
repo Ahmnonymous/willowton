@@ -22,6 +22,21 @@ const formatDate = (date) => {
   return null;
 };
 
+const formatDates = (date) => {
+  if (date) {
+    // Convert the date to a Date object
+    const formattedDate = new Date(date);
+
+    // Handle time zone shift by adding 19 hours (UTC+19) to adjust the time to your desired output.
+    formattedDate.setHours(formattedDate.getHours() + 19); // Add 19 hours to the date (adjust as needed)
+
+    // Return the date in ISO format (keeping the date in UTC format)
+    // return formattedDate.toISOString();
+    return formattedDate.toISOString().split('T')[0];
+  }
+  return null; // If date is null, return null
+};
+
 // Route to get all student details
 router.get("/student-details", async (req, res) => {
   try {
@@ -367,7 +382,7 @@ router.put("/student-details/update/:id", upload.single('employment_status_attac
 
     if (result.rows.length > 0) {
       const student = result.rows[0];
-      student.student_date_of_birth = formatDate(student.student_date_of_birth);
+      student.student_date_of_birth = formatDates(student.student_date_of_birth);
       res.status(200).json(student);
     } else {
       res.status(404).json({ error: "Student not found after update" });

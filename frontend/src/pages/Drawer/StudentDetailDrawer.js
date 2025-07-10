@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useRef } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Drawer,
   Box,
@@ -12,7 +12,6 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  CircularProgress,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useMediaQuery } from "@mui/material";
@@ -49,11 +48,8 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
   const [deleteAttachmentConfirmationOpen, setDeleteAttachmentConfirmationOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState(""); // New state for error messages
-  const [isLoading, setIsLoading] = useState(false); // New state for loading
   const isLargeScreen = useMediaQuery("(min-width:600px)");
   const drawerWidth = isLargeScreen ? 500 : 330;
-  const isMounted = useRef(true); // Ref to track component mount status
 
   const user = JSON.parse(localStorage.getItem("user"));
   const userType = user?.user_type; // student or admin
@@ -106,8 +102,8 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     student_emergency_contact_address: "",
     student_status: "Pending",
     student_status_comment: "",
-    employment_status_attachment: null,
-    employment_status_attachment_name: "",
+    employment_status_attachment: null, // New field for attachment
+    employment_status_attachment_name: "", // New field for attachment name
   });
 
   const statusOptions = ["Received", "Pending", "Approved", "Declined"];
@@ -123,117 +119,97 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
   };
 
   useEffect(() => {
-    isMounted.current = true;
-    return () => {
-      isMounted.current = false;
-    };
-  }, []);
-
-  useEffect(() => {
     if (open) {
       if (studentId) {
         const fetchStudentData = async () => {
           try {
             const response = await fetch(`https://willowtonbursary.co.za/api/student-details/${studentId}`);
-            if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
-            }
             const data = await response.json();
-            if (isMounted.current) {
-              const dates = data.student_date_of_birth ? parse(data.student_date_of_birth, 'MM/dd/yyyy', new Date()) : null;
-              setSelectedDate(dates);
-              setFormData((prev) => ({
-                ...prev,
-                ...data,
-                student_date_of_birth: dates,
-                student_status: data.student_status || "Pending",
-                student_status_comment: data.student_status_comment || "",
-                relation_type: data.relation_type || "",
-                relation_hr_contact: data.relation_hr_contact || "",
-                relation_branch: data.relation_branch || "",
-                relation_name: data.relation_name || "",
-                relation_surname: data.relation_surname || "",
-                relation_employee_code: data.relation_employee_code || "",
-                relation_reference: data.relation_reference || "",
-                employment_status_attachment: null,
-                employment_status_attachment_name: data.employment_status_attachment_name || "",
-              }));
-              setEmergencyContactOption(data.student_emergency_contact_name ? "Add new" : "");
-              setEmailError(data.student_email_address && !validateEmail(data.student_email_address) ? "Please enter a valid email address" : "");
-              setWhatsappError(data.student_whatsapp_number && !validateNumber(data.student_whatsapp_number) ? "WhatsApp number must be exactly 10 digits" : "");
-              setAlternativeError(data.student_alternative_number && !validateNumber(data.student_alternative_number) ? "Alternative number must be exactly 10 digits" : "");
-              setEmergencyError(data.student_emergency_contact_number && !validateNumber(data.student_emergency_contact_number) ? "Emergency contact number must be exactly 10 digits" : "");
-            }
+            const dates = data.student_date_of_birth ? parse(data.student_date_of_birth, 'MM/dd/yyyy', new Date()) : null;
+            setSelectedDate(dates);
+            setFormData((prev) => ({
+              ...prev,
+              ...data,
+              student_date_of_birth: dates,
+              student_status: data.student_status || "Pending",
+              student_status_comment: data.student_status_comment || "",
+              relation_type: data.relation_type || "",
+              relation_hr_contact: data.relation_hr_contact || "",
+              relation_branch: data.relation_branch || "",
+              relation_name: data.relation_name || "",
+              relation_surname: data.relation_surname || "",
+              relation_employee_code: data.relation_employee_code || "",
+              relation_reference: data.relation_reference || "",
+              employment_status_attachment: null, // Don't preload binary data
+              employment_status_attachment_name: data.employment_status_attachment_name || "",
+            }));
+            setEmergencyContactOption(data.student_emergency_contact_name ? "Add new" : "");
+            setEmailError(data.student_email_address && !validateEmail(data.student_email_address) ? "Please enter a valid email address" : "");
+            setWhatsappError(data.student_whatsapp_number && !validateNumber(data.student_whatsapp_number) ? "WhatsApp number must be exactly 10 digits" : "");
+            setAlternativeError(data.student_alternative_number && !validateNumber(data.student_alternative_number) ? "Alternative number must be exactly 10 digits" : "");
+            setEmergencyError(data.student_emergency_contact_number && !validateNumber(data.student_emergency_contact_number) ? "Emergency contact number must be exactly 10 digits" : "");
           } catch (error) {
             console.error("Error fetching student data:", error);
-            if (isMounted.current) {
-              setErrorMessage("Failed to load student data.");
-            }
           }
         };
         fetchStudentData();
       } else {
-        if (isMounted.current) {
-          setSelectedDate(null);
-          setFormData({
-            student_name: '',
-            student_surname: '',
-            student_nationality: '',
-            student_id_passport_number: '',
-            student_type: '',
-            student_religion: '',
-            student_finance_type: '',
-            student_whatsapp_number: '',
-            student_alternative_number: '',
-            student_email_address: '',
-            student_highest_education: '',
-            student_home_address: '',
-            student_suburb: '',
-            student_area_code: '',
-            student_province: '',
-            student_date_of_birth: '',
-            student_race: '',
-            student_marital_status: '',
-            student_employment_status: '',
-            student_job_title: '',
-            student_company_of_employment: '',
-            student_current_salary: '',
-            student_number_of_siblings: '',
-            student_siblings_bursary: '',
-            student_willow_relationship: '',
-            relation_type: '',
-            relation_hr_contact: '',
-            relation_branch: '',
-            relation_name: '',
-            relation_surname: '',
-            relation_employee_code: '',
-            relation_reference: '',
-            student_emergency_contact_name: '',
-            student_emergency_contact_number: '',
-            student_emergency_contact_relationship: '',
-            student_emergency_contact_address: '',
-            student_status: 'Pending',
-            student_status_comment: '',
-            employment_status_attachment: null,
-            employment_status_attachment_name: '',
-          });
-          setEmergencyContactOption("");
-          setEmailError("");
-          setWhatsappError("");
-          setAlternativeError("");
-          setEmergencyError("");
-          setErrorMessage("");
-        }
+        setSelectedDate(null);
+        setFormData({
+          student_name: '',
+          student_surname: '',
+          student_nationality: '',
+          student_id_passport_number: '',
+          student_type: '',
+          student_religion: '',
+          student_finance_type: '',
+          student_whatsapp_number: '',
+          student_alternative_number: '',
+          student_email_address: '',
+          student_highest_education: '',
+          student_home_address: '',
+          student_suburb: '',
+          student_area_code: '',
+          student_province: '',
+          student_date_of_birth: '',
+          student_race: '',
+          student_marital_status: '',
+          student_employment_status: '',
+          student_job_title: '',
+          student_company_of_employment: '',
+          student_current_salary: '',
+          student_number_of_siblings: '',
+          student_siblings_bursary: '',
+          student_willow_relationship: '',
+          relation_type: '',
+          relation_hr_contact: '',
+          relation_branch: '',
+          relation_name: '',
+          relation_surname: '',
+          relation_employee_code: '',
+          relation_reference: '',
+          student_emergency_contact_name: '',
+          student_emergency_contact_number: '',
+          student_emergency_contact_relationship: '',
+          student_emergency_contact_address: '',
+          student_status: 'Pending',
+          student_status_comment: '',
+          employment_status_attachment: null,
+          employment_status_attachment_name: '',
+        });
+        setEmergencyContactOption("");
+        setEmailError("");
+        setWhatsappError("");
+        setAlternativeError("");
+        setEmergencyError("");
       }
     }
   }, [open, studentId]);
 
   const handleDateChange = (newDate) => {
-    if (isMounted.current) {
-      setSelectedDate(newDate);
-      const formattedDate = newDate ? format(newDate, 'MM/dd/yyyy') : '';
-      setFormData(prev => ({ ...prev, student_date_of_birth: formattedDate }));
-    }
+    setSelectedDate(newDate);
+    const formattedDate = newDate ? format(newDate, 'MM/dd/yyyy') : '';
+    setFormData(prev => ({ ...prev, student_date_of_birth: formattedDate }));
   };
 
   const handleChange = (e) => {
@@ -289,7 +265,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    if (file && isMounted.current) {
+    if (file) {
       const fileNameWithoutExtension = file.name;
       setFormData((prev) => ({
         ...prev,
@@ -315,7 +291,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
       const response = await fetch(`https://willowtonbursary.co.za/api/student-details/delete-attachment/${studentId}`, {
         method: "PUT",
       });
-      if (response.ok && isMounted.current) {
+      if (response.ok) {
         setFormData((prev) => ({
           ...prev,
           employment_status_attachment: null,
@@ -325,15 +301,9 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
         setDeleteAttachmentConfirmationOpen(false);
       } else {
         console.error("Failed to delete attachment");
-        if (isMounted.current) {
-          setErrorMessage("Failed to delete attachment.");
-        }
       }
     } catch (err) {
       console.error("Error deleting attachment:", err);
-      if (isMounted.current) {
-        setErrorMessage("Error deleting attachment.");
-      }
     }
   };
 
@@ -342,27 +312,25 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
   };
 
   const handleEmergencyContactChange = (e, newValue) => {
-    if (isMounted.current) {
-      setEmergencyContactOption(newValue);
-      if (newValue === "Same as above") {
-        setFormData((prevState) => ({
-          ...prevState,
-          student_emergency_contact_name: formData.student_name,
-          student_emergency_contact_number: formData.student_whatsapp_number,
-          student_emergency_contact_relationship: "Self",
-          student_emergency_contact_address: formData.student_home_address,
-        }));
-        setEmergencyError(formData.student_whatsapp_number && !validateNumber(formData.student_whatsapp_number) ? "Emergency contact number must be exactly 10 digits" : "");
-      } else {
-        setFormData((prevState) => ({
-          ...prevState,
-          student_emergency_contact_name: "",
-          student_emergency_contact_number: "",
-          student_emergency_contact_relationship: "",
-          student_emergency_contact_address: "",
-        }));
-        setEmergencyError("");
-      }
+    setEmergencyContactOption(newValue);
+    if (newValue === "Same as above") {
+      setFormData((prevState) => ({
+        ...prevState,
+        student_emergency_contact_name: formData.student_name,
+        student_emergency_contact_number: formData.student_whatsapp_number,
+        student_emergency_contact_relationship: "Self",
+        student_emergency_contact_address: formData.student_home_address,
+      }));
+      setEmergencyError(formData.student_whatsapp_number && !validateNumber(formData.student_whatsapp_number) ? "Emergency contact number must be exactly 10 digits" : "");
+    } else {
+      setFormData((prevState) => ({
+        ...prevState,
+        student_emergency_contact_name: "",
+        student_emergency_contact_number: "",
+        student_emergency_contact_relationship: "",
+        student_emergency_contact_address: "",
+      }));
+      setEmergencyError("");
     }
   };
 
@@ -380,13 +348,9 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
       return;
     }
     if (formData.student_emergency_contact_number && !validateNumber(formData.student_emergency_contact_number)) {
-      setEmergencyError("Emergency contact number must be exactly 10 digits");
+      setEmergencyError("Emergency contact.refactor the number must be exactly 10 digits");
       return;
     }
-
-    setIsLoading(true); // Start loading
-    setErrorMessage(""); // Clear previous errors
-    setSuccessMessage(""); // Clear previous success message
 
     const userId = user?.user_id;
     const url = studentId
@@ -413,25 +377,16 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
         body,
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const savedStudent = await response.json();
-      if (isMounted.current) {
+      if (response.ok) {
+        const savedStudent = await response.json();
         setSuccessMessage(studentId ? "Updated successfully!" : "Created successfully!");
         onSave(savedStudent);
         onClose();
+      } else {
+        console.error("Failed to save data");
       }
     } catch (error) {
       console.error("Error saving student data:", error);
-      if (isMounted.current) {
-        setErrorMessage("Failed to save student data. Please try again.");
-      }
-    } finally {
-      if (isMounted.current) {
-        setIsLoading(false); // Stop loading
-      }
     }
   };
 
@@ -448,21 +403,15 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
         { method: "DELETE" }
       );
 
-      if (response.ok && isMounted.current) {
+      if (response.ok) {
         onDelete(studentId);
         onClose();
         setDeleteConfirmationOpen(false);
       } else {
         console.error("Failed to delete student");
-        if (isMounted.current) {
-          setErrorMessage("Failed to delete student.");
-        }
       }
     } catch (error) {
       console.error("Error deleting student:", error);
-      if (isMounted.current) {
-        setErrorMessage("Error deleting student.");
-      }
     }
   };
 
@@ -1011,7 +960,6 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
             variant="outlined"
             component="label"
             sx={{ ...fieldStyles, width: "100%", marginTop: 1, borderColor: isDarkMode ? '#F7FAFC' : '#1E293B' }}
-            disabled={isLoading}
           >
             Upload Employment Status Attachment
             <input type="file" hidden onChange={handleFileChange} />
@@ -1024,7 +972,6 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                 onClick={handleViewFile}
                 startIcon={<VisibilityIcon />}
                 sx={{ width: "100%", marginTop: 1, color: isDarkMode ? '#F7FAFC' : '#1E293B' }}
-                disabled={isLoading}
               >
                 View/Download Attachment
               </Button>
@@ -1034,7 +981,6 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                 onClick={handleDeleteAttachmentClick}
                 startIcon={<DeleteIcon />}
                 sx={{ width: "100%", marginTop: 1, borderColor: isDarkMode ? '#F7FAFC' : '#1E293B', color: 'red' }}
-                disabled={isLoading}
               >
                 Delete Attachment
               </Button>
@@ -1054,7 +1000,6 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
             renderInput={(params) => (
               <TextField {...params} label="Student Highest Education" sx={fieldStyles} InputLabelProps={inputLabelProps} />
             )}
-            disabled={isLoading}
           />
         </Grid>
       );
@@ -1075,7 +1020,6 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
           onChange={handleChange}
           sx={fieldStyles}
           InputLabelProps={inputLabelProps}
-          disabled={isLoading}
         />
       </Grid>
     );
@@ -1093,19 +1037,9 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
               {successMessage}
             </Typography>
           )}
-          {errorMessage && (
-            <Typography variant="body2" color="error.main" sx={{ mt: 1 }}>
-              {errorMessage}
-            </Typography>
-          )}
         </Box>
 
         <Box sx={{ flex: 1, overflowY: "auto", padding: 2 }}>
-          {isLoading && (
-            <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}>
-              <CircularProgress />
-            </Box>
-          )}
           <Grid container spacing={2}>
             {Object.keys(formData).map((key, index) => renderField(key, index))}
           </Grid>
@@ -1120,7 +1054,6 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
               size="small"
               sx={{ borderColor: isDarkMode ? '#F7FAFC' : '#1E293B', color: isDarkMode ? '#F7FAFC' : '#1E293B' }}
               startIcon={<CloseIcon />}
-              disabled={isLoading}
             >
               Close
             </Button>
@@ -1132,7 +1065,6 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                 size="small"
                 sx={{ borderColor: isDarkMode ? '#F7FAFC' : '#1E293B', color: 'red' }}
                 startIcon={<DeleteIcon />}
-                disabled={isLoading}
               >
                 Delete
               </Button>
@@ -1146,8 +1078,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                 variant="contained"
                 size="small"
                 color="primary"
-                startIcon={isLoading ? <CircularProgress size={16} color="inherit" /> : <AddIcon />}
-                disabled={isLoading}
+                startIcon={<AddIcon />}
               >
                 Create
               </Button>
@@ -1157,8 +1088,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
                 variant="contained"
                 size="small"
                 color="primary"
-                startIcon={isLoading ? <CircularProgress size={16} color="inherit" /> : <SaveIcon />}
-                disabled={isLoading}
+                startIcon={<SaveIcon />}
               >
                 Save
               </Button>
@@ -1175,10 +1105,10 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
             Are you sure you want to delete this record?
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleDeleteCancel} color="primary" disabled={isLoading}>
+            <Button onClick={handleDeleteCancel} color="primary">
               Cancel
             </Button>
-            <Button onClick={handleDeleteConfirm} color="error" disabled={isLoading}>
+            <Button onClick={handleDeleteConfirm} color="error">
               Delete
             </Button>
           </DialogActions>
@@ -1193,10 +1123,10 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
             Are you sure you want to delete the employment status attachment?
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleDeleteAttachmentCancel} color="primary" disabled={isLoading}>
+            <Button onClick={handleDeleteAttachmentCancel} color="primary">
               Cancel
             </Button>
-            <Button onClick={handleDeleteAttachmentConfirm} color="error" disabled={isLoading}>
+            <Button onClick={handleDeleteAttachmentConfirm} color="error">
               Delete
             </Button>
           </DialogActions>

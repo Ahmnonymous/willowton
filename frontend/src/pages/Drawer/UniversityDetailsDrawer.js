@@ -10,8 +10,8 @@ import {
   Autocomplete,
   Dialog,
   DialogActions,
-  DialogContent,
   DialogTitle,
+  DialogContent,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useMediaQuery } from "@mui/material";
@@ -42,14 +42,7 @@ const UniversityDetailsDrawer = ({
         fetch(`https://willowtonbursary.co.za/api/university-details/id/${universityDetailsId}`)
           .then((res) => res.json())
           .then((data) => {
-            // Ensure conditional fields are properly initialized
-            const updatedData = { ...data };
-            conditionalFields.forEach(({ select, amount }) => {
-              if (updatedData[select] !== "Yes") {
-                updatedData[amount] = "";
-              }
-            });
-            setFormData(updatedData);
+            setFormData(data);
           });
       } else {
         const initialData = {
@@ -106,7 +99,7 @@ const UniversityDetailsDrawer = ({
       const newFormData = { ...prev, [name]: value };
       // Clear the corresponding amount field if the selection is "No"
       const conditionalField = conditionalFields.find(field => field.select === name);
-      if (conditionalField && value !== "Yes") {
+      if (conditionalField && value === "No") {
         newFormData[conditionalField.amount] = "";
       }
       return newFormData;
@@ -222,38 +215,6 @@ const UniversityDetailsDrawer = ({
               const isConditionalSelect = conditionalFields.some(field => field.select === key);
               const isConditionalAmount = conditionalFields.some(field => field.amount === key);
 
-              if (isConditionalSelect) {
-                return (
-                  <Grid item xs={12} key={key}>
-                    <Autocomplete
-                      value={value || ""}
-                      onChange={(e, newValue) => handleAutocompleteChange(key, newValue)}
-                      options={yesNoOptions}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label={label}
-                          sx={{
-                            backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                            color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                            borderRadius: '8px',
-                            '& .MuiInputBase-input': {
-                              color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                            }
-                          }}
-                          InputLabelProps={{ style: { color: isDarkMode ? '#F7FAFC' : '#1E293B' } }}
-                        />
-                      )}
-                    />
-                  </Grid>
-                );
-              }
-
-              if (isConditionalAmount) {
-                const relatedSelect = conditionalFields.find(field => field.amount === key).select;
-                if (formData[relatedSelect] !== "Yes") return null;
-              }
-
               if (key === "Semester" || key === "semester") {
                 return (
                   <Grid item xs={12} key={key}>
@@ -261,21 +222,16 @@ const UniversityDetailsDrawer = ({
                       value={value || ""}
                       onChange={(e, newValue) => handleAutocompleteChange(key, newValue)}
                       options={semesters}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label={label}
-                          sx={{
-                            backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                            color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                            borderRadius: '8px',
-                            '& .MuiInputBase-input': {
-                              color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                            }
-                          }}
-                          InputLabelProps={{ style: { color: isDarkMode ? '#F7FAFC' : '#1E293B' } }}
-                        />
-                      )}
+                      renderInput={(params) => <TextField {...params} label={label} sx={{
+                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        borderRadius: '8px',
+                        '& .MuiInputBase-input': {
+                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        }
+                      }}
+                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                      />}
                     />
                   </Grid>
                 );
@@ -288,24 +244,46 @@ const UniversityDetailsDrawer = ({
                       value={value || ""}
                       onChange={(e, newValue) => handleAutocompleteChange(key, newValue)}
                       options={highestEducation}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label={label}
-                          sx={{
-                            backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
-                            color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                            borderRadius: '8px',
-                            '& .MuiInputBase-input': {
-                              color: isDarkMode ? '#F7FAFC' : '#1E293B',
-                            }
-                          }}
-                          InputLabelProps={{ style: { color: isDarkMode ? '#F7FAFC' : '#1E293B' } }}
-                        />
-                      )}
+                      renderInput={(params) => <TextField {...params} label={label} sx={{
+                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        borderRadius: '8px',
+                        '& .MuiInputBase-input': {
+                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        }
+                      }}
+                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                      />}
                     />
                   </Grid>
                 );
+              }
+
+              if (isConditionalSelect) {
+                return (
+                  <Grid item xs={12} key={key}>
+                    <Autocomplete
+                      value={value || ""}
+                      onChange={(e, newValue) => handleAutocompleteChange(key, newValue)}
+                      options={yesNoOptions}
+                      renderInput={(params) => <TextField {...params} label={label} sx={{
+                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        borderRadius: '8px',
+                        '& .MuiInputBase-input': {
+                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        }
+                      }}
+                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                      />}
+                    />
+                  </Grid>
+                );
+              }
+
+              if (isConditionalAmount) {
+                const relatedSelect = conditionalFields.find(field => field.amount === key).select;
+                if (formData[relatedSelect] !== "Yes") return null;
               }
 
               return (

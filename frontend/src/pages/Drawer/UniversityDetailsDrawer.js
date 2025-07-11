@@ -12,31 +12,22 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  useMediaQuery,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import { useMediaQuery } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { ThemeContext } from '../../config/ThemeContext';
 import { semesters, highestEducation } from "../../components/lov";
 
-const toTitleCase = (str) => {
-  if (!str) return "";
-  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-};
-
-const yesNoOptions = ["Yes", "No"];
-
-const conditionalFields = [
-  { select: "Previously_Funded", amount: "Previously_Funded_Amount" },
-  { select: "Tuition", amount: "Tuition_Amount" },
-  { select: "Accommodation", amount: "Accommodation_Fee" },
-  { select: "Textbooks", amount: "Textbooks_Fee" },
-  { select: "Travel", amount: "Travel_Fee" },
-];
-
-const UniversityDetailsDrawer = ({ open, onClose, studentId, universityDetailsId, onSave }) => {
+const UniversityDetailsDrawer = ({
+  open,
+  onClose,
+  studentId,
+  universityDetailsId,
+  onSave,
+}) => {
   const { isDarkMode } = useContext(ThemeContext);
   const isLargeScreen = useMediaQuery("(min-width:600px)");
   const drawerWidth = isLargeScreen ? 500 : 330;
@@ -51,13 +42,25 @@ const UniversityDetailsDrawer = ({ open, onClose, studentId, universityDetailsId
         fetch(`https://willowtonbursary.co.za/api/university-details/id/${universityDetailsId}`)
           .then((res) => res.json())
           .then((data) => {
-            const normalized = { ...data };
-            conditionalFields.forEach(({ select }) => {
-              if (normalized[select]) {
-                normalized[select] = toTitleCase(normalized[select]);
+            setFormData(data);// Normalize the conditional Yes/No fields
+            const normalizedFields = [
+              "Previously_Funded",
+              "Tuition",
+              "Accommodation",
+              "Textbooks",
+              "Travel"
+            ];
+
+            const normalizedData = { ...data };
+
+            normalizedFields.forEach((field) => {
+              const value = data[field];
+              if (value !== "Yes" && value !== "No") {
+                normalizedData[field] = "";
               }
             });
-            setFormData(normalized);
+
+            setFormData(normalizedData);
           });
       } else {
         const initialData = {
@@ -111,11 +114,11 @@ const UniversityDetailsDrawer = ({ open, onClose, studentId, universityDetailsId
 
   const handleAutocompleteChange = (name, value) => {
     setFormData((prev) => {
-      const newValue = toTitleCase(value);
-      const newFormData = { ...prev, [name]: newValue };
-      const conditional = conditionalFields.find(field => field.select === name);
-      if (conditional && newValue === "No") {
-        newFormData[conditional.amount] = "";
+      const newFormData = { ...prev, [name]: value };
+      // Clear the corresponding amount field if the selection is "No"
+      const conditionalField = conditionalFields.find(field => field.select === name);
+      if (conditionalField && value === "No") {
+        newFormData[conditionalField.amount] = "";
       }
       return newFormData;
     });
@@ -147,15 +150,19 @@ const UniversityDetailsDrawer = ({ open, onClose, studentId, universityDetailsId
     }
   };
 
-  const handleDeleteClick = () => setDeleteConfirmationOpen(true);
-  const handleDeleteCancel = () => setDeleteConfirmationOpen(false);
+  const handleDeleteClick = () => {
+    setDeleteConfirmationOpen(true);
+  };
+
   const handleDeleteConfirm = async () => {
     if (!formData.id) return;
+
     try {
       const res = await fetch(
         `https://willowtonbursary.co.za/api/university-details/delete/${formData.id}`,
         { method: "DELETE" }
       );
+
       if (res.ok) {
         onSave(null);
         setSuccessMessage("Deleted successfully!");
@@ -169,53 +176,102 @@ const UniversityDetailsDrawer = ({ open, onClose, studentId, universityDetailsId
     }
   };
 
+  const handleDeleteCancel = () => {
+    setDeleteConfirmationOpen(false);
+  };
+
+  const yesNoOptions = ["Yes", "No"];
+
+  const conditionalFields = [
+    { select: "Previously_Funded", amount: "Previously_Funded_Amount" },
+    { select: "Tuition", amount: "Tuition_Amount" },
+    { select: "Accommodation", amount: "Accommodation_Fee" },
+    { select: "Textbooks", amount: "Textbooks_Fee" },
+    { select: "Travel", amount: "Travel_Fee" },
+  ];
+
   return (
     <Drawer anchor="right" open={open} onClose={onClose}>
-      <Box sx={{ width: drawerWidth, height: "100%", display: "flex", flexDirection: "column", backgroundColor: isDarkMode ? '#2D3748' : '#fff' }}>
-        <Box sx={{ p: 2, borderBottom: "1px solid #ccc", backgroundColor: isDarkMode ? '#1E293B' : '#e1f5fe' }}>
+      <Box sx={{
+        width: drawerWidth,
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        backgroundColor: isDarkMode ? '#2D3748' : '#fff'
+      }}>
+        <Box sx={{
+          p: 2,
+          borderBottom: "1px solid #ccc",
+          backgroundColor: isDarkMode ? '#1E293B' : '#e1f5fe'
+        }}>
           <Typography variant="h6" sx={{ fontWeight: "bold", color: isDarkMode ? '#F7FAFC' : '#1E293B' }}>
             University Details
           </Typography>
           {successMessage && (
-            <Typography variant="body2" color="success.main" sx={{ mt: 1 }}>{successMessage}</Typography>
+            <Typography variant="body2" color="success.main" sx={{ mt: 1 }}>
+              {successMessage}
+            </Typography>
           )}
         </Box>
 
         <Box sx={{ flex: 1, overflowY: "auto", p: 2 }}>
           <Grid container spacing={2}>
             {Object.entries(formData).map(([key, value]) => {
-              if (["id", "student_details_portal_id", "University_Details_Date_Stamp"].includes(key)) return null;
-              let label = key.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+              if (
+                key === "id" ||
+                key === "student_details_portal_id" ||
+                key === "University_Details_Date_Stamp"
+              )
+                return null;
+
+              let label = key.replace(/_/g, " ");
+              label = label
+                .split(" ")
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(" ");
 
               const isConditionalSelect = conditionalFields.some(field => field.select === key);
               const conditionalField = conditionalFields.find(field => field.select === key);
-              const isConditionalAmount = conditionalFields.some(field => field.amount === key);
 
-              if (key === "Semester") {
+              if (key === "Semester" || key === "semester") {
                 return (
                   <Grid item xs={12} key={key}>
                     <Autocomplete
                       value={value || ""}
                       onChange={(e, newValue) => handleAutocompleteChange(key, newValue)}
                       options={semesters}
-                      renderInput={(params) => (
-                        <TextField {...params} label={label} sx={{ backgroundColor: isDarkMode ? '#1A202C' : '#fff' }} />
-                      )}
+                      renderInput={(params) => <TextField {...params} label={label} sx={{
+                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        borderRadius: '8px',
+                        '& .MuiInputBase-input': {
+                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        }
+                      }}
+                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                      />}
                     />
                   </Grid>
                 );
               }
 
-              if (key === "NQF_Level") {
+              if (key === "NQF_Level" || key === "nqf_level") {
                 return (
                   <Grid item xs={12} key={key}>
                     <Autocomplete
                       value={value || ""}
                       onChange={(e, newValue) => handleAutocompleteChange(key, newValue)}
                       options={highestEducation}
-                      renderInput={(params) => (
-                        <TextField {...params} label={label} sx={{ backgroundColor: isDarkMode ? '#1A202C' : '#fff' }} />
-                      )}
+                      renderInput={(params) => <TextField {...params} label={label} sx={{
+                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        borderRadius: '8px',
+                        '& .MuiInputBase-input': {
+                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        }
+                      }}
+                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                      />}
                     />
                   </Grid>
                 );
@@ -225,20 +281,28 @@ const UniversityDetailsDrawer = ({ open, onClose, studentId, universityDetailsId
                 return (
                   <Grid item xs={12} key={key}>
                     <Autocomplete
-                      value={toTitleCase(value || "")}
+                      value={value || ""}
                       onChange={(e, newValue) => handleAutocompleteChange(key, newValue)}
                       options={yesNoOptions}
-                      renderInput={(params) => (
-                        <TextField {...params} label={label} sx={{ backgroundColor: isDarkMode ? '#1A202C' : '#fff' }} />
-                      )}
+                      renderInput={(params) => <TextField {...params} label={label} sx={{
+                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        borderRadius: '8px',
+                        '& .MuiInputBase-input': {
+                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        }
+                      }}
+                        InputLabelProps={{ style: { color: isDarkMode ? '#ffffff' : '#000000' } }}
+                      />}
                     />
                   </Grid>
                 );
               }
 
+              const isConditionalAmount = conditionalFields.some(field => field.amount === key);
               if (isConditionalAmount) {
                 const relatedSelect = conditionalFields.find(field => field.amount === key).select;
-                if (toTitleCase(formData[relatedSelect]) !== "Yes") return null;
+                if (formData[relatedSelect] !== "Yes") return null;
               }
 
               return (
@@ -249,7 +313,15 @@ const UniversityDetailsDrawer = ({ open, onClose, studentId, universityDetailsId
                     fullWidth
                     value={value || ""}
                     onChange={handleChange}
-                    sx={{ backgroundColor: isDarkMode ? '#1A202C' : '#fff' }}
+                    sx={{
+                      backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                      color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                      borderRadius: '8px',
+                      '& .MuiInputBase-input': {
+                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                      }
+                    }}
+                    InputLabelProps={{ style: { color: isDarkMode ? '#F7FAFC' : '#1E293B' } }}
                   />
                 </Grid>
               );
@@ -260,29 +332,59 @@ const UniversityDetailsDrawer = ({ open, onClose, studentId, universityDetailsId
         <Divider />
         <Box sx={{ p: 2, display: "flex", justifyContent: "space-between" }}>
           <Box sx={{ display: "flex", gap: 1 }}>
-            <Button onClick={onClose} startIcon={<CloseIcon />} size="small" variant="outlined">
+            <Button
+              onClick={onClose}
+              startIcon={<CloseIcon />}
+              size="small"
+              variant="outlined"
+              sx={{
+                borderColor: isDarkMode ? '#F7FAFC' : '#1E293B',
+                color: isDarkMode ? '#F7FAFC' : '#1E293B',
+              }}
+            >
               Close
             </Button>
             {formData.id && (
-              <Button onClick={handleDeleteClick} startIcon={<DeleteIcon />} size="small" color="error" variant="outlined">
+              <Button
+                onClick={handleDeleteClick}
+                startIcon={<DeleteIcon />}
+                size="small"
+                color="error"
+                variant="outlined"
+                sx={{
+                  borderColor: isDarkMode ? '#F7FAFC' : '#1E293B',
+                  color: 'red',
+                }}
+              >
                 Delete
               </Button>
             )}
           </Box>
-          <Button onClick={handleSave} startIcon={formData.id ? <SaveIcon /> : <AddIcon />} variant="contained" size="small">
+          <Button
+            onClick={handleSave}
+            startIcon={formData.id ? <SaveIcon /> : <AddIcon />}
+            variant="contained"
+            size="small"
+          >
             {formData.id ? "Save" : "Create"}
           </Button>
         </Box>
-
-        <Dialog open={deleteConfirmationOpen} onClose={handleDeleteCancel}>
-          <DialogTitle>Confirm Deletion</DialogTitle>
-          <DialogContent>Are you sure you want to delete this record?</DialogContent>
-          <DialogActions>
-            <Button onClick={handleDeleteCancel}>Cancel</Button>
-            <Button onClick={handleDeleteConfirm} color="error">Delete</Button>
-          </DialogActions>
-        </Dialog>
       </Box>
+
+      <Dialog open={deleteConfirmationOpen} onClose={handleDeleteCancel}>
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent>
+          Are you sure you want to delete this record?
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteCancel} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleDeleteConfirm} color="error">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Drawer>
   );
 };

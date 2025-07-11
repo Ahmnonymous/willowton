@@ -36,13 +36,53 @@ const UniversityDetailsDrawer = ({
   const [formData, setFormData] = useState({});
   const [successMessage, setSuccessMessage] = useState("");
 
+  const yesNoOptions = ["Yes", "No"];
+
+  const conditionalFields = [
+    { select: "Previously_Funded", amount: "Previously_Funded_Amount" },
+    { select: "Tuition", amount: "Tuition_Amount" },
+    { select: "Accommodation", amount: "Accommodation_Fee" },
+    { select: "Textbooks", amount: "Textbooks_Fee" },
+    { select: "Travel", amount: "Travel_Fee" },
+  ];
+
+  const autocompleteFields = [
+    "Semester",
+    "semester",
+    "NQF_Level",
+    "nqf_level",
+    ...conditionalFields.map(field => field.select),
+  ];
+
   useEffect(() => {
     if (open) {
       if (universityDetailsId) {
         fetch(`https://willowtonbursary.co.za/api/university-details/id/${universityDetailsId}`)
           .then((res) => res.json())
           .then((data) => {
-            setFormData(data);
+            // Ensure Yes/No fields are normalized to valid options
+            const normalizedData = { ...data };
+            conditionalFields.forEach(({ select, amount }) => {
+              if (normalizedData[select] && !yesNoOptions.includes(normalizedData[select])) {
+                normalizedData[select] = "";
+              }
+              // Clear amount if select is not "Yes"
+              if (normalizedData[select] !== "Yes") {
+                normalizedData[amount] = "";
+              }
+            });
+            // Normalize Semester and NQF_Level
+            if (normalizedData.Semester && !semesters.includes(normalizedData.Semester)) {
+              normalizedData.Semester = "";
+            }
+            if (normalizedData.NQF_Level && !highestEducation.includes(normalizedData.NQF_Level)) {
+              normalizedData.NQF_Level = "";
+            }
+            setFormData(normalizedData);
+          })
+          .catch((err) => {
+            console.error("Error fetching university details", err);
+            setFormData({});
           });
       } else {
         const initialData = {
@@ -162,16 +202,6 @@ const UniversityDetailsDrawer = ({
     setDeleteConfirmationOpen(false);
   };
 
-  const yesNoOptions = ["Yes", "No"];
-
-  const conditionalFields = [
-    { select: "Previously_Funded", amount: "Previously_Funded_Amount" },
-    { select: "Tuition", amount: "Tuition_Amount" },
-    { select: "Accommodation", amount: "Accommodation_Fee" },
-    { select: "Textbooks", amount: "Textbooks_Fee" },
-    { select: "Travel", amount: "Travel_Fee" },
-  ];
-
   return (
     <Drawer anchor="right" open={open} onClose={onClose}>
       <Box sx={{
@@ -213,7 +243,7 @@ const UniversityDetailsDrawer = ({
                 .join(" ");
 
               const isConditionalSelect = conditionalFields.some(field => field.select === key);
-              const conditionalField = conditionalFields.find(field => field.select === key);
+              const isConditionalAmount = conditionalFields.some(field => field.amount === key);
 
               if (key === "Semester" || key === "semester") {
                 return (
@@ -281,7 +311,6 @@ const UniversityDetailsDrawer = ({
                 );
               }
 
-              const isConditionalAmount = conditionalFields.some(field => field.amount === key);
               if (isConditionalAmount) {
                 const relatedSelect = conditionalFields.find(field => field.amount === key).select;
                 if (formData[relatedSelect] !== "Yes") return null;
@@ -345,7 +374,7 @@ const UniversityDetailsDrawer = ({
           <Button
             onClick={handleSave}
             startIcon={formData.id ? <SaveIcon /> : <AddIcon />}
-            variant="contained"
+           ientes variant="contained"
             size="small"
           >
             {formData.id ? "Save" : "Create"}

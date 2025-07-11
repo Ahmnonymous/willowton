@@ -46,6 +46,11 @@ const UniversityDetailsDrawer = ({
     { select: "Travel", amount: "Travel_Fee" },
   ];
 
+  // Convert snake_case to camelCase
+  const snakeToCamel = (str) => {
+    return str.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+  };
+
   useEffect(() => {
     if (open) {
       if (universityDetailsId) {
@@ -53,14 +58,19 @@ const UniversityDetailsDrawer = ({
           .then((res) => res.json())
           .then((data) => {
             console.log("API Response:", data); // Debug: Log API response
-            const normalizedData = {
-              ...data,
-              Previously_Funded: normalizeYesNo(data.Previously_Funded),
-              Tuition: normalizeYesNo(data.Tuition),
-              Accommodation: normalizeYesNo(data.Accommodation),
-              Textbooks: normalizeYesNo(data.Textbooks),
-              Travel: normalizeYesNo(data.Travel),
-            };
+            // Normalize API response keys to camelCase and values for Yes/No fields
+            const normalizedData = Object.keys(data).reduce((acc, key) => {
+              const camelKey = snakeToCamel(key);
+              acc[camelKey] = key === "previously_funded" ||
+                              key === "tuition" ||
+                              key === "accommodation" ||
+                              key === "textbooks" ||
+                              key === "travel"
+                ? normalizeYesNo(data[key])
+                : data[key];
+              return acc;
+            }, {});
+            console.log("Normalized FormData:", normalizedData); // Debug: Log normalized data
             setFormData(normalizedData);
           })
           .catch((err) => {
@@ -143,7 +153,12 @@ const UniversityDetailsDrawer = ({
       : `https://willowtonbursary.co.za/api/university-details/insert`;
     const method = isUpdate ? "PUT" : "POST";
 
-    const body = { ...formData };
+    // Convert camelCase back to snake_case for API request
+    const body = Object.keys(formData).reduce((acc, key) => {
+      const snakeKey = key.replace(/([A-Z])/g, '_$1').toLowerCase();
+      acc[snakeKey] = formData[key];
+      return acc;
+    }, {});
     if (!isUpdate) delete body.id;
 
     try {
@@ -308,6 +323,26 @@ const UniversityDetailsDrawer = ({
               if (isConditionalAmount) {
                 const relatedSelect = conditionalFields.find(field => field.amount === key).select;
                 if (formData[relatedSelect] !== "Yes") return null;
+                return (
+                  <Grid item xs={12} key={key}>
+                    <TextField
+                      name={key}
+                      label={label}
+                      fullWidth
+                      value={value || ""}
+                      onChange={handleChange}
+                      sx={{
+                        backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
+                        color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        borderRadius: '8px',
+                        '& .MuiInputBase-input': {
+                          color: isDarkMode ? '#F7FAFC' : '#1E293B',
+                        }
+                      }}
+                      InputLabelProps={{ style: { color: isDarkMode ? '#F7FAFC' : '#1E293B' } }}
+                    />
+                  </Grid>
+                );
               }
 
               return (

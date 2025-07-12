@@ -174,11 +174,11 @@ const UniversityDetailsDrawer = ({
   const yesNoOptions = ["Yes", "No"];
 
   const conditionalFields = [
-    { select: "Previously_Funded", amount: "Previously_Funded_Amount" },
-    { select: "Tuition", amount: "Tuition_Amount" },
-    { select: "Accommodation", amount: "Accommodation_Fee" },
-    { select: "Textbooks", amount: "Textbooks_Fee" },
-    { select: "Travel", amount: "Travel_Fee" },
+    { select: "previously_funded", amount: "previously_funded_amount" },
+    { select: "tuition", amount: "tuition_amount" },
+    { select: "accommodation", amount: "accommodation_fee" },
+    { select: "textbooks", amount: "textbooks_fee" },
+    { select: "travel", amount: "travel_fee" },
   ];
 
   const fieldStyles = {
@@ -199,7 +199,7 @@ const UniversityDetailsDrawer = ({
     if (
       key === "id" ||
       key === "student_details_portal_id" ||
-      key === "University_Details_Date_Stamp"
+      key === "university_details_date_stamp"
     ) {
       return null;
     }

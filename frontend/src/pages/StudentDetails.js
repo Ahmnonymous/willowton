@@ -612,7 +612,7 @@ const StudentDetails = () => {
               <TableRow>
                 <TableCell sx={{ fontWeight: 'bold', width: '50px' }} />
                 {Object.keys(data[0])
-                  .filter(field => field !== "id" && field !== "student_details_portal_id")
+                  .filter(field => field !== "id" && field !== "student_details_portal_id" && field !== "employment_status_attachment")
                   .map((field, idx) => (
                     <TableCell key={idx}
                       sx={{

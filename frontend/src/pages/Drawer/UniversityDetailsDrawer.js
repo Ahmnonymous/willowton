@@ -42,7 +42,16 @@ const UniversityDetailsDrawer = ({
         fetch(`https://willowtonbursary.co.za/api/university-details/id/${universityDetailsId}`)
           .then((res) => res.json())
           .then((data) => {
-            setFormData(data);
+            // Normalize the conditional fields to match yes_no options
+            const normalizedData = {
+              ...data,
+              Previously_Funded: yes_no.includes(data.Previously_Funded) ? data.Previously_Funded : "",
+              Tuition: yes_no.includes(data.Tuition) ? data.Tuition : "",
+              Accommodation: yes_no.includes(data.Accommodation) ? data.Accommodation : "",
+              Textbooks: yes_no.includes(data.Textbooks) ? data.Textbooks : "",
+              Travel: yes_no.includes(data.Travel) ? data.Travel : "",
+            };
+            setFormData(normalizedData);
           });
       } else {
         const initialData = {

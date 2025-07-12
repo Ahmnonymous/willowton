@@ -12,7 +12,6 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  CircularProgress,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useMediaQuery } from "@mui/material";
@@ -36,36 +35,14 @@ const UniversityDetailsDrawer = ({
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
   const [formData, setFormData] = useState({});
   const [successMessage, setSuccessMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (open) {
       if (universityDetailsId) {
-        setIsLoading(true);
         fetch(`https://willowtonbursary.co.za/api/university-details/id/${universityDetailsId}`)
-          .then((res) => {
-            if (!res.ok) {
-              throw new Error(`Failed to fetch university details: ${res.statusText}`);
-            }
-            return res.json();
-          })
+          .then((res) => res.json())
           .then((data) => {
-            // Ensure Yes/No fields are properly set for Autocomplete
-            const normalizedData = {
-              ...data,
-              Previously_Funded: data.Previously_Funded || "",
-              Tuition: data.Tuition || "",
-              Accommodation: data.Accommodation || "",
-              Textbooks: data.Textbooks || "",
-              Travel: data.Travel || "",
-            };
-            setFormData(normalizedData);
-            setIsLoading(false);
-          })
-          .catch((error) => {
-            console.error("Error fetching university details:", error);
-            setSuccessMessage("Failed to load university details. Please try again.");
-            setIsLoading(false);
+            setFormData(data);
           });
       } else {
         const initialData = {
@@ -109,7 +86,6 @@ const UniversityDetailsDrawer = ({
       }
     } else {
       setFormData({});
-      setSuccessMessage("");
     }
   }, [open, studentId, universityDetailsId]);
 
@@ -131,7 +107,6 @@ const UniversityDetailsDrawer = ({
   };
 
   const handleSave = async () => {
-    setIsLoading(true);
     const isUpdate = !!formData.id;
     const url = isUpdate
       ? `https://willowtonbursary.co.za/api/university-details/update/${formData.id}`
@@ -141,27 +116,19 @@ const UniversityDetailsDrawer = ({
     const body = { ...formData };
     if (!isUpdate) delete body.id;
 
-    try {
-      const res = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
+    const res = await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
 
-      if (res.ok) {
-        const result = await res.json();
-        onSave(result);
-        setSuccessMessage(isUpdate ? "Updated successfully!" : "Created successfully!");
-        onClose();
-      } else {
-        console.error("Failed to save University Details");
-        setSuccessMessage("Failed to save university details. Please try again.");
-      }
-    } catch (error) {
-      console.error("Error saving university details:", error);
-      setSuccessMessage("An error occurred. Please try again.");
-    } finally {
-      setIsLoading(false);
+    if (res.ok) {
+      const result = await res.json();
+      onSave(result);
+      setSuccessMessage(isUpdate ? "Updated successfully!" : "Created successfully!");
+      onClose();
+    } else {
+      console.error("Failed to save University Details");
     }
   };
 
@@ -171,7 +138,7 @@ const UniversityDetailsDrawer = ({
 
   const handleDeleteConfirm = async () => {
     if (!formData.id) return;
-    setIsLoading(true);
+
     try {
       const res = await fetch(
         `https://willowtonbursary.co.za/api/university-details/delete/${formData.id}`,
@@ -185,13 +152,9 @@ const UniversityDetailsDrawer = ({
         setDeleteConfirmationOpen(false);
       } else {
         console.error("Failed to delete University Details");
-        setSuccessMessage("Failed to delete university details. Please try again.");
       }
-    } catch (error) {
-      console.error("Error deleting University Details", error);
-      setSuccessMessage("An error occurred. Please try again.");
-    } finally {
-      setIsLoading(false);
+    } catch (err) {
+      console.error("Error deleting University Details", err);
     }
   };
 
@@ -223,7 +186,7 @@ const UniversityDetailsDrawer = ({
 
   const inputLabelProps = { style: { color: isDarkMode ? '#F7FAFC' : '#1E293B' } };
 
-  const renderField = (key, value) => {
+  const renderField = (key, index) => {
     if (
       key === "id" ||
       key === "student_details_portal_id" ||
@@ -243,9 +206,9 @@ const UniversityDetailsDrawer = ({
 
     if (isConditionalSelect) {
       return (
-        <Grid item xs={12} key={key}>
+        <Grid item xs={12} key={index}>
           <Autocomplete
-            value={value || ""}
+            value={formData[key] || ""}
             onChange={(e, newValue) => handleAutocompleteChange(key, newValue)}
             options={yesNoOptions}
             renderInput={(params) => (
@@ -263,9 +226,9 @@ const UniversityDetailsDrawer = ({
 
     if (key === "Semester" || key === "semester") {
       return (
-        <Grid item xs={12} key={key}>
+        <Grid item xs={12} key={index}>
           <Autocomplete
-            value={value || ""}
+            value={formData[key] || ""}
             onChange={(e, newValue) => handleAutocompleteChange(key, newValue)}
             options={semesters}
             renderInput={(params) => (
@@ -278,9 +241,9 @@ const UniversityDetailsDrawer = ({
 
     if (key === "NQF_Level" || key === "nqf_level") {
       return (
-        <Grid item xs={12} key={key}>
+        <Grid item xs={12} key={index}>
           <Autocomplete
-            value={value || ""}
+            value={formData[key] || ""}
             onChange={(e, newValue) => handleAutocompleteChange(key, newValue)}
             options={highestEducation}
             renderInput={(params) => (
@@ -292,12 +255,12 @@ const UniversityDetailsDrawer = ({
     }
 
     return (
-      <Grid item xs={12} key={key}>
+      <Grid item xs={12} key={index}>
         <TextField
           name={key}
           label={label}
           fullWidth
-          value={value || ""}
+          value={formData[key] || ""}
           onChange={handleChange}
           sx={fieldStyles}
           InputLabelProps={inputLabelProps}
@@ -331,15 +294,9 @@ const UniversityDetailsDrawer = ({
         </Box>
 
         <Box sx={{ flex: 1, overflowY: "auto", p: 2 }}>
-          {isLoading ? (
-            <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
-              <CircularProgress />
-            </Box>
-          ) : (
-            <Grid container spacing={2}>
-              {Object.entries(formData).map(([key, value]) => renderField(key, value))}
-            </Grid>
-          )}
+          <Grid container spacing={2}>
+            {Object.keys(formData).map((key, index) => renderField(key, index))}
+          </Grid>
         </Box>
 
         <Divider />
@@ -378,9 +335,8 @@ const UniversityDetailsDrawer = ({
             startIcon={formData.id ? <SaveIcon /> : <AddIcon />}
             variant="contained"
             size="small"
-            disabled={isLoading}
           >
-            {isLoading ? <CircularProgress size={20} /> : (formData.id ? "Save" : "Create")}
+            {formData.id ? "Save" : "Create"}
           </Button>
         </Box>
 
@@ -390,11 +346,11 @@ const UniversityDetailsDrawer = ({
             Are you sure you want to delete this record?
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleDeleteCancel} color="primary" disabled={isLoading}>
+            <Button onClick={handleDeleteCancel} color="primary">
               Cancel
             </Button>
-            <Button onClick={handleDeleteConfirm} color="error" disabled={isLoading}>
-              {isLoading ? <CircularProgress size={20} /> : "Delete"}
+            <Button onClick={handleDeleteConfirm} color="error">
+              Delete
             </Button>
           </DialogActions>
         </Dialog>

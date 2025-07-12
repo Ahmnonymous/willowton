@@ -612,7 +612,7 @@ const StudentDetails = () => {
               <TableRow>
                 <TableCell sx={{ fontWeight: 'bold', width: '50px' }} />
                 {Object.keys(data[0])
-                  .filter(field => field !== "id" && field !== "student_details_portal_id" && field !== "employment_status_attachment")
+                  .filter(field => field !== "id" && field !== "student_details_portal_id")
                   .map((field, idx) => (
                     <TableCell key={idx}
                       sx={{
@@ -860,7 +860,7 @@ const StudentDetails = () => {
               <Box sx={{ padding: 1.5 }}>
                 <Grid container spacing={1}>
                   {Object.entries(selectedStudent).map(([key, value], i) => (
-                    key !== "id" && key !== "user_id" && (
+                    key !== "id" && key !== "user_id"  && key !== "employment_status_attachment" && (
                       <React.Fragment key={i}>
                         <Grid item xs={6} sx={{ borderBottom: '1px solid #ccc', pb: '6px' }}>
                           <Typography variant="body1"><strong>{capitalizeWords(key.replace(/_/g, " "))}</strong></Typography>

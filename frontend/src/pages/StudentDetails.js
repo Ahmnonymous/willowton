@@ -29,11 +29,12 @@ import AcademicResultsDrawer from './Drawer/AcademicResultsDrawer';
 import VoluntaryServiceDrawer from './Drawer/VoluntaryServiceDrawer';
 import PaymentDrawer from './Drawer/PaymentDrawer';
 import InterviewDrawer from './Drawer/InterviewDrawer';
-import { ThemeContext } from '../config/ThemeContext'; // Import ThemeContext
+import TaskDetailsDrawer from './Drawer/TaskDetailsDrawer';
+import { ThemeContext } from '../config/ThemeContext';
 
 const StudentDetails = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const { isDarkMode } = useContext(ThemeContext); // Access theme context
+  const { isDarkMode } = useContext(ThemeContext);
   const [studentDetails, setStudentDetails] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [selectedStudentid, setSelectedStudentid] = useState(null);
@@ -59,13 +60,13 @@ const StudentDetails = () => {
   const [editingPaymentId, setEditingPaymentId] = useState(null);
   const [interviewDrawerOpen, setInterviewDrawerOpen] = useState(false);
   const [editingInterviewId, setEditingInterviewId] = useState(null);
+  const [tasksDrawerOpen, setTasksDrawerOpen] = useState(false);
+  const [editingTaskId, setEditingTaskId] = useState(null);
 
-  // Add this to the top of your StudentDetails component
   const user = JSON.parse(localStorage.getItem("user"));
   const isAdmin = user?.user_type === 'admin';
   const isStudent = user?.user_type === 'student';
 
-  // Define background and text colors based on theme
   const pageStyle = {
     backgroundColor: isDarkMode ? '#1e293b' : '#e1f5fe',
     color: isDarkMode ? '#ffffff' : '#000000',
@@ -73,8 +74,6 @@ const StudentDetails = () => {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-
-    // Create the format for the date in the form of '24/Apr/2025 06:15PM'
     const options = {
       day: '2-digit',
       month: 'short',
@@ -83,12 +82,8 @@ const StudentDetails = () => {
       minute: '2-digit',
       hour12: true
     };
-
-    // Format the date
     const formattedDate = date.toLocaleString('en-GB', options).replace(',', '');
-
-    // Ensure the format is exactly what you want
-    return formattedDate.replace(/\//g, '/'); // Replace any / if needed (it shouldn't actually change here)
+    return formattedDate.replace(/\//g, '/');
   };
 
   const fetchStudentDetails = useCallback(async () => {
@@ -98,10 +93,8 @@ const StudentDetails = () => {
 
       let response;
       if (user.user_type === 'admin') {
-        // Admin gets an array of students, handle the first student for now (or modify later to handle a selection)
         response = await fetch("https://willowtonbursary.co.za/api/student-details");
       } else if (user.user_type === 'student' && userId) {
-        // Student gets a single student object
         response = await fetch(`https://willowtonbursary.co.za/api/student-detail/${userId}`);
       } else {
         console.error("User type is neither admin nor student or user ID is missing");
@@ -110,26 +103,19 @@ const StudentDetails = () => {
 
       const data = await response.json();
 
-      // Handle different data formats for admin and student
       if (data) {
-        // For admin, data is an array, so select the first student or handle as needed
-        const updatedStudent = Array.isArray(data) ? data[0] : data;  // If it's an array, take the first student
-
-        // Dynamically format date fields (check if date_stamp exists)
+        const updatedStudent = Array.isArray(data) ? data[0] : data;
         Object.keys(updatedStudent).forEach((key) => {
           if (key.toLowerCase().includes('date_stamp')) {
-            updatedStudent[key] = formatDate(updatedStudent[key]);  // Format the date
+            updatedStudent[key] = formatDate(updatedStudent[key]);
           }
         });
-
-        // Update the state with the formatted student data
-        setStudentDetails(Array.isArray(data) ? data : [updatedStudent]);  // Ensure it's an array for consistency
+        setStudentDetails(Array.isArray(data) ? data : [updatedStudent]);
         setSelectedStudent(updatedStudent);
         setSelectedStudentid(updatedStudent.id);
       }
 
       return data;
-
     } catch (error) {
       console.error("Error fetching student details:", error);
       return {};
@@ -137,21 +123,17 @@ const StudentDetails = () => {
   }, []);
 
   const handleDeleteStudent = async (studentId) => {
-    // console.log("Student deleted successfully!");
-
     if (isStudent) {
-      // If the user is a student, clear the selected student details
       setSelectedStudent(null);
       setSelectedStudentid(null);
     } else if (isAdmin) {
-      // If the user is an admin, fetch and set the next student
       const remainingStudents = studentDetails.filter(student => student.id !== studentId);
       if (remainingStudents.length > 0) {
-        const nextStudent = remainingStudents[0];  // Select the first student in the remaining list
+        const nextStudent = remainingStudents[0];
         setSelectedStudent(nextStudent);
         setSelectedStudentid(nextStudent.id);
       } else {
-        setSelectedStudent(null);  // No students left, reset the selected student
+        setSelectedStudent(null);
         setSelectedStudentid(null);
       }
       fetchStudentDetails();
@@ -166,8 +148,6 @@ const StudentDetails = () => {
     try {
       const response = await fetch(`https://willowtonbursary.co.za/api/about-me/${studentId}`);
       const data = await response.json();
-
-      // Format date fields dynamically
       if (Array.isArray(data)) {
         const formattedData = data.map(item => {
           const updatedItem = { ...item };
@@ -358,6 +338,25 @@ const StudentDetails = () => {
     }
   };
 
+  const fetchTasks = async (studentId) => {
+    try {
+      const response = await fetch(`https://willowtonbursary.co.za/api/tasks/${studentId}`);
+      const data = await response.json();
+      const formattedData = data.map(item => {
+        const updatedItem = { ...item };
+        Object.keys(updatedItem).forEach((key) => {
+          if (key.toLowerCase().endsWith('date_stamp')) {
+            updatedItem[key] = formatDate(updatedItem[key]);
+          }
+        });
+        return updatedItem;
+      });
+      setTasks(formattedData);
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+    }
+  };
+
   useEffect(() => {
     fetchStudentDetails().then((data) => {
       if (data.length > 0) {
@@ -370,57 +369,44 @@ const StudentDetails = () => {
   const handleTabChange = (event, newValue) => setTabValue(newValue);
 
   const renderDrawer = () => (
-  <DrawerForm
-    open={drawerOpen}
-    onClose={() => setDrawerOpen(false)}
-    studentId={selectedStudentid}
-    onSave={(savedStudent) => {
-      console.log("Saving student data...", savedStudent);
-
-      if (savedStudent && typeof savedStudent === "object" && savedStudent.id) {
-        // Format date fields in savedStudent
-        const formattedStudent = {
-          ...savedStudent,
-          ...Object.keys(savedStudent).reduce((acc, key) => {
-            if (key.toLowerCase().includes("date") && savedStudent[key]) {
-              acc[key] = formatDate(savedStudent[key]);
+    <DrawerForm
+      open={drawerOpen}
+      onClose={() => setDrawerOpen(false)}
+      studentId={selectedStudentid}
+      onSave={(savedStudent) => {
+        if (savedStudent && typeof savedStudent === "object" && savedStudent.id) {
+          const formattedStudent = {
+            ...savedStudent,
+            ...Object.keys(savedStudent).reduce((acc, key) => {
+              if (key.toLowerCase().includes("date") && savedStudent[key]) {
+                acc[key] = formatDate(savedStudent[key]);
+              } else {
+                acc[key] = savedStudent[key];
+              }
+              return acc;
+            }, {}),
+          };
+          setStudentDetails((prev) => {
+            const existingIndex = prev.findIndex((s) => s.id === savedStudent.id);
+            if (existingIndex >= 0) {
+              const updatedDetails = [...prev];
+              updatedDetails[existingIndex] = formattedStudent;
+              return updatedDetails;
             } else {
-              acc[key] = savedStudent[key];
+              return [...prev, formattedStudent];
             }
-            return acc;
-          }, {}),
-        };
-
-        // Update studentDetails state
-        setStudentDetails((prev) => {
-          const existingIndex = prev.findIndex((s) => s.id === savedStudent.id);
-          if (existingIndex >= 0) {
-            // Update existing student
-            const updatedDetails = [...prev];
-            updatedDetails[existingIndex] = formattedStudent;
-            return updatedDetails;
-          } else {
-            // Add new student
-            return [...prev, formattedStudent];
-          }
-        });
-
-        // Update selected student
-        setSelectedStudent(formattedStudent);
-        setSelectedStudentid(formattedStudent.id);
-      } else {
-        console.error("Invalid savedStudent data:", savedStudent);
-      }
-
-      // Close the drawer
-      setDrawerOpen(false);
-
-      // Refresh student details to ensure consistency
-      fetchStudentDetails();
-    }}
-    onDelete={handleDeleteStudent}
-  />
-);
+          });
+          setSelectedStudent(formattedStudent);
+          setSelectedStudentid(formattedStudent.id);
+        } else {
+          console.error("Invalid savedStudent data:", savedStudent);
+        }
+        setDrawerOpen(false);
+        fetchStudentDetails();
+      }}
+      onDelete={handleDeleteStudent}
+    />
+  );
 
   const tabSections = [
     { label: "Show all", key: "show_all" },
@@ -432,29 +418,24 @@ const StudentDetails = () => {
     { label: "Assets & Liabilities", key: "assets-liabilities" },
     { label: "Academic Results", key: "academic-results" },
     { label: "Voluntary Services", key: "voluntary-services" },
+    { label: "Tasks", key: "tasks" },
   ];
 
   if (isAdmin) {
-    tabSections.push(
+    tabSections.splice(9, 0, 
       { label: "Payments", key: "payments" },
       { label: "Interviews", key: "interviews" }
     );
   }
 
   const capitalizeWords = (str) => {
-    // Handle the specific case for "student_id_passport_number"
     if (str.toLowerCase() === "student id passport number") {
       return "ID/Passport Number";
     }
-    
     if (str.toLowerCase() === "student willow relationship") {
       return "Willowton Group Relationship";
     }
-    
-    // Remove "Student" from the beginning of the string, if it exists
     const formattedStr = str.replace(/^student /i, '').replace(/_/g, "");
-  
-    // Capitalize the first letter of each word
     return formattedStr.replace(/\b\w/g, (char) => char.toUpperCase());
   };
 
@@ -469,7 +450,8 @@ const StudentDetails = () => {
       "academic-results": academicResults,
       "voluntary-services": voluntaryServices,
       "payments": payments,
-      "interviews": interviews
+      "interviews": interviews,
+      "tasks": tasks
     };
     return mapping[key] || [];
   };
@@ -484,30 +466,29 @@ const StudentDetails = () => {
   const [voluntaryServices, setVoluntaryServices] = useState(null);
   const [payments, setPayments] = useState(null);
   const [interviews, setInterviews] = useState(null);
+  const [tasks, setTasks] = useState(null);
 
   useEffect(() => {
     if (selectedStudent) {
       const fetchAllData = async () => {
         try {
           const responses = await Promise.all(
-            ["about-me", "parents-details", "university-details", "attachments", "expenses-summary", "assets-liabilities", "academic-results", "voluntary-services", "payments", "interviews"]
+            ["about-me", "parents-details", "university-details", "attachments", "expenses-summary", "assets-liabilities", "academic-results", "voluntary-services", "payments", "interviews", "tasks"]
               .map((key) => fetch(`https://willowtonbursary.co.za/api/${key}/${selectedStudent.id}`).then(res => res.json()))
           );
 
-          // Apply date formatting for each response (if needed)
           const formatResponseData = (data) => {
             return data.map(item => {
               const updatedItem = { ...item };
               Object.keys(updatedItem).forEach((key) => {
                 if (key.toLowerCase().endsWith('date_stamp') && updatedItem[key]) {
-                  updatedItem[key] = formatDate(updatedItem[key]); // Format the date
+                  updatedItem[key] = formatDate(updatedItem[key]);
                 }
               });
               return updatedItem;
             });
           };
 
-          // Format the data for each section
           setAboutMe(formatResponseData(responses[0]));
           setParentsDetails(formatResponseData(responses[1]));
           setUniversityDetails(formatResponseData(responses[2]));
@@ -518,13 +499,11 @@ const StudentDetails = () => {
           setVoluntaryServices(formatResponseData(responses[7]));
           setPayments(formatResponseData(responses[8]));
           setInterviews(formatResponseData(responses[9]));
-
+          setTasks(formatResponseData(responses[10]));
         } catch (error) {
           console.error("Error fetching section data:", error);
         }
       };
-
-
       fetchAllData();
     }
   }, [selectedStudent]);
@@ -542,20 +521,18 @@ const StudentDetails = () => {
     const isVoluntaryServices = sectionKey === "voluntary-services";
     const isPayments = sectionKey === "payments";
     const isInterview = sectionKey === "interviews";
+    const isTasks = sectionKey === "tasks";
 
-    // Ensure only admins can see Payments and Interviews sections
     if ((isPayments || isInterview) && !isAdmin) return null;
 
     return (
-
       <Box sx={{ padding: 0, border: '1px solid #ccc', marginBottom: 2, backgroundColor: isDarkMode ? '#1e293b' : 'white', color: pageStyle.color }}>
         <Box sx={{ padding: 1, display: 'flex', alignItems: 'center', marginBottom: 0.5, borderBottom: 1, borderBottomColor: '#ccc', height: 40, backgroundColor: isDarkMode ? '#1e293b' : '#e1f5fe' }}>
           <Typography variant="h6" sx={{ fontWeight: 'bold', marginLeft: 1 }}>
             {capitalizeWords(sectionKey === "expenses-summary" ? "financial-details" : sectionKey)}
           </Typography>
-
           {isSelectedStudent && (isAboutMe || isParents || isUniversityDetails || isAttachments || isExpenses
-            || isAssetsLiabilities || isAcademicResults || isVoluntaryServices || isPayments || isInterview) && (
+            || isAssetsLiabilities || isAcademicResults || isVoluntaryServices || isPayments || isInterview || isTasks) && (
               <Button
                 sx={{ marginLeft: 'auto', color: isDarkMode ? 'white' : 'black' }}
                 onClick={() => {
@@ -568,8 +545,8 @@ const StudentDetails = () => {
                     setParentsDrawerOpen(true);
                   }
                   if (isUniversityDetails) {
-                    setEditingUniversityId(null);  // Reset the ID for university details
-                    setUniversityDetailsDrawerOpen(true);  // Open the university details drawer
+                    setEditingUniversityId(null);
+                    setUniversityDetailsDrawerOpen(true);
                   }
                   if (isAttachments) {
                     setEditingAttachmentId(null);
@@ -599,13 +576,16 @@ const StudentDetails = () => {
                     setEditingInterviewId(null);
                     setInterviewDrawerOpen(true);
                   }
+                  if (isTasks) {
+                    setEditingTaskId(null);
+                    setTasksDrawerOpen(true);
+                  }
                 }}
               >
                 <AddIcon fontSize="small" />
               </Button>
             )}
         </Box>
-
         {data.length > 0 && (
           <Table sx={{ maxHeight: 400, overflowY: 'auto', display: 'block' }}>
             <TableHead>
@@ -634,7 +614,7 @@ const StudentDetails = () => {
                 <TableRow key={i}>
                   <TableCell sx={{ width: '50px' }}>
                     {(isAboutMe || isParents || isUniversityDetails || isAttachments || isExpenses
-                      || isAssetsLiabilities || isAcademicResults || isVoluntaryServices || isPayments || isInterview) && (
+                      || isAssetsLiabilities || isAcademicResults || isVoluntaryServices || isPayments || isInterview || isTasks) && (
                         <EditIcon
                           sx={{ cursor: 'pointer', fontSize: 'large', color: isDarkMode ? 'white' : 'black' }}
                           onClick={() => {
@@ -647,8 +627,8 @@ const StudentDetails = () => {
                               setParentsDrawerOpen(true);
                             }
                             if (isUniversityDetails) {
-                              setEditingUniversityId(row.id);  // Set the university ID for editing
-                              setUniversityDetailsDrawerOpen(true);  // Open the university details drawer
+                              setEditingUniversityId(row.id);
+                              setUniversityDetailsDrawerOpen(true);
                             }
                             if (isAttachments) {
                               setEditingAttachmentId(row.id);
@@ -678,6 +658,10 @@ const StudentDetails = () => {
                               setEditingInterviewId(row.id);
                               setInterviewDrawerOpen(true);
                             }
+                            if (isTasks) {
+                              setEditingTaskId(row.id);
+                              setTasksDrawerOpen(true);
+                            }
                           }}
                         />
                       )}
@@ -701,7 +685,6 @@ const StudentDetails = () => {
           </Table>
         )}
       </Box>
-      // )};
     );
   };
 
@@ -709,10 +692,8 @@ const StudentDetails = () => {
 
   const renderTabContent = (tabValue) => {
     const section = tabSections[tabValue];
-
     return section.key === "show_all"
       ? tabSections.filter(s => s.key !== "show_all").map((sec, i) => (
-        // Check if the section is Payments or Interviews, and render only for admin
         (isAdmin || (sec.key !== 'payments' && sec.key !== 'interviews')) && (
           <TabContent key={i} sectionKey={sec.key} data={dataForSection(sec.key)} />
         )
@@ -722,10 +703,8 @@ const StudentDetails = () => {
 
   return (
     <div>
-      {/* style={{ backgroundColor: pageStyle.backgroundColor, color: pageStyle.color }}> */}
       <Box sx={{ padding: "12px", backgroundColor: isDarkMode ? '#1e293b' : '#e1f5fe', borderRadius: "8px", marginBottom: "12px", display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid #ccc' }}>
         <Typography variant="h6" sx={{ fontWeight: "bold", color: isDarkMode ? 'white' : 'black' }}>Student Details</Typography>
-
         {isStudentWithNoData && (
           <Button
             variant="contained"
@@ -748,9 +727,7 @@ const StudentDetails = () => {
         )}
       </Box>
 
-
       <Grid container spacing={3}>
-        {/* Sidebar */}
         {isAdmin && (
           <Grid item xs={12} sm={3} md={2}>
             <Paper sx={{ border: '1px solid #ccc', backgroundColor: isDarkMode ? '#1e293b' : 'white', color: pageStyle.color }}>
@@ -827,12 +804,10 @@ const StudentDetails = () => {
           </Grid>
         )}
 
-        {/* Right Panel */}
         <Grid item xs={12} sm={9} md={isStudent ? 12 : 10}>
           <Paper sx={{ border: '1px solid #ccc', backgroundColor: isDarkMode ? '#1e293b' : 'white', color: pageStyle.color }}>
             <Box sx={{ backgroundColor: isDarkMode ? '#1e293b' : '#e1f5fe', borderBottom: isDarkMode ? '1px solid white' : '1px solid #ccc', padding: "6px", display: 'flex', justifyContent: 'space-between' }}>
               <Typography variant="h6" sx={{ fontWeight: "bold", color: isDarkMode ? 'white' : '#1e293b', marginLeft: 1 }}>Student Details Portal</Typography>
-
               {isUserWithData && (
                 <Button
                   variant="contained"
@@ -860,7 +835,7 @@ const StudentDetails = () => {
               <Box sx={{ padding: 1.5 }}>
                 <Grid container spacing={1}>
                   {Object.entries(selectedStudent).map(([key, value], i) => (
-                    key !== "id" && key !== "user_id"  && key !== "employment_status_attachment" && (
+                    key !== "id" && key !== "user_id" && key !== "employment_status_attachment" && (
                       <React.Fragment key={i}>
                         <Grid item xs={6} sx={{ borderBottom: '1px solid #ccc', pb: '6px' }}>
                           <Typography variant="body1"><strong>{capitalizeWords(key.replace(/_/g, " "))}</strong></Typography>
@@ -1043,10 +1018,10 @@ const StudentDetails = () => {
         recordId={editingPaymentId}
         onSave={() => {
           if (selectedStudentid) {
-            fetchPaymentsDetails(selectedStudentid);  // Refetch payments data after saving
+            fetchPaymentsDetails(selectedStudentid);
           }
-          setPaymentDrawerOpen(false);  // Close the drawer
-          setEditingPaymentId(null);  // Reset the editing ID
+          setPaymentDrawerOpen(false);
+          setEditingPaymentId(null);
         }}
       />
 
@@ -1057,10 +1032,27 @@ const StudentDetails = () => {
         recordId={editingInterviewId}
         onSave={() => {
           if (selectedStudentid) {
-            fetchInterviewsDetails(selectedStudentid);  // Refetch interview data after saving
+            fetchInterviewsDetails(selectedStudentid);
           }
-          setInterviewDrawerOpen(false);  // Close the drawer
-          setEditingInterviewId(null);  // Reset the editing ID
+          setInterviewDrawerOpen(false);
+          setEditingInterviewId(null);
+        }}
+      />
+
+      <TaskDetailsDrawer
+        open={tasksDrawerOpen}
+        onClose={() => {
+          setTasksDrawerOpen(false);
+          setEditingTaskId(null);
+        }}
+        studentId={selectedStudentid}
+        taskId={editingTaskId}
+        onSave={() => {
+          if (selectedStudentid) {
+            fetchTasks(selectedStudentid);
+          }
+          setTasksDrawerOpen(false);
+          setEditingTaskId(null);
         }}
       />
     </div>

@@ -18,6 +18,7 @@ const reportroutes = require("./routes/reportroutes");
 const dashboardroutes = require("./routes/dashboardroutes");
 const createadmin = require("./routes/createadmin");
 const emailRoutes = require('./routes/emailRoutes');
+const taskdetailsroutes = require("./routes/taskdetailsroutes");
 const app = express();
 
 // Middleware
@@ -51,6 +52,7 @@ app.use("/api", reportroutes);
 app.use("/api", dashboardroutes);
 app.use("/api", createadmin);
 app.use("/api", emailRoutes);
+app.use("/api", taskdetailsroutes);
 
 // Start the server
 const PORT = process.env.PORT || 5000;

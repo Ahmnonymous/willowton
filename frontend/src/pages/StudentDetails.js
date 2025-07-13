@@ -19,7 +19,7 @@ import {
 } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
-import GetAppIcon from '@mui/icons-material/GetApp'; // Icon for Download PDF
+import GetAppIcon from '@mui/icons-material/GetApp';
 import axios from 'axios';
 import DrawerForm from './Drawer/StudentDetailDrawer';
 import AboutusDrawer from './Drawer/AboutUsDrawer';
@@ -65,8 +65,8 @@ const StudentDetails = () => {
   const [editingInterviewId, setEditingInterviewId] = useState(null);
   const [tasksDrawerOpen, setTasksDrawerOpen] = useState(false);
   const [editingTaskId, setEditingTaskId] = useState(null);
-  const [pdfLoading, setPdfLoading] = useState(false); // State for PDF loading
-  const [pdfError, setPdfError] = useState(null); // State for PDF errors
+  const [pdfLoading, setPdfLoading] = useState(false);
+  const [pdfError, setPdfError] = useState(null);
 
   const user = JSON.parse(localStorage.getItem("user"));
   const isAdmin = user?.user_type === 'admin';
@@ -91,7 +91,6 @@ const StudentDetails = () => {
     return formattedDate.replace(/\//g, '/');
   };
 
-  // Function to escape LaTeX special characters
   const escapeLatex = (str) => {
     if (!str || typeof str !== 'string') return 'N/A';
     return str
@@ -107,7 +106,6 @@ const StudentDetails = () => {
       .replace(/\\/g, '\\textbackslash{}');
   };
 
-  // Function to generate LaTeX content
   const generateLatex = (data) => {
     if (!data) return '';
 
@@ -185,6 +183,7 @@ const StudentDetails = () => {
 \\usepackage{pdflscape}
 \\usepackage{hyperref}
 \\usepackage{fancyhdr}
+\\usepackage{graphicx}
 
 \\definecolor{headerblue}{RGB}{0, 51, 102}
 \\definecolor{lightgray}{RGB}{230, 230, 230}
@@ -194,27 +193,13 @@ const StudentDetails = () => {
 
 \\pagestyle{fancy}
 \\fancyhf{}
-\\fancyhead[L]{\\textbf{Student Report}}
+\\fancyhead[L]{\\includegraphics[height=1cm]{willowton_logo.png} \\textbf{WillowTon Bursary}}
 \\fancyhead[R]{\\textbf{Generated on \\today}}
 \\fancyfoot[C]{\\thepage}
 
 \\newcolumntype{L}[1]{>{\\raggedright\\arraybackslash}p{#1}}
 
 \\begin{document}
-
-\\begin{titlepage}
-    \\centering
-    \\vspace*{2cm}
-    {\\Huge\\bfseries Student Profile Report \\par}
-    \\vspace{1cm}
-    {\\Large\\bfseries ${escapeLatex(student_details.student_name)} ${escapeLatex(student_details.student_surname)} \\par}
-    \\vspace{0.5cm}
-    {\\large Student ID: ${escapeLatex(student_details.id.toString())} \\par}
-    \\vspace{2cm}
-    {\\large WillowTon Student Portal \\par}
-    \\vspace{0.5cm}
-    {\\large Generated on \\today \\par}
-\\end{titlepage}
 
 \\section{Personal Details}
 \\begin{tabular}{L{5cm} L{10cm}}
@@ -350,30 +335,30 @@ const StudentDetails = () => {
 \\end{tabular}
 \\subsection{Interview Responses}
 \\begin{itemize}[leftmargin=1.5cm]
-    \\item \\textbf{Question 1:} ${escapeLatex(interview.interview_q01)} \\\\
-    \\item \\textbf{Question 2:} ${escapeLatex(interview.interview_q02)} \\\\
-    \\item \\textbf{Question 3:} ${escapeLatex(interview.interview_q03)} \\\\
-    \\item \\textbf{Question 4:} ${escapeLatex(interview.interview_q04)} \\\\
-    \\item \\textbf{Question 5:} ${escapeLatex(interview.interview_q05)} \\\\
-    \\item \\textbf{Question 6:} ${escapeLatex(interview.interview_q06)} \\\\
-    \\item \\textbf{Question 7:} ${escapeLatex(interview.interview_q07)} \\\\
-    \\item \\textbf{Question 8:} ${escapeLatex(interview.interview_q08)} \\\\
-    \\item \\textbf{Question 9:} ${escapeLatex(interview.interview_q09)} \\\\
-    \\item \\textbf{Question 10:} ${escapeLatex(interview.interview_q10)} \\\\
-    \\item \\textbf{Question 11:} ${escapeLatex(interview.interview_q11)} \\\\
-    \\item \\textbf{Question 12:} ${escapeLatex(interview.interview_q12)} \\\\
-    \\item \\textbf{Question 13:} ${escapeLatex(interview.interview_q13)} \\\\
-    \\item \\textbf{Question 14:} ${escapeLatex(interview.interview_q14)} \\\\
-    \\item \\textbf{Question 15:} ${escapeLatex(interview.interview_q15)} \\\\
-    \\item \\textbf{Question 16:} ${escapeLatex(interview.interview_q16)} \\\\
-    \\item \\textbf{Question 17:} ${escapeLatex(interview.interview_q17)} \\\\
-    \\item \\textbf{Question 18:} ${escapeLatex(interview.interview_q18)} \\\\
-    \\item \\textbf{Question 19:} ${escapeLatex(interview.interview_q19)} \\\\
-    \\item \\textbf{Question 20:} ${escapeLatex(interview.interview_q20)} \\\\
-    \\item \\textbf{Question 21:} ${escapeLatex(interview.interview_q21)} \\\\
-    \\item \\textbf{Question 22:} ${escapeLatex(interview.interview_q22)} \\\\
-    \\item \\textbf{Question 23:} ${escapeLatex(interview.interview_q23)} \\\\
-    \\item \\textbf{Question 24:} ${escapeLatex(interview.interview_q24)} \\\\
+    \\item \\textbf{Briefly describe the applicant's family & social financial conditions?} ${escapeLatex(interview.interview_q01)} \\\\
+    \\item \\textbf{Employment Status Score} ${escapeLatex(interview.interview_q02)} \\\\
+    \\item \\textbf{Year of Study} ${escapeLatex(interview.interview_q03)} \\\\
+    \\item \\textbf{Degree/Diploma Name} ${escapeLatex(interview.interview_q04)} \\\\
+    \\item \\textbf{Number of Years to Qualify} ${escapeLatex(interview.interview_q05)} \\\\
+    \\item \\textbf{Reason for Choosing the Course} ${escapeLatex(interview.interview_q06)} \\\\
+    \\item \\textbf{Field of Study Score} ${escapeLatex(interview.interview_q07)} \\\\
+    \\item \\textbf{APS Score (Matric) or University Average} ${escapeLatex(interview.interview_q08)} \\\\
+    \\item \\textbf{Number of Failed Modules} ${escapeLatex(interview.interview_q09)} \\\\
+    \\item \\textbf{Academic Results Score} ${escapeLatex(interview.interview_q10)} \\\\
+    \\item \\textbf{Have you worked on any special projects or initiatives?} ${escapeLatex(interview.interview_q11)} \\\\
+    \\item \\textbf{What extracurricular activities have you participated in?} ${escapeLatex(interview.interview_q12)} \\\\
+    \\item \\textbf{How do you plan to contribute to your community post-graduation?} ${escapeLatex(interview.interview_q13)} \\\\
+    \\item \\textbf{How would you inspire others to make an impact?} ${escapeLatex(interview.interview_q14)} \\\\
+    \\item \\textbf{Community Work Involvement Score} ${escapeLatex(interview.interview_q15)} \\\\
+    \\item \\textbf{How will you use your education and skills to make an impact?} ${escapeLatex(interview.interview_q16)} \\\\
+    \\item \\textbf{Can you share academic awards or scholarships received?} ${escapeLatex(interview.interview_q17)} \\\\
+    \\item \\textbf{Describe a role model and why they inspire you?} ${escapeLatex(interview.interview_q18)} \\\\
+    \\item \\textbf{Why do you believe you deserve this bursary?} ${escapeLatex(interview.interview_q19)} \\\\
+    \\item \\textbf{If not awarded this bursary, what are your plans?} ${escapeLatex(interview.interview_q20)} \\\\
+    \\item \\textbf{Motivation Score} ${escapeLatex(interview.interview_q21)} \\\\
+    \\item \\textbf{Total Score} ${escapeLatex(interview.interview_q22)} \\\\
+    \\item \\textbf{Comments Section} ${escapeLatex(interview.interview_q23)} \\\\
+    \\item \\textbf{Overall Impression} ${escapeLatex(interview.interview_q24)} \\\\
 \\end{itemize}
 
 \\section{Parents Details}
@@ -472,7 +457,6 @@ const StudentDetails = () => {
 \\end{document}`;
   };
 
-  // Function to download LaTeX file
   const downloadLatex = async () => {
     if (!selectedStudentid) return;
 
@@ -484,11 +468,11 @@ const StudentDetails = () => {
       const data = response.data;
 
       const latexContent = generateLatex(data);
-      const blob = new Blob([latexContent], { type: 'text/plain' });
+      const blob = new Blob([latexContent], { type: 'application/x-tex' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `StudentReport_${selectedStudentid}.tex`;
+      a.download = `StudentReport_${selectedStudentid}.pdf`;
       a.click();
       URL.revokeObjectURL(url);
     } catch (err) {

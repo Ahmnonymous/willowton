@@ -193,7 +193,7 @@ const StudentDetails = () => {
 
 \\pagestyle{fancy}
 \\fancyhf{}
-\\fancyhead[L]{\\includegraphics[height=1cm]{willowton_logo.png} \\textbf{WillowTon Bursary}}
+\\fancyhead[L]{\\includegraphics[height=1cm]{willowton_logo.png}}
 \\fancyhead[R]{\\textbf{Generated on \\today}}
 \\fancyfoot[C]{\\thepage}
 

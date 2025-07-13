@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Box, Button, TextField, Typography, ToggleButtonGroup, ToggleButton, IconButton, InputAdornment, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
 import { AccountCircle, Lock, PersonAdd, Email, Visibility, VisibilityOff } from "@mui/icons-material";
-import axios from "axios"; // Import axios for making HTTP requests
+import axios from "axios";
 import footerImage from '../images/footer.png';
 
 const LoginSignup = () => {
@@ -18,11 +18,10 @@ const LoginSignup = () => {
     email: "",
     password: "",
   });
-
-  const [openForgotPassword, setOpenForgotPassword] = useState(false);  // For controlling the popup state
-  const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");  // To store the email for password reset
-  const [forgotPasswordError, setForgotPasswordError] = useState("");  // To display error in the popup
-  const [forgotPasswordSuccess, setForgotPasswordSuccess] = useState("");  // For success message in popup
+  const [openForgotPassword, setOpenForgotPassword] = useState(false);
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
+  const [forgotPasswordError, setForgotPasswordError] = useState("");
+  const [forgotPasswordSuccess, setForgotPasswordSuccess] = useState("");
 
   const handleAuthToggle = (_, newAuthMode) => {
     if (newAuthMode !== null) setAuthMode(newAuthMode);
@@ -38,12 +37,11 @@ const LoginSignup = () => {
 
   const handleForgotPasswordChange = (e) => {
     setForgotPasswordEmail(e.target.value);
-    setForgotPasswordError("");  // Clear the error message when the user starts typing
+    setForgotPasswordError("");
   };
 
   const handleForgotPasswordSubmit = async () => {
     try {
-      // Fetch all users from the API
       const response = await axios.get("https://willowtonbursary.co.za/api/users");
       const users = response.data;
       const userExists = users.some(user => user.email_address === forgotPasswordEmail);
@@ -54,25 +52,34 @@ const LoginSignup = () => {
       } else {
         setForgotPasswordSuccess("Password reset email has been sent.");
         setForgotPasswordError("");
-        setTimeout(() => setOpenForgotPassword(false), 3000);  // Close popup after success
+        setTimeout(() => setOpenForgotPassword(false), 3000);
       }
     } catch (error) {
       setForgotPasswordError("An error occurred. Please try again.");
     }
   };
 
+  const logActivity = async (userId, activityType) => {
+    try {
+      await axios.post("https://willowtonbursary.co.za/api/activity-log/insert", {
+        user_id: userId,
+        activity_type: activityType,
+      });
+      console.log(`${activityType} activity logged for user ${userId}`);
+    } catch (err) {
+      console.error("Error logging activity:", err);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Reset errors before validating the form
     setErrors({ email: "", password: "" });
 
-    // Validation checks only for "signup" mode
     let formValid = true;
     const newErrors = { email: "", password: "" };
 
     if (authMode === "signup") {
-      // Email and password validation for Register (signup)
       if (!formData.email_address) {
         newErrors.email = "Email is required";
         formValid = false;
@@ -86,13 +93,12 @@ const LoginSignup = () => {
 
     if (!formValid) {
       setErrors(newErrors);
-      return; // Stop submission if form is invalid
+      return;
     }
 
     try {
       let response;
       if (authMode === "login") {
-        // Send login request to backend
         response = await axios.post("https://willowtonbursary.co.za/api/login", {
           email_address: formData.email_address,
           password: formData.password,
@@ -101,46 +107,46 @@ const LoginSignup = () => {
         if (response.data.msg === "User not found") {
           setErrors({
             email: "User does not exist",
-            password: "", // Clear password error
+            password: "",
           });
-          return; // Stop further processing if user is not found
+          return;
         } else if (response.data.msg === "Incorrect password") {
           setErrors({
-            email: "", // Clear email error
-            password: "Incorrect password. Please try again.", // Show password error
+            email: "",
+            password: "Incorrect password. Please try again.",
           });
-          return; // Stop further processing if password is incorrect
+          return;
         }
 
-        // Ensure both token and user data are stored in localStorage
         localStorage.setItem("token", response.data.token);
-        localStorage.setItem("user", JSON.stringify(response.data.user)); // Store user data
+        localStorage.setItem("user", JSON.stringify(response.data.user));
 
-        // Redirect user to profile or dashboard based on user type
+        // Log login activity
+        await logActivity(response.data.user.user_id, "login");
+
         if (response.data.user.user_type === 'student') {
-          window.location.href = "/student-details";  // Redirect to student details
+          window.location.href = "/student-details";
         } else if (response.data.user.user_type === 'admin') {
-          window.location.href = "/dashboard";  // Redirect to admin dashboard
+          window.location.href = "/dashboard";
         }
       } else {
-        // Send signup request to backend
         response = await axios.post("https://willowtonbursary.co.za/api/users", formData);
 
-        // Auto-login after successful registration
         const loginResponse = await axios.post("https://willowtonbursary.co.za/api/login", {
           email_address: formData.email_address,
           password: formData.password,
         });
 
-        // Store token and user data from login
         localStorage.setItem("token", loginResponse.data.token);
         localStorage.setItem("user", JSON.stringify(loginResponse.data.user));
 
-        // Redirect to dashboard or student details page based on user type
+        // Log login activity after successful registration
+        await logActivity(loginResponse.data.user.user_id, "login");
+
         if (loginResponse.data.user.user_type === 'student') {
-          window.location.href = "/student-details";  // Redirect to student details
+          window.location.href = "/student-details";
         } else if (loginResponse.data.user.user_type === 'admin') {
-          window.location.href = "/dashboard";  // Redirect to admin dashboard
+          window.location.href = "/dashboard";
         }
       }
     } catch (error) {
@@ -154,20 +160,19 @@ const LoginSignup = () => {
       } else {
         setErrors((prevErrors) => ({
           ...prevErrors,
-          email: "An error occurred. Please try again.",  // Set a generic error message
+          email: "An error occurred. Please try again.",
         }));
       }
     }
   };
-
 
   return (
     <Box
       display="flex"
       flexDirection="column"
       alignItems="center"
-      justifyContent="space-between" // Ensures the content stretches and footer stays at the bottom
-      minHeight="100vh" // Ensures that the parent takes at least the full screen height
+      justifyContent="space-between"
+      minHeight="100vh"
       mt={5}
       bgcolor="#FFB612"
       position="relative"
@@ -339,16 +344,15 @@ const LoginSignup = () => {
         </form>
       </Box>
 
-      {/* Forgot Password Popup */}
       <Dialog
         open={openForgotPassword}
         onClose={() => setOpenForgotPassword(false)}
         sx={{
           '& .MuiDialog-paper': {
-            maxWidth: '300px',          // Set max width to 600px for a wider dialog
-            width: '100%',              // Make it responsive to full screen width
-            margin: 'auto',             // Center the dialog horizontally and vertically
-            padding: '5px',            // Add some padding inside the dialog for better spacing
+            maxWidth: '300px',
+            width: '100%',
+            margin: 'auto',
+            padding: '5px',
           }
         }}
       >
@@ -356,7 +360,7 @@ const LoginSignup = () => {
           <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ padding: '5px 10px' }}>
             <Typography variant="h6">Forgot Password</Typography>
             <IconButton onClick={() => setOpenForgotPassword(false)}>
-              &times;
+              ×
             </IconButton>
           </Box>
         </DialogTitle>
@@ -384,7 +388,6 @@ const LoginSignup = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Footer */}
       <Box
         component="img"
         src={footerImage}
@@ -401,6 +404,3 @@ const LoginSignup = () => {
 };
 
 export default LoginSignup;
-
-
-

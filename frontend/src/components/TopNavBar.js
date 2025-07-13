@@ -1,24 +1,28 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
 import { AppBar, Toolbar, Typography, IconButton, Box, Avatar, Menu, MenuItem } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import PersonIcon from "@mui/icons-material/Person"; // User profile icon
-import WbSunnyIcon from "@mui/icons-material/WbSunny"; // Sun icon
-import ModeNightIcon from "@mui/icons-material/ModeNight"; // Moon icon
-import ExitToAppIcon from "@mui/icons-material/ExitToApp"; // Logout icon
-import DashboardIcon from "@mui/icons-material/Home"; // Dashboard icon
-import { ThemeContext } from "../config/ThemeContext"; // Import the ThemeContext
+import PersonIcon from "@mui/icons-material/Person";
+import WbSunnyIcon from "@mui/icons-material/WbSunny";
+import ModeNightIcon from "@mui/icons-material/ModeNight";
+import ExitToAppIcon from "@mui/icons-material/ExitToApp";
+import DashboardIcon from "@mui/icons-material/Home";
+import { ThemeContext } from "../config/ThemeContext";
+import axios from "axios"; // Import axios
 
 const TopNavBar = ({ toggleSidebar }) => {
-  const { isDarkMode, toggleTheme } = useContext(ThemeContext); // Use context for theme toggle
+  const { isDarkMode, toggleTheme } = useContext(ThemeContext);
   const [userName, setUserName] = useState("");
-  const [anchorEl, setAnchorEl] = useState(null); // For dropdown menu
-  const dropdownRef = useRef(null); // Reference for the dropdown menu
+  const [anchorEl, setAnchorEl] = useState(null);
+  const dropdownRef = useRef(null);
 
   // Fetch the logged-in user's first name from localStorage
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
     if (storedUser) {
-      setUserName(storedUser.first_name); // Set the user's first name
+      setUserName(storedUser.first_name);
+
+      // Log login activity when the component mounts and user exists
+      // logActivity(storedUser.user_id, "login");
     }
   }, []);
 
@@ -26,31 +30,47 @@ const TopNavBar = ({ toggleSidebar }) => {
 
   // If the user is not logged in, don't render the TopNavBar
   if (!user) {
-    return null; // Return nothing if the user is not logged in
+    return null;
   }
 
+  // Function to log user activity
+  const logActivity = async (userId, activityType) => {
+    try {
+      await axios.post("https://willowtonbursary.co.za/api/activity-log/insert", {
+        user_id: userId,
+        activity_type: activityType,
+      });
+      console.log(`${activityType} activity logged for user ${userId}`);
+    } catch (err) {
+      console.error("Error logging activity:", err);
+    }
+  };
+
   const handleMenuClick = (event) => {
-    setAnchorEl(event.currentTarget); // Open the dropdown menu
+    setAnchorEl(event.currentTarget);
   };
 
   const handleMenuClose = () => {
-    setAnchorEl(null); // Close the dropdown menu
+    setAnchorEl(null);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    // Log logout activity before clearing localStorage
+    await logActivity(user.user_id, "logout");
+
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    setUserName(""); // Reset user data
-    window.location.href = "/"; // Redirect to home or login page
+    setUserName("");
+    window.location.href = "/";
   };
 
   return (
     <AppBar
       position="fixed"
       sx={{
-        backgroundColor: isDarkMode ? "#1E293B" : "#F7FAFC", // Light background in light mode, dark in dark mode
-        color: isDarkMode ? "#fff" : "#000", // Light text color in dark mode, dark text in light mode
-        height: "64px", // Set the height of the navbar here
+        backgroundColor: isDarkMode ? "#1E293B" : "#F7FAFC",
+        color: isDarkMode ? "#fff" : "#000",
+        height: "64px",
       }}
     >
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
@@ -66,28 +86,30 @@ const TopNavBar = ({ toggleSidebar }) => {
 
         {/* Right - Theme Toggle, User Profile */}
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          {/* Theme Toggle with Sun and Moon Icons */}
-          <IconButton onClick={toggleTheme} sx={{ mr: 2, display: 'flex', alignItems: 'center' }}>
+          <IconButton onClick={toggleTheme} sx={{ mr: 2, display: "flex", alignItems: "center" }}>
             {isDarkMode ? (
               <>
                 <WbSunnyIcon sx={{ color: isDarkMode ? "#fff" : "#000" }} />
-                <Typography variant="body2" sx={{ color: isDarkMode ? "#fff" : "#000", ml: 1 }}>Light</Typography>
+                <Typography variant="body2" sx={{ color: isDarkMode ? "#fff" : "#000", ml: 1 }}>
+                  Light
+                </Typography>
               </>
             ) : (
               <>
                 <ModeNightIcon sx={{ color: isDarkMode ? "#fff" : "#000" }} />
-                <Typography variant="body2" sx={{ color: isDarkMode ? "#fff" : "#000", ml: 1 }}>Dark</Typography>
+                <Typography variant="body2" sx={{ color: isDarkMode ? "#fff" : "#000", ml: 1 }}>
+                  Dark
+                </Typography>
               </>
             )}
           </IconButton>
 
-          {/* User Profile with Dropdown */}
           <Box
             sx={{
               display: "flex",
               alignItems: "center",
               cursor: "pointer",
-              color: isDarkMode ? "#fff" : "#000", // User profile text color based on theme
+              color: isDarkMode ? "#fff" : "#000",
             }}
             ref={dropdownRef}
             onClick={handleMenuClick}
@@ -96,34 +118,35 @@ const TopNavBar = ({ toggleSidebar }) => {
               sx={{
                 width: 32,
                 height: 32,
-                bgcolor: isDarkMode ? "#3f51b5" : "#fff", // Avatar background color based on theme
-                color: isDarkMode ? "#fff" : "#000", // Avatar icon color based on theme
+                bgcolor: isDarkMode ? "#3f51b5" : "#fff",
+                color: isDarkMode ? "#fff" : "#000",
                 mr: 1,
-                boxShadow: isDarkMode ? "0 4px 6px rgba(0,0,0,0.5)" : "0 4px 6px rgba(0,0,0,0.1)", // Avatar shadow effect
+                boxShadow: isDarkMode ? "0 4px 6px rgba(0,0,0,0.5)" : "0 4px 6px rgba(0,0,0,0.1)",
               }}
             >
-              <PersonIcon /> {/* Use a person icon for the user profile */}
+              <PersonIcon />
             </Avatar>
             <Typography variant="body1" color="inherit">
-              {userName || "User"} {/* Display the logged-in user's first name */}
+              {userName || "User"}
             </Typography>
           </Box>
 
-          {/* User Profile Dropdown Menu */}
           <Menu
             anchorEl={anchorEl}
             open={Boolean(anchorEl)}
             onClose={handleMenuClose}
             sx={{
-              borderRadius: "0",  // Square corners for the dropdown
+              borderRadius: "0",
               marginTop: "10px",
             }}
           >
-            {/* Menu Items with Icons */}
-            <MenuItem component="a" href="/" sx={{ padding: '10px', fontFamily: 'Sansation Light', marginTop: '-8px' }}>
+            <MenuItem component="a" href="/" sx={{ padding: "10px", fontFamily: "Sansation Light", marginTop: "-8px" }}>
               <DashboardIcon sx={{ mr: 1 }} /> Home
             </MenuItem>
-            <MenuItem onClick={handleLogout} sx={{ padding: '10px', fontFamily: 'Sansation Light', marginBottom: '-8px' }}>
+            <MenuItem
+              onClick={handleLogout}
+              sx={{ padding: "10px", fontFamily: "Sansation Light", marginBottom: "-8px" }}
+            >
               <ExitToAppIcon sx={{ mr: 1 }} /> Logout
             </MenuItem>
           </Menu>

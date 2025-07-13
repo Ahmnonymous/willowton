@@ -11,6 +11,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Autocomplete,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import SaveIcon from "@mui/icons-material/Save";
@@ -49,7 +50,7 @@ const TaskDetailsDrawer = ({
       } else {
         const initialData = {
           student_details_portal_id: studentId,
-          created_by: isAdmin ? user?.username || "" : "",
+          created_by: isAdmin ? user?.first_name || "" : "",
           task_comment: "",
           task_description: "",
           task_status: "",
@@ -66,9 +67,13 @@ const TaskDetailsDrawer = ({
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleAutocompleteChange = (name, value) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
   const handleSave = async () => {
     if (!isAdmin) {
-      setSuccessMessage("Only admins canW can create or edit tasks.");
+      setSuccessMessage("Only admins can create or edit tasks.");
       return;
     }
 
@@ -148,8 +153,10 @@ const TaskDetailsDrawer = ({
 
   const inputLabelProps = { style: { color: isDarkMode ? '#F7FAFC' : '#1E293B' } };
 
+  const taskStatusOptions = ["Pending", "Completed"];
+
   const renderField = (key, index) => {
-    if (key === "id" || key === "student_details_portal_id" || key === "task_date_stamp") {
+    if (key === "id" || key === "student_details_portal_id" || key === "task_date_stamp" || key === "created_by") {
       return null;
     }
 
@@ -158,6 +165,27 @@ const TaskDetailsDrawer = ({
       .split(" ")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
+
+    if (key === "task_status") {
+      return (
+        <Grid item xs={12} key={index}>
+          <Autocomplete
+            value={formData[key] || ""}
+            onChange={(e, newValue) => handleAutocompleteChange(key, newValue)}
+            options={taskStatusOptions}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label={label}
+                sx={fieldStyles}
+                InputLabelProps={inputLabelProps}
+                disabled={isStudent}
+              />
+            )}
+          />
+        </Grid>
+      );
+    }
 
     return (
       <Grid item xs={12} key={index}>

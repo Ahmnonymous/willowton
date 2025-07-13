@@ -309,7 +309,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
           employment_status_attachment: null,
           employment_status_attachment_name: "",
         }));
-        // setSuccessMessage("Attachment deleted successfully!");
+        // // setsuccessmessage("Attachment deleted successfully!");
         setDeleteAttachmentConfirmationOpen(false);
       } else {
         setErrorMessage("Failed to delete attachment. Please try again.");
@@ -402,16 +402,16 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
         employment_status_attachment: null,
         employment_status_attachment_name: savedStudent.employment_status_attachment_name || "",
       };
-      // setSuccessMessage(studentId ? "Updated successfully!" : "Created successfully!");
+      // // setsuccessmessage(studentId ? "Updated successfully!" : "Created successfully!");
       onSave(cleanStudent); // Pass cleaned student data
       onClose(); // Close the drawer
     } else {
       console.error("Failed to save data:", response.statusText);
-      setSuccessMessage("Failed to save data. Please try again.");
+      // setsuccessmessage("Failed to save data. Please try again.");
     }
   } catch (error) {
     console.error("Error saving student data:", error);
-    setSuccessMessage("An error occurred. Please try again.");
+    // setsuccessmessage("An error occurred. Please try again.");
     onClose(); // Close the drawer even on error
   }
 };

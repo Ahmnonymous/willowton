@@ -99,7 +99,7 @@ const AttachmentsDrawer = ({ open, onClose, studentId, attachmentId, onSave }) =
     if (res.ok) {
       const result = await res.json();
       onSave(result);
-      setSuccessMessage(isUpdate ? "Updated successfully!" : "Created successfully!");
+      // setSuccessMessage(isUpdate ? "Updated successfully!" : "Created successfully!");
       onClose();
     } else {
       console.error("Failed to save attachment");
@@ -117,7 +117,7 @@ const AttachmentsDrawer = ({ open, onClose, studentId, attachmentId, onSave }) =
         method: "DELETE",
       });
       onSave(null);
-      setSuccessMessage("Deleted successfully!");
+      // setSuccessMessage("Deleted successfully!");
       onClose();
       setDeleteConfirmationOpen(false); // Close the confirmation dialog
     } catch (err) {

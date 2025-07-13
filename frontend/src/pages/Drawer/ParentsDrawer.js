@@ -139,7 +139,7 @@ const ParentsDrawer = ({ open, onClose, studentId, parentId, onSave }) => {
     if (res.ok) {
       const result = await res.json();
       onSave(result);
-      setSuccessMessage(isUpdate ? "Parent details updated successfully!" : "Parent details created successfully!");
+      // setsuccessmessage(isUpdate ? "Parent details updated successfully!" : "Parent details created successfully!");
       onClose();
     } else {
       console.error("Failed to save parent data");
@@ -154,7 +154,7 @@ const ParentsDrawer = ({ open, onClose, studentId, parentId, onSave }) => {
     });
     if (res.ok) {
       onSave(null);
-      setSuccessMessage("Parent details deleted successfully!");
+      // setsuccessmessage("Parent details deleted successfully!");
       onClose();
     }
   };

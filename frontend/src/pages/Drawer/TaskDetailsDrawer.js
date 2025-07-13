@@ -51,9 +51,9 @@ const TaskDetailsDrawer = ({
         const initialData = {
           student_details_portal_id: studentId,
           created_by: isAdmin ? user?.first_name || "" : "",
-          task_comment: "",
           task_description: "",
           task_status: "",
+          task_comment: "",
         };
         setFormData(initialData);
       }
@@ -73,7 +73,7 @@ const TaskDetailsDrawer = ({
 
   const handleSave = async () => {
     if (!isAdmin) {
-      setSuccessMessage("Only admins can create or edit tasks.");
+      // setsuccessmessage("Only admins can create or edit tasks.");
       return;
     }
 
@@ -96,7 +96,7 @@ const TaskDetailsDrawer = ({
       if (res.ok) {
         const result = await res.json();
         onSave(result);
-        setSuccessMessage(isUpdate ? "Updated successfully!" : "Created successfully!");
+        // setsuccessmessage(isUpdate ? "Updated successfully!" : "Created successfully!");
         onClose();
       } else {
         console.error("Failed to save Task Details");
@@ -112,7 +112,7 @@ const TaskDetailsDrawer = ({
 
   const handleDeleteConfirm = async () => {
     if (!formData.id || !isAdmin) {
-      if (!isAdmin) setSuccessMessage("Only admins can delete tasks.");
+      if (!isAdmin) // setsuccessmessage("Only admins can delete tasks.");
       return;
     }
 
@@ -124,7 +124,7 @@ const TaskDetailsDrawer = ({
 
       if (res.ok) {
         onSave(null);
-        setSuccessMessage("Deleted successfully!");
+        // setsuccessmessage("Deleted successfully!");
         onClose();
         setDeleteConfirmationOpen(false);
       } else {
@@ -155,6 +155,8 @@ const TaskDetailsDrawer = ({
 
   const taskStatusOptions = ["Pending", "Completed"];
 
+  const fieldOrder = ["task_description", "task_status", "task_comment"];
+
   const renderField = (key, index) => {
     if (key === "id" || key === "student_details_portal_id" || key === "task_date_stamp" || key === "created_by") {
       return null;
@@ -166,7 +168,7 @@ const TaskDetailsDrawer = ({
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
 
-    if (key === "task_status") {
+    if (key === "task_status" && isAdmin) {
       return (
         <Grid item xs={12} key={index}>
           <Autocomplete
@@ -177,9 +179,9 @@ const TaskDetailsDrawer = ({
               <TextField
                 {...params}
                 label={label}
+                name={key}
                 sx={fieldStyles}
                 InputLabelProps={inputLabelProps}
-                disabled={isStudent}
               />
             )}
           />
@@ -197,7 +199,10 @@ const TaskDetailsDrawer = ({
           onChange={handleChange}
           sx={fieldStyles}
           InputLabelProps={inputLabelProps}
-          disabled={isStudent}
+          disabled={isStudent || (key === "task_status" && !isAdmin)}
+          InputProps={{
+            readOnly: key === "task_status" && !isAdmin,
+          }}
         />
       </Grid>
     );
@@ -229,7 +234,7 @@ const TaskDetailsDrawer = ({
 
         <Box sx={{ flex: 1, overflowY: "auto", p: 2 }}>
           <Grid container spacing={2}>
-            {Object.keys(formData).map((key, index) => renderField(key, index))}
+            {fieldOrder.map((key, index) => renderField(key, index))}
           </Grid>
         </Box>
 

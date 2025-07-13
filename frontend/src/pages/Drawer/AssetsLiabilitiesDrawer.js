@@ -81,7 +81,7 @@ const AssetsLiabilitiesDrawer = ({ open, onClose, studentId, assetLiabilityId, o
       .then(res => res.json())
       .then(savedData => {
         onSave(savedData);
-        setSuccessMessage(assetLiabilityId ? 'Updated successfully!' : 'Created successfully!');
+        // setSuccessMessage(assetLiabilityId ? 'Updated successfully!' : 'Created successfully!');
         onClose();
       })
       .catch(console.error);
@@ -98,7 +98,7 @@ const AssetsLiabilitiesDrawer = ({ open, onClose, studentId, assetLiabilityId, o
         method: "DELETE"
       });
       onSave(null);
-      setSuccessMessage('Deleted successfully!');
+      // setSuccessMessage('Deleted successfully!');
       onClose();
       setDeleteConfirmationOpen(false); // Close the confirmation dialog
     } catch (err) {

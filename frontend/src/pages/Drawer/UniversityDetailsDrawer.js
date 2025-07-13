@@ -134,7 +134,7 @@ const UniversityDetailsDrawer = ({
     if (res.ok) {
       const result = await res.json();
       onSave(result);
-      setSuccessMessage(isUpdate ? "Updated successfully!" : "Created successfully!");
+      // setsuccessmessage(isUpdate ? "Updated successfully!" : "Created successfully!");
       onClose();
     } else {
       console.error("Failed to save University Details");
@@ -156,7 +156,7 @@ const UniversityDetailsDrawer = ({
 
       if (res.ok) {
         onSave(null);
-        setSuccessMessage("Deleted successfully!");
+        // setsuccessmessage("Deleted successfully!");
         onClose();
         setDeleteConfirmationOpen(false);
       } else {

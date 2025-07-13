@@ -20,6 +20,7 @@ const createadmin = require("./routes/createadmin");
 const emailRoutes = require('./routes/emailRoutes');
 const taskdetailsroutes = require("./routes/taskdetailsroutes");
 const activitylogroutes = require("./routes/activitylogroutes");
+const studentPDFroutes = require("./routes/studentPDFroutes");
 const app = express();
 
 // Middleware
@@ -55,6 +56,7 @@ app.use("/api", createadmin);
 app.use("/api", emailRoutes);
 app.use("/api", taskdetailsroutes);
 app.use("/api", activitylogroutes);
+app.use("/api", studentPDFroutes);
 
 // Start the server
 const PORT = process.env.PORT || 5000;

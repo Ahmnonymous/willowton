@@ -18,6 +18,20 @@ router.use(cors({
   allowedHeaders: ["Content-Type"],
 }));
 
+// Utility to retry file deletion
+const deleteFileWithRetry = async (file, retries = 3, delay = 1000) => {
+  for (let i = 0; i < retries; i++) {
+    try {
+      await fs.unlink(file);
+      return;
+    } catch (err) {
+      if (err.code === 'ENOENT') return; // Ignore if file doesn't exist
+      if (err.code !== 'EBUSY' || i === retries - 1) throw err;
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+};
+
 router.post("/compile-latex", async (req, res) => {
   const { latexContent } = req.body;
 
@@ -28,7 +42,8 @@ router.post("/compile-latex", async (req, res) => {
 
   // Check if pdflatex is installed
   try {
-    await execPromise("pdflatex --version");
+    const { stdout } = await execPromise("pdflatex --version");
+    console.log("pdfLaTeX version:", stdout);
   } catch (err) {
     console.error("pdfLaTeX not found:", err);
     return res.status(500).json({ error: "pdfLaTeX is not installed on the server", details: err.message });
@@ -52,9 +67,9 @@ router.post("/compile-latex", async (req, res) => {
     // Copy logo file if needed (uncomment if using a logo)
     // await fs.copyFile(path.join(__dirname, "willowton_logo.png"), path.join(tempDir, "willowton_logo.png"));
 
-    // Compile LaTeX using pdflatex
+    // Compile LaTeX using pdflatex with --shell-escape
     const { stdout, stderr } = await execPromise(
-      `pdflatex -interaction=nonstopmode -output-directory=${tempDir} ${texFilePath}`,
+      `pdflatex -interaction=nonstopmode --shell-escape -output-directory=${tempDir} ${texFilePath}`,
       { timeout: 30000 }
     );
 
@@ -83,12 +98,12 @@ router.post("/compile-latex", async (req, res) => {
       details: execError.message + "\n" + (execError.stderr || logContent),
     });
   } finally {
-    // Clean up files asynchronously
+    // Clean up files asynchronously with retry
     try {
       const filesToDelete = [texFilePath, pdfFilePath, logFilePath, auxFilePath];
       await Promise.all(
         filesToDelete.map((file) =>
-          fs.unlink(file).catch((err) => console.warn(`Failed to delete ${file}:`, err))
+          deleteFileWithRetry(file).catch((err) => console.warn(`Failed to delete ${file}:`, err))
         )
       );
       await fs.rm(tempDir, { recursive: true, force: true }).catch((err) =>

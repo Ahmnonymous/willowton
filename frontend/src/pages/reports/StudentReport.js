@@ -6,6 +6,7 @@ import { ThemeContext } from '../../config/ThemeContext.js';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import './GenericTable.css';
+import WillowTonLogo from "./willowton_logo.png";
 
 function GenericTable() {
   const { isDarkMode } = useContext(ThemeContext);
@@ -64,8 +65,9 @@ function GenericTable() {
     const doc = new jsPDF();
     
     // Add logo (assuming willowton_logo.png is accessible in public folder)
-    const logo = '/willowton_logo.png';
-    doc.addImage(logo, 'PNG', 10, 10, 50, 20); // Logo at top-left
+    const logo = WillowTonLogo;
+    
+    // doc.addImage(logo, 'PNG', 10, 10, 50, 20); // Logo at top-left
 
     // Set initial Y position after logo
     let yPos = 40;

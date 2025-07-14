@@ -458,11 +458,11 @@ const StudentDetails = () => {
 \\end{document}`;
   };
 
-const downloadLatex = async () => {
-  if (!selectedStudentid) return;
+  const downloadLatex = async () => {
+    if (!selectedStudentid) return;
 
-  setPdfLoading(true);
-  setPdfError(null);
+    setPdfLoading(true);
+    setPdfError(null);
 
     try {
       const response = await axios.get(`https://willowtonbursary.co.za/api/student-data/${selectedStudentid}`);
@@ -470,15 +470,11 @@ const downloadLatex = async () => {
 
       const latexContent = generateLatex(data);
 
-      // Call your backend endpoint
+      // Call the new backend endpoint
       const compileResponse = await axios.post(
-        'https://willowtonbursary.co.za/api/generate-pdf',
-        {
-          text: latexContent,
-        },
-        {
-          responseType: 'blob', // Expect a binary PDF response
-        }
+        'https://willowtonbursary.co.za/api/compile-latex',
+        { latexContent },
+        { responseType: 'blob' }
       );
 
       // Check if response is a PDF
@@ -497,11 +493,16 @@ const downloadLatex = async () => {
     } catch (err) {
       setPdfError(err.message || 'Failed to generate PDF');
       console.error('Download error:', err);
+      if (err.response) {
+        console.error('Response data:', err.response.data);
+        console.error('Response status:', err.response.status);
+        console.error('Response headers:', err.response.headers);
+      }
     } finally {
       setPdfLoading(false);
     }
   };
-  
+
   const fetchStudentDetails = useCallback(async () => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));

@@ -470,28 +470,40 @@ const StudentDetails = () => {
 
     const latexContent = generateLatex(data);
 
-    // Send LaTeX content to the backend for compilation
-    const compileResponse = await axios.post('https://willowtonbursary.co.za/api/compile-latex', {
-      latexContent,
-    }, {
-      responseType: 'blob', // Expect a binary response (PDF)
-    });
-
-        // Create a Blob from the response and trigger download
-        const blob = new Blob([compileResponse.data], { type: 'application/pdf' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `StudentReport_${selectedStudentid}.pdf`;
-        a.click();
-        URL.revokeObjectURL(url);
-      } catch (err) {
-        setPdfError('Failed to generate PDF');
-        console.error(err);
-      } finally {
-        setPdfLoading(false);
+    // Send LaTeX content to LaTeX Online
+    const compileResponse = await axios.post(
+      'https://latexonline.cc/compile',
+      {
+        text: latexContent,
+        compiler: 'pdflatex',
+        output: 'pdf',
+      },
+      {
+        responseType: 'blob', // Expect a binary PDF response
       }
-    };
+    );
+
+    // Check if response is a PDF
+    if (compileResponse.headers['content-type'] === 'application/pdf') {
+      const blob = new Blob([compileResponse.data], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `StudentReport_${selectedStudentid}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } else {
+      // Handle error response
+      const text = await compileResponse.data.text();
+      throw new Error(`Failed to compile LaTeX: ${text}`);
+    }
+  } catch (err) {
+    setPdfError(err.message || 'Failed to generate PDF');
+    console.error('Download error:', err);
+  } finally {
+    setPdfLoading(false);
+  }
+};
 
   const fetchStudentDetails = useCallback(async () => {
     try {

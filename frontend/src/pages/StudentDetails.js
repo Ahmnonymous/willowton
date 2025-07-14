@@ -34,7 +34,7 @@ import PaymentDrawer from './Drawer/PaymentDrawer';
 import InterviewDrawer from './Drawer/InterviewDrawer';
 import TaskDetailsDrawer from './Drawer/TaskDetailsDrawer';
 import { ThemeContext } from '../config/ThemeContext';
-import WillowTonLogo from "../images/willowton_logo.png";
+// import WillowTonLogo from "../images/willowton_logo.png";
 
 const StudentDetails = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -194,7 +194,7 @@ const StudentDetails = () => {
 
 \\pagestyle{fancy}
 \\fancyhf{}
-\\fancyhead[L]{\\includegraphics[height=1cm]{WillowTonLogo}}
+\\fancyhead[L]{\\includegraphics[height=1cm]{willowton_logo.png}}
 \\fancyhead[R]{\\textbf{Generated on \\today}}
 \\fancyfoot[C]{\\thepage}
 

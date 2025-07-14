@@ -458,53 +458,50 @@ const StudentDetails = () => {
 \\end{document}`;
   };
 
-  const downloadLatex = async () => {
+const downloadLatex = async () => {
   if (!selectedStudentid) return;
 
   setPdfLoading(true);
   setPdfError(null);
 
-  try {
-    const response = await axios.get(`https://willowtonbursary.co.za/api/student-data/${selectedStudentid}`);
-    const data = response.data;
+    try {
+      const response = await axios.get(`https://willowtonbursary.co.za/api/student-data/${selectedStudentid}`);
+      const data = response.data;
 
-    const latexContent = generateLatex(data);
+      const latexContent = generateLatex(data);
 
-    // Send LaTeX content to LaTeX Online
-    const compileResponse = await axios.post(
-      'https://latexonline.cc/compile',
-      {
-        text: latexContent,
-        compiler: 'pdflatex',
-        output: 'pdf',
-      },
-      {
-        responseType: 'blob', // Expect a binary PDF response
+      // Call your backend endpoint
+      const compileResponse = await axios.post(
+        'https://willowtonbursary.co.za/api/generate-pdf',
+        {
+          text: latexContent,
+        },
+        {
+          responseType: 'blob', // Expect a binary PDF response
+        }
+      );
+
+      // Check if response is a PDF
+      if (compileResponse.headers['content-type'] === 'application/pdf') {
+        const blob = new Blob([compileResponse.data], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `StudentReport_${selectedStudentid}.pdf`;
+        a.click();
+        URL.revokeObjectURL(url);
+      } else {
+        const text = await compileResponse.data.text();
+        throw new Error(`Failed to compile LaTeX: ${text}`);
       }
-    );
-
-    // Check if response is a PDF
-    if (compileResponse.headers['content-type'] === 'application/pdf') {
-      const blob = new Blob([compileResponse.data], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `StudentReport_${selectedStudentid}.pdf`;
-      a.click();
-      URL.revokeObjectURL(url);
-    } else {
-      // Handle error response
-      const text = await compileResponse.data.text();
-      throw new Error(`Failed to compile LaTeX: ${text}`);
+    } catch (err) {
+      setPdfError(err.message || 'Failed to generate PDF');
+      console.error('Download error:', err);
+    } finally {
+      setPdfLoading(false);
     }
-  } catch (err) {
-    setPdfError(err.message || 'Failed to generate PDF');
-    console.error('Download error:', err);
-  } finally {
-    setPdfLoading(false);
-  }
-};
-
+  };
+  
   const fetchStudentDetails = useCallback(async () => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));

@@ -3,10 +3,9 @@ const latex = require('latex');
 const fs = require('fs');
 const path = require('path');
 
-const app = express();
-app.use(express.json({ limit: '10mb' }));
+const router = express.Router();
 
-app.post('/compile-latex', async (req, res) => {
+router.post('/compile-latex', async (req, res) => {
   const { latexContent } = req.body;
 
   if (!latexContent) {
@@ -17,20 +16,18 @@ app.post('/compile-latex', async (req, res) => {
   const pdfFilePath = path.join(__dirname, 'output.pdf');
 
   try {
-    // Write LaTeX content to a .tex file
     fs.writeFileSync(texFilePath, latexContent);
 
-    // Compile LaTeX to PDF
-    const stream = fs.createReadStream(texFilePath).pipe(latex()).pipe(fs.createWriteStream(pdfFilePath));
+    const stream = fs.createReadStream(texFilePath)
+      .pipe(latex())
+      .pipe(fs.createWriteStream(pdfFilePath));
 
     stream.on('finish', () => {
-      // Send the compiled PDF back to the client
       res.download(pdfFilePath, 'StudentReport.pdf', (err) => {
         if (err) {
           console.error('Error sending PDF:', err);
           res.status(500).json({ error: 'Failed to send PDF' });
         }
-        // Clean up files
         fs.unlinkSync(texFilePath);
         fs.unlinkSync(pdfFilePath);
       });
@@ -46,6 +43,4 @@ app.post('/compile-latex', async (req, res) => {
   }
 });
 
-app.listen(3000, () => {
-  console.log('Server running on port 3000');
-});
+module.exports = router;

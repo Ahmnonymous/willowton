@@ -11,9 +11,9 @@ const execPromise = util.promisify(exec);
 
 const router = express.Router();
 
-// Enable CORS for specific origins (adjust to your frontend's domain)
+// Enable CORS for specific origins
 router.use(cors({
-  origin: ["https://willowtonbursary.co.za", "http://localhost:3000"], // Add your frontend domains
+  origin: ["https://willowtonbursary.co.za", "http://localhost:3000"],
   methods: ["POST"],
   allowedHeaders: ["Content-Type"],
 }));
@@ -26,7 +26,15 @@ router.post("/compile-latex", async (req, res) => {
     return res.status(400).json({ error: "Invalid or missing LaTeX content" });
   }
 
-  // Generate unique filenames to avoid conflicts
+  // Check if pdflatex is installed
+  try {
+    await execPromise("pdflatex --version");
+  } catch (err) {
+    console.error("pdfLaTeX not found:", err);
+    return res.status(500).json({ error: "pdfLaTeX is not installed on the server", details: err.message });
+  }
+
+  // Generate unique filenames
   const uniqueId = uuidv4();
   const tempDir = path.join(__dirname, "temp", uniqueId);
   const texFilePath = path.join(tempDir, "output.tex");
@@ -41,10 +49,13 @@ router.post("/compile-latex", async (req, res) => {
     // Write LaTeX content to a .tex file
     await fs.writeFile(texFilePath, latexContent);
 
+    // Copy logo file if needed (uncomment if using a logo)
+    // await fs.copyFile(path.join(__dirname, "willowton_logo.png"), path.join(tempDir, "willowton_logo.png"));
+
     // Compile LaTeX using pdflatex
     const { stdout, stderr } = await execPromise(
       `pdflatex -interaction=nonstopmode -output-directory=${tempDir} ${texFilePath}`,
-      { timeout: 30000 } // Set a 30-second timeout for compilation
+      { timeout: 30000 }
     );
 
     // Check if PDF was generated

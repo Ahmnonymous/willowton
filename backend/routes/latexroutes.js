@@ -2,7 +2,7 @@ const express = require('express');
 const axios = require('axios');
 const router = express.Router();
 
-router.post("/compile-latex", async (req, res) => {
+router.post("/generate-pdf", async (req, res) => {
   try {
     const latexContent = req.body.text;
     const response = await axios.post(

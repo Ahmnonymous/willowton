@@ -1,141 +1,42 @@
-import Breadcrumb from "../../components/Breadcrumb";
+import Breadcrumb from "../../components/Breadcrumb.js";
 import React, { useState, useEffect, useContext } from 'react';
-import { Box, Button } from '@mui/material';
+import { Box } from '@mui/material';
 import axios from 'axios';
-import { ThemeContext } from '../../config/ThemeContext.js';
-import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
-import './GenericTable.css';
-import WillowTonLogo from "./willowton_logo.png";
+import { ThemeContext } from '../../config/ThemeContext.js'; // Import ThemeContext
+import './GenericTable.css'; // Updated generic class names for styling
 
 function GenericTable() {
-  const { isDarkMode } = useContext(ThemeContext);
+  const { isDarkMode } = useContext(ThemeContext); // Access theme context
   const [students, setStudents] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [columns, setColumns] = useState([]);
-  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');  // Search term to filter the student list
+  const [columns, setColumns] = useState([]); // To store the column names
 
   // Format the date to mm/dd/yyyy
   const formatDate = (date) => {
-    if (!date) return 'N/A';
     const d = new Date(date);
-    if (isNaN(d.getTime())) return 'N/A';
-    const month = d.getMonth() + 1;
+    const month = d.getMonth() + 1; // Months are zero-indexed, so add 1
     const day = d.getDate();
     const year = d.getFullYear();
     return `${month}/${day}/${year}`;
   };
 
-  // Convert string to sentence case
-  const sentenceCase = (str) => {
-    return str
-      .replace(/_/g, ' ')
-      .replace(/\b\w/g, (char) => char.toUpperCase());
-  };
-
   // Fetch student details when the component mounts
   useEffect(() => {
     const fetchStudents = async () => {
-      try {
-        const response = await axios.get('https://willowtonbursary.co.za/api/student-details');
-        if (response.data.length > 0) {
-          setColumns(Object.keys(response.data[0]).filter((column) => column !== 'id'));
-        }
-        setStudents(response.data);
-      } catch (error) {
-        console.error('Error fetching students:', error);
+      const response = await axios.get('https://willowtonbursary.co.za/api/student-details');
+
+      if (response.data.length > 0) {
+        // Dynamically set the columns from the first student's object, remove the 'id' column
+        setColumns(Object.keys(response.data[0]).filter((column) => column !== 'id')); // Remove 'id' column
       }
+
+      setStudents(response.data);
     };
+
     fetchStudents();
-  }, []);
+  }, []); // Only run once when component mounts
 
-  // Fetch detailed student data for PDF generation
-  const fetchStudentDetails = async (id) => {
-    try {
-      const response = await axios.get(`https://willowtonbursary.co.za/api/student-data/${id}`);
-      setSelectedStudent(response.data);
-      generatePDF(response.data);
-    } catch (error) {
-      console.error('Error fetching student details:', error);
-    }
-  };
-
-  // Generate PDF
-  const generatePDF = (data) => {
-    const doc = new jsPDF();
-    
-    // Add logo (assuming willowton_logo.png is accessible in public folder)
-    const logo = WillowTonLogo;
-    
-    // doc.addImage(logo, 'PNG', 10, 10, 50, 20); // Logo at top-left
-
-    // Set initial Y position after logo
-    let yPos = 40;
-
-    // Helper function to add section
-    const addSection = (title, fields, isArray = false) => {
-      // Section heading
-      doc.setFillColor(200, 200, 200); // Light gray background
-      doc.rect(10, yPos, 190, 10, 'F');
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(14);
-      doc.setTextColor(0, 0, 0);
-      doc.text(title, 15, yPos + 7);
-      yPos += 15;
-
-      // Section content
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(12);
-
-      if (isArray) {
-        fields.forEach((item, index) => {
-          Object.entries(item).forEach(([key, value]) => {
-            if (value && key !== 'student_details_portal_id') {
-              const formattedKey = sentenceCase(key);
-              const formattedValue = key.includes('date') ? formatDate(value) : value;
-              doc.text(`${formattedKey}: ${formattedValue}`, 15, yPos);
-              yPos += 7;
-            }
-          });
-          if (index < fields.length - 1) {
-            // Add separator for multi-row sections
-            doc.setLineWidth(0.5);
-            doc.line(15, yPos, 195, yPos);
-            yPos += 5;
-          }
-        });
-      } else {
-        Object.entries(fields).forEach(([key, value]) => {
-          if (value && key !== 'id' && key !== 'user_id') {
-            const formattedKey = sentenceCase(key);
-            const formattedValue = key.includes('date') ? formatDate(value) : value;
-            doc.text(`${formattedKey}: ${formattedValue}`, 15, yPos);
-            yPos += 7;
-          }
-        });
-      }
-      yPos += 5; // Space between sections
-    };
-
-    // Add sections
-    addSection('Student Details', data.student_details);
-    addSection('About Me', data.about_me);
-    addSection('Assets and Liabilities', data.assets_liabilities);
-    addSection('Attachments', data.attachments, true);
-    addSection('Expense Details', data.expense_details);
-    addSection('Interview', data.interview);
-    addSection('Parents Details', data.parents_details, true);
-    addSection('Payments', data.payments, true);
-    addSection('Results', data.results, true);
-    addSection('Tasks', data.tasks, true);
-    addSection('University Details', data.university_details);
-    addSection('Voluntary Service', data.voluntary_service, true);
-
-    // Save the PDF
-    doc.save(`Student_Report_${data.student_details.student_name}_${data.student_details.student_surname}.pdf`);
-  };
-
-  // Handle search
+  // Handle the search term and filter students based on it
   const filteredStudents = students.filter((student) => {
     return columns.some((column) => {
       const value = student[column];
@@ -146,12 +47,19 @@ function GenericTable() {
     });
   });
 
+  // Function to convert string to sentence case (capitalize only the first letter of each word)
+  const sentenceCase = (str) => {
+    return str
+      .replace(/_/g, ' ') // Replace underscores with spaces
+      .replace(/\b\w/g, (char) => char.toUpperCase())
+  };
+
   return (
     <Box sx={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC', minHeight: '100vh', padding: '1px' }}>
       <div>
         <Breadcrumb title="Student Report" />
 
-        {/* Search Input */}
+        {/* Generic Search Input */}
         <div className="generic-search-container">
           <input
             type="text"
@@ -162,29 +70,13 @@ function GenericTable() {
           />
         </div>
 
-        {/* Download PDF Button */}
-        <div style={{ margin: '10px 0' }}>
-          {filteredStudents.map((student) => (
-            <Button
-              key={student.id}
-              variant="contained"
-              color="primary"
-              onClick={() => fetchStudentDetails(student.id)}
-              style={{ margin: '5px' }}
-            >
-              Download PDF for {student.student_name} {student.student_surname}
-            </Button>
-          ))}
-        </div>
-
-        {/* Table */}
         <div className="generic-table-container">
           <table className="generic-table" style={{ backgroundColor: isDarkMode ? '#1e293b' : 'white' }}>
             <thead>
               <tr>
                 {columns.map((column) => (
                   <th key={column} style={{ color: isDarkMode ? 'white' : '#1e293b' }}>
-                    {sentenceCase(column)}
+                    {sentenceCase(column)} {/* Convert column header to sentence case */}
                   </th>
                 ))}
               </tr>
@@ -195,8 +87,9 @@ function GenericTable() {
                   <tr key={student.id}>
                     {columns.map((column) => (
                       <td key={column} style={{ color: isDarkMode ? 'white' : '#1e293b' }}>
+                        {/* Format dates for 'student_date_stamp' and 'student_dob' columns */}
                         {column === 'student_date_stamp' || column === 'student_dob'
-                          ? formatDate(student[column])
+                          ? formatDate(student[column]) // Format the date fields
                           : student[column]}
                       </td>
                     ))}

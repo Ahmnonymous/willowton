@@ -34,6 +34,7 @@ import PaymentDrawer from './Drawer/PaymentDrawer';
 import InterviewDrawer from './Drawer/InterviewDrawer';
 import TaskDetailsDrawer from './Drawer/TaskDetailsDrawer';
 import { ThemeContext } from '../config/ThemeContext';
+import WillowTonLogo from "../images/willowton_logo.png";
 
 const StudentDetails = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -193,7 +194,7 @@ const StudentDetails = () => {
 
 \\pagestyle{fancy}
 \\fancyhf{}
-\\fancyhead[L]{\\includegraphics[height=1cm]{willowton_logo.png}}
+\\fancyhead[L]{\\includegraphics[height=1cm]{WillowTonLogo}}
 \\fancyhead[R]{\\textbf{Generated on \\today}}
 \\fancyfoot[C]{\\thepage}
 
@@ -458,30 +459,39 @@ const StudentDetails = () => {
   };
 
   const downloadLatex = async () => {
-    if (!selectedStudentid) return;
+  if (!selectedStudentid) return;
 
-    setPdfLoading(true);
-    setPdfError(null);
+  setPdfLoading(true);
+  setPdfError(null);
 
-    try {
-      const response = await axios.get(`https://willowtonbursary.co.za/api/student-data/${selectedStudentid}`);
-      const data = response.data;
+  try {
+    const response = await axios.get(`https://willowtonbursary.co.za/api/student-data/${selectedStudentid}`);
+    const data = response.data;
 
-      const latexContent = generateLatex(data);
-      const blob = new Blob([latexContent], { type: 'application/x-tex' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `StudentReport_${selectedStudentid}.pdf`;
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch (err) {
-      setPdfError('Failed to generate PDF');
-      console.error(err);
-    } finally {
-      setPdfLoading(false);
-    }
-  };
+    const latexContent = generateLatex(data);
+
+    // Send LaTeX content to the backend for compilation
+    const compileResponse = await axios.post('https://willowtonbursary.co.za/api/compile-latex', {
+      latexContent,
+    }, {
+      responseType: 'blob', // Expect a binary response (PDF)
+    });
+
+        // Create a Blob from the response and trigger download
+        const blob = new Blob([compileResponse.data], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `StudentReport_${selectedStudentid}.pdf`;
+        a.click();
+        URL.revokeObjectURL(url);
+      } catch (err) {
+        setPdfError('Failed to generate PDF');
+        console.error(err);
+      } finally {
+        setPdfLoading(false);
+      }
+    };
 
   const fetchStudentDetails = useCallback(async () => {
     try {

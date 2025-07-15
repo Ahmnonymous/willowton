@@ -31,7 +31,8 @@ router.get('/activity-log', async (req, res) => {
             student_portal_activity_log m,
             student_portal_users d
         WHERE 
-            d.user_id = m.user_id;
+            d.user_id = m.user_id
+        order by ACTIVITY_DATE_STAMP desc;
       `;
 
     const result = await pool.query(query);

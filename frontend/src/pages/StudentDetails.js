@@ -31,10 +31,12 @@ import PaymentDrawer from './Drawer/PaymentDrawer';
 import InterviewDrawer from './Drawer/InterviewDrawer';
 import TaskDetailsDrawer from './Drawer/TaskDetailsDrawer';
 import { ThemeContext } from '../config/ThemeContext';
+import DownloadPDFButton from './DownloadPDFButton';
+import axios from 'axios';
 
 const StudentDetails = () => {
+  // Move all useState hooks to the top
   const [searchQuery, setSearchQuery] = useState("");
-  const { isDarkMode } = useContext(ThemeContext);
   const [studentDetails, setStudentDetails] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [selectedStudentid, setSelectedStudentid] = useState(null);
@@ -62,16 +64,34 @@ const StudentDetails = () => {
   const [editingInterviewId, setEditingInterviewId] = useState(null);
   const [tasksDrawerOpen, setTasksDrawerOpen] = useState(false);
   const [editingTaskId, setEditingTaskId] = useState(null);
+  const [studentData, setStudentData] = useState(null);
+  const [aboutMe, setAboutMe] = useState(null);
+  const [parentsDetails, setParentsDetails] = useState(null);
+  const [universityDetails, setUniversityDetails] = useState(null);
+  const [attachments, setAttachments] = useState(null);
+  const [expensesSummary, setExpensesSummary] = useState(null);
+  const [assetsLiabilities, setAssetsLiabilities] = useState(null);
+  const [academicResults, setAcademicResults] = useState(null);
+  const [voluntaryServices, setVoluntaryServices] = useState(null);
+  const [payments, setPayments] = useState(null);
+  const [interviews, setInterviews] = useState(null);
+  const [tasks, setTasks] = useState(null);
 
+  // Move useContext to the top
+  const { isDarkMode } = useContext(ThemeContext);
+
+  // Define user-related variables
   const user = JSON.parse(localStorage.getItem("user"));
   const isAdmin = user?.user_type === 'admin';
   const isStudent = user?.user_type === 'student';
 
+  // Define page style
   const pageStyle = {
     backgroundColor: isDarkMode ? '#1e293b' : '#e1f5fe',
     color: isDarkMode ? '#ffffff' : '#000000',
   };
 
+  // Define formatDate function
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const options = {
@@ -86,6 +106,7 @@ const StudentDetails = () => {
     return formattedDate.replace(/\//g, '/');
   };
 
+  // Move useCallback to the top
   const fetchStudentDetails = useCallback(async () => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
@@ -121,6 +142,70 @@ const StudentDetails = () => {
       return {};
     }
   }, []);
+
+  // Fetch initial student data
+  useEffect(() => {
+    axios.get("https://willowtonbursary.co.za/api/student-data/73")
+      .then((res) => setStudentData(res.data))
+      .catch(console.error);
+  }, []);
+
+  // Fetch student details on mount
+  useEffect(() => {
+    fetchStudentDetails().then((data) => {
+      if (data.length > 0) {
+        setSelectedStudent(data[0]);
+        setSelectedStudentid(data[0].id);
+      }
+    });
+  }, [fetchStudentDetails]);
+
+  // Fetch section data when selectedStudent changes
+  useEffect(() => {
+    if (selectedStudent) {
+      const fetchAllData = async () => {
+        try {
+          const responses = await Promise.all(
+            ["about-me", "parents-details", "university-details", "attachments", "expenses-summary", "assets-liabilities", "academic-results", "voluntary-services", "payments", "interviews", "tasks"]
+              .map((key) => fetch(`https://willowtonbursary.co.za/api/${key}/${selectedStudent.id}`)
+                .then(res => res.json())
+                .catch(() => [])) // Handle individual fetch failures
+          );
+
+          const formatResponseData = (data) => {
+            if (!Array.isArray(data)) return [];
+            return data.map(item => {
+              const updatedItem = { ...item };
+              Object.keys(updatedItem).forEach((key) => {
+                if (key.toLowerCase().endsWith('date_stamp') && updatedItem[key]) {
+                  updatedItem[key] = formatDate(updatedItem[key]);
+                }
+              });
+              return updatedItem;
+            });
+          };
+
+          setAboutMe(formatResponseData(responses[0]));
+          setParentsDetails(formatResponseData(responses[1]));
+          setUniversityDetails(formatResponseData(responses[2]));
+          setAttachments(formatResponseData(responses[3]));
+          setExpensesSummary(formatResponseData(responses[4]));
+          setAssetsLiabilities(formatResponseData(responses[5]));
+          setAcademicResults(formatResponseData(responses[6]));
+          setVoluntaryServices(formatResponseData(responses[7]));
+          setPayments(formatResponseData(responses[8]));
+          setInterviews(formatResponseData(responses[9]));
+          setTasks(formatResponseData(responses[10]));
+        } catch (error) {
+          console.error("Error fetching section data:", error);
+        }
+      };
+      fetchAllData();
+    }
+  }, [selectedStudent]);
+
+  // Early return after all hooks
+  if (!studentData) return <div>Loading...</div>;
 
   const handleDeleteStudent = async (studentId) => {
     if (isStudent) {
@@ -357,15 +442,6 @@ const StudentDetails = () => {
     }
   };
 
-  useEffect(() => {
-    fetchStudentDetails().then((data) => {
-      if (data.length > 0) {
-        setSelectedStudent(data[0]);
-        setSelectedStudentid(data[0].id);
-      }
-    });
-  }, [fetchStudentDetails]);
-
   const handleTabChange = (event, newValue) => setTabValue(newValue);
 
   const renderDrawer = () => (
@@ -455,58 +531,6 @@ const StudentDetails = () => {
     };
     return mapping[key] || [];
   };
-
-  const [aboutMe, setAboutMe] = useState(null);
-  const [parentsDetails, setParentsDetails] = useState(null);
-  const [universityDetails, setUniversityDetails] = useState(null);
-  const [attachments, setAttachments] = useState(null);
-  const [expensesSummary, setExpensesSummary] = useState(null);
-  const [assetsLiabilities, setAssetsLiabilities] = useState(null);
-  const [academicResults, setAcademicResults] = useState(null);
-  const [voluntaryServices, setVoluntaryServices] = useState(null);
-  const [payments, setPayments] = useState(null);
-  const [interviews, setInterviews] = useState(null);
-  const [tasks, setTasks] = useState(null);
-
-  useEffect(() => {
-    if (selectedStudent) {
-      const fetchAllData = async () => {
-        try {
-          const responses = await Promise.all(
-            ["about-me", "parents-details", "university-details", "attachments", "expenses-summary", "assets-liabilities", "academic-results", "voluntary-services", "payments", "interviews", "tasks"]
-              .map((key) => fetch(`https://willowtonbursary.co.za/api/${key}/${selectedStudent.id}`).then(res => res.json()))
-          );
-
-          const formatResponseData = (data) => {
-            return data.map(item => {
-              const updatedItem = { ...item };
-              Object.keys(updatedItem).forEach((key) => {
-                if (key.toLowerCase().endsWith('date_stamp') && updatedItem[key]) {
-                  updatedItem[key] = formatDate(updatedItem[key]);
-                }
-              });
-              return updatedItem;
-            });
-          };
-
-          setAboutMe(formatResponseData(responses[0]));
-          setParentsDetails(formatResponseData(responses[1]));
-          setUniversityDetails(formatResponseData(responses[2]));
-          setAttachments(formatResponseData(responses[3]));
-          setExpensesSummary(formatResponseData(responses[4]));
-          setAssetsLiabilities(formatResponseData(responses[5]));
-          setAcademicResults(formatResponseData(responses[6]));
-          setVoluntaryServices(formatResponseData(responses[7]));
-          setPayments(formatResponseData(responses[8]));
-          setInterviews(formatResponseData(responses[9]));
-          setTasks(formatResponseData(responses[10]));
-        } catch (error) {
-          console.error("Error fetching section data:", error);
-        }
-      };
-      fetchAllData();
-    }
-  }, [selectedStudent]);
 
   const renderRegion = (sectionKey, data) => {
     if (!data) return null;
@@ -703,6 +727,10 @@ const StudentDetails = () => {
 
   return (
     <div>
+      <div>
+        <h2>Student PDF Export</h2>
+        <DownloadPDFButton studentData={studentData} />
+      </div>
       <Box sx={{ padding: "12px", backgroundColor: isDarkMode ? '#1e293b' : '#e1f5fe', borderRadius: "8px", marginBottom: "12px", display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid #ccc' }}>
         <Typography variant="h6" sx={{ fontWeight: "bold", color: isDarkMode ? 'white' : 'black' }}>Student Details</Typography>
         {isStudentWithNoData && (

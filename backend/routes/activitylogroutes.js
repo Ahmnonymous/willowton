@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db'); // Assuming db is your PostgreSQL connection
+const pool = require('../db');
 
 // Log user activity (login or logout)
 router.post('/activity-log/insert', async (req, res) => {

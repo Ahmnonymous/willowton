@@ -37,7 +37,6 @@ const TaskDetailsDrawer = ({
 
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
   const [formData, setFormData] = useState({});
-  const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
     if (open) {
@@ -60,7 +59,7 @@ const TaskDetailsDrawer = ({
     } else {
       setFormData({});
     }
-  }, [open, studentId, taskId, isAdmin]);
+  }, [open, studentId, taskId, isAdmin, user]); // Added user to dependency array
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -73,7 +72,6 @@ const TaskDetailsDrawer = ({
 
   const handleSave = async () => {
     if (!isAdmin) {
-      // setsuccessmessage("Only admins can create or edit tasks.");
       return;
     }
 
@@ -96,7 +94,6 @@ const TaskDetailsDrawer = ({
       if (res.ok) {
         const result = await res.json();
         onSave(result);
-        // setsuccessmessage(isUpdate ? "Updated successfully!" : "Created successfully!");
         onClose();
       } else {
         console.error("Failed to save Task Details");
@@ -112,7 +109,6 @@ const TaskDetailsDrawer = ({
 
   const handleDeleteConfirm = async () => {
     if (!formData.id || !isAdmin) {
-      if (!isAdmin) // setsuccessmessage("Only admins can delete tasks.");
       return;
     }
 
@@ -124,7 +120,6 @@ const TaskDetailsDrawer = ({
 
       if (res.ok) {
         onSave(null);
-        // setsuccessmessage("Deleted successfully!");
         onClose();
         setDeleteConfirmationOpen(false);
       } else {
@@ -225,11 +220,6 @@ const TaskDetailsDrawer = ({
           <Typography variant="h6" sx={{ fontWeight: "bold", color: isDarkMode ? '#F7FAFC' : '#1E293B' }}>
             Task Details
           </Typography>
-          {successMessage && (
-            <Typography variant="body2" color="success.main" sx={{ mt: 1 }}>
-              {successMessage}
-            </Typography>
-          )}
         </Box>
 
         <Box sx={{ flex: 1, overflowY: "auto", p: 2 }}>

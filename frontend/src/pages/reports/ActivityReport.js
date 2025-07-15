@@ -63,7 +63,7 @@ function ActivityLogTable() {
       <Breadcrumb title="Activity Logs" />
 
       {/* Search Input */}
-      <div className="generic-search-container" style={{ marginBottom: '20px' }}>
+      {/* <div className="generic-search-container" style={{ marginBottom: '20px' }}>
         <input
           type="text"
           className="generic-search-input"
@@ -80,7 +80,17 @@ function ActivityLogTable() {
             color: isDarkMode ? '#FFFFFF' : '#1E293B',
           }}
         />
-      </div>
+      </div> */}
+      {/* Generic Search Input */}
+        <div className="generic-search-container">
+          <input
+            type="text"
+            className="generic-search-input"
+            placeholder="Search..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>      
 
       {/* Loading State */}
       {loading && (

@@ -26,7 +26,7 @@ const ParentsDrawer = ({ open, onClose, studentId, parentId, onSave }) => {
 
   const [formData, setFormData] = useState({});
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
+  // const [successMessage, setSuccessMessage] = useState("");
   const [emailError, setEmailError] = useState(""); // State for email validation error
   const [cellNumberError, setCellNumberError] = useState(""); // State for cell number validation error
 
@@ -177,11 +177,11 @@ const ParentsDrawer = ({ open, onClose, studentId, parentId, onSave }) => {
           <Typography variant="h6" sx={{ fontWeight: "bold", color: isDarkMode ? '#F7FAFC' : '#1E293B' }}>
             Parent Details
           </Typography>
-          {successMessage && (
+          {/* {successMessage && (
             <Typography variant="body2" color="success.main" sx={{ mt: 1 }}>
               {successMessage}
             </Typography>
-          )}
+          )} */}
         </Box>
 
         {/* Form Content */}

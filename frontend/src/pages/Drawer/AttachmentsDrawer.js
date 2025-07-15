@@ -25,7 +25,7 @@ const AttachmentsDrawer = ({ open, onClose, studentId, attachmentId, onSave }) =
 
   const [formData, setFormData] = useState({});
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
+  // const [successMessage, setSuccessMessage] = useState("");
   // Check for larger or smaller screen size
   const isLargeScreen = useMediaQuery("(min-width:600px)");
 
@@ -143,11 +143,11 @@ const AttachmentsDrawer = ({ open, onClose, studentId, attachmentId, onSave }) =
           <Typography variant="h6" sx={{ fontWeight: "bold", color: isDarkMode ? '#F7FAFC' : '#1E293B' }}>
             Attachment Details
           </Typography>
-          {successMessage && (
+          {/* {successMessage && (
             <Typography variant="body2" color="success.main" sx={{ mt: 1 }}>
               {successMessage}
             </Typography>
-          )}
+          )} */}
         </Box>
 
         {/* Form Content */}

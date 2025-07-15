@@ -19,7 +19,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { ThemeContext } from '../../config/ThemeContext';
-import { semesters, highestEducation, yes_no } from "../../components/lov";
+import { semesters, highestEducation } from "../../components/lov";
 
 const UniversityDetailsDrawer = ({
   open,
@@ -34,7 +34,7 @@ const UniversityDetailsDrawer = ({
 
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
   const [formData, setFormData] = useState({});
-  const [successMessage, setSuccessMessage] = useState("");
+  // const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
     if (open) {
@@ -295,11 +295,11 @@ const UniversityDetailsDrawer = ({
           <Typography variant="h6" sx={{ fontWeight: "bold", color: isDarkMode ? '#F7FAFC' : '#1E293B' }}>
             University Details
           </Typography>
-          {successMessage && (
+          {/* {successMessage && (
             <Typography variant="body2" color="success.main" sx={{ mt: 1 }}>
               {successMessage}
             </Typography>
-          )}
+          )} */}
         </Box>
 
         <Box sx={{ flex: 1, overflowY: "auto", p: 2 }}>

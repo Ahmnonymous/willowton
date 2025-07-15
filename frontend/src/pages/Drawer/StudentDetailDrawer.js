@@ -48,7 +48,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
   const [emergencyContactOption, setEmergencyContactOption] = useState("");
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
   const [deleteAttachmentConfirmationOpen, setDeleteAttachmentConfirmationOpen] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
+  // const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState(""); // Added for error feedback
   const [isLoading, setIsLoading] = useState(false); // Added for loading state
   const isLargeScreen = useMediaQuery("(min-width:600px)");
@@ -1061,11 +1061,11 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
           <Typography variant="h6" sx={{ fontWeight: "bold", color: isDarkMode ? '#F7FAFC' : '#1E293B' }}>
             Student Details
           </Typography>
-          {successMessage && (
+          {/* {successMessage && (
             <Typography variant="body2" color="success.main" sx={{ mt: 1 }}>
               {successMessage}
             </Typography>
-          )}
+          )} */}
           {errorMessage && (
             <Typography variant="body2" color="error.main" sx={{ mt: 1 }}>
               {errorMessage}

@@ -8,6 +8,7 @@ import LocalLibraryIcon from '@mui/icons-material/LocalLibrary';
 import FamilyRestroomIcon from '@mui/icons-material/FamilyRestroom';
 import BalanceIcon from '@mui/icons-material/Balance';
 import PaymentsIcon from '@mui/icons-material/Payments';
+import ActivityLogsIcon from '@mui/icons-material/History';
 import AssistWalkerIcon from '@mui/icons-material/AssistWalker';
 import SchoolIcon from '@mui/icons-material/School';  // For Student Details
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'; // For User Information
@@ -40,6 +41,7 @@ const SideNavMenu = ({ open }) => {
           { text: "Student Equity", path: "/reports/student-equity", icon: <BalanceIcon /> },
           { text: "Payment Report", path: "/reports/payment-report", icon: <PaymentsIcon /> },
           { text: "Voluntary Service", path: "/reports/voluntary-report", icon: <AssistWalkerIcon /> },
+          { text: "Activity Logs", path: "/reports/activity-logs", icon: <ActivityLogsIcon /> },
         ],
       },
       { text: "User Information", path: "/user-info", icon: <AdminPanelSettingsIcon /> },

@@ -35,7 +35,7 @@ const AssetsLiabilitiesDrawer = ({ open, onClose, studentId, assetLiabilityId, o
   });
 
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
+  // const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
     if (open && assetLiabilityId) {
@@ -118,11 +118,11 @@ const AssetsLiabilitiesDrawer = ({ open, onClose, studentId, assetLiabilityId, o
           <Typography variant="h6" sx={{ fontWeight: "bold", color: isDarkMode ? '#F7FAFC' : '#1E293B' }}>
             Assets & Liabilities
           </Typography>
-          {successMessage && (
+          {/* {successMessage && (
             <Typography variant="body2" color="success.main" sx={{ mt: 1 }}>
               {successMessage}
             </Typography>
-          )}
+          )} */}
         </Box>
 
         {/* Form Content */}

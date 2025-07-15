@@ -45,11 +45,42 @@ function ActivityLogTable() {
     })
   );
 
-  // Convert string to sentence case (e.g., email_address -> Email Address)
-  const sentenceCase = (str) => {
-    return str
-      .replace(/_/g, ' ')
-      .replace(/\b\w/g, (char) => char.toUpperCase());
+  // Convert string to sentence case or custom header names
+  const formatColumnName = (column) => {
+    switch (column) {
+      case 'act_type':
+        return 'Activity';
+      case 'act_date':
+        return 'Date';
+      case 'act_time':
+        return 'Time';
+      default:
+        return column
+          .replace(/_/g, ' ')
+          .replace(/\b\w/g, (char) => char.toUpperCase());
+    }
+  };
+
+  // Determine styles for activity type
+  const getActivityStyles = (activity) => {
+    if (activity === 'Login') {
+      return {
+        backgroundColor: '#22C55E', // Green
+        color: '#FFFFFF', // White text
+        padding: '4px 8px',
+        borderRadius: '4px',
+        display: 'inline-block',
+      };
+    } else if (activity === 'Logout') {
+      return {
+        backgroundColor: '#EF4444', // Red
+        color: '#FFFFFF', // White text
+        padding: '4px 8px',
+        borderRadius: '4px',
+        display: 'inline-block',
+      };
+    }
+    return {};
   };
 
   return (
@@ -62,35 +93,16 @@ function ActivityLogTable() {
     >
       <Breadcrumb title="Activity Logs" />
 
-      {/* Search Input */}
-      {/* <div className="generic-search-container" style={{ marginBottom: '20px' }}>
+      {/* Generic Search Input */}
+      <div className="generic-search-container">
         <input
           type="text"
           className="generic-search-input"
-          placeholder="Search logs..."
+          placeholder="Search..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          style={{
-            width: '100%',
-            maxWidth: '400px',
-            padding: '10px',
-            borderRadius: '4px',
-            border: isDarkMode ? '1px solid #4B5563' : '1px solid #E2E8F0',
-            backgroundColor: isDarkMode ? '#1E293B' : '#FFFFFF',
-            color: isDarkMode ? '#FFFFFF' : '#1E293B',
-          }}
         />
-      </div> */}
-      {/* Generic Search Input */}
-        <div className="generic-search-container">
-          <input
-            type="text"
-            className="generic-search-input"
-            placeholder="Search..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>      
+      </div>      
 
       {/* Loading State */}
       {loading && (
@@ -129,7 +141,7 @@ function ActivityLogTable() {
                       textAlign: 'left',
                     }}
                   >
-                    {sentenceCase(column)}
+                    {formatColumnName(column)}
                   </th>
                 ))}
               </tr>
@@ -138,7 +150,7 @@ function ActivityLogTable() {
               {filteredLogs.length > 0 ? (
                 filteredLogs.map((log, index) => (
                   <tr
-                    key={`${log.username}-${log.act_date}-${index}`} // Unique key using username, act_date, and index
+                    key={`${log.username}-${log.act_date}-${index}`}
                     style={{ borderBottom: isDarkMode ? '1px solid #4B5563' : '1px solid #E2E8F0' }}
                   >
                     {columns.map((column) => (
@@ -149,7 +161,13 @@ function ActivityLogTable() {
                           padding: '12px',
                         }}
                       >
-                        {log[column] || 'N/A'}
+                        {column === 'act_type' ? (
+                          <span style={getActivityStyles(log[column])}>
+                            {log[column] || 'N/A'}
+                          </span>
+                        ) : (
+                          log[column] || 'N/A'
+                        )}
                       </td>
                     ))}
                   </tr>

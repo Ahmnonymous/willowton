@@ -28,6 +28,7 @@ import StudentEquity from "./pages/reports/StudentEquity";
 import PaymentReport from "./pages/reports/PaymentReport";
 import StudentReport from "./pages/reports/StudentReport";
 import VoluntaryReport from "./pages/reports/VoluntaryReport";
+import ActivityReport from "./pages/reports/ActivityReport";
 
 // Page title updater component
 const PageTitleUpdater = () => {
@@ -54,6 +55,7 @@ const PageTitleUpdater = () => {
       else if (path === "/reports/payment-report") title = "Payment Report";
       else if (path === "/reports/student-report") title = "Student Report";
       else if (path === "/reports/voluntary-report") title = "Voluntary Report";
+      else if (path === "/reports/activity-logs") title = "Activity Logs";
       else title = "Page Not Found";
     } else {
       title = "Page Not Found";
@@ -91,7 +93,8 @@ const LayoutHandler = () => {
     location.pathname.startsWith("/reports/parent-report") ||
     location.pathname.startsWith("/reports/student-equity") ||
     location.pathname.startsWith("/reports/payment-report") ||
-    location.pathname.startsWith("/reports/voluntary-report");
+    location.pathname.startsWith("/reports/voluntary-report") ||
+    location.pathname.startsWith("/reports/activity-logs");
 
   const isReportPage = location.pathname.startsWith("/reports");
 
@@ -99,7 +102,7 @@ const LayoutHandler = () => {
     "/", "/about-us", "/contact-us", "/eligibility", "/popia",
     "/dashboard", "/add-student", "/student-details", "/user-info",
     "/reports/parent-report", "/reports/student-equity", "/reports/payment-report",
-    "/reports/student-report", "/reports/voluntary-report", "/login-register", "/send-email"
+    "/reports/student-report", "/reports/voluntary-report", "/reports/activity-logs", "/login-register", "/send-email"
   ];
   const isKnownRoute = validPaths.includes(location.pathname);
   const isWebPage = !isWebAppPage && !isReportPage && isKnownRoute;
@@ -127,7 +130,8 @@ const LayoutHandler = () => {
         !location.pathname.startsWith("/reports/student-equity") &&
         !location.pathname.startsWith("/reports/payment-report") &&
         !location.pathname.startsWith("/reports/student-report") &&
-        !location.pathname.startsWith("/reports/voluntary-report")
+        !location.pathname.startsWith("/reports/voluntary-report") &&
+        !location.pathname.startsWith("/reports/activity-logs")
       );
     }
     return false;
@@ -193,6 +197,7 @@ const LayoutHandler = () => {
               <Route path="/reports/payment-report" element={<PaymentReport />} />
               <Route path="/reports/student-report" element={<StudentReport />} />
               <Route path="/reports/voluntary-report" element={<VoluntaryReport />} />
+              <Route path="/reports/activity-logs" element={<ActivityReport />} />
             </>
           )}
 

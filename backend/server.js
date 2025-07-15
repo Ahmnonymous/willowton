@@ -21,7 +21,6 @@ const emailRoutes = require('./routes/emailRoutes');
 const taskdetailsroutes = require("./routes/taskdetailsroutes");
 const activitylogroutes = require("./routes/activitylogroutes");
 const studentPDFroutes = require("./routes/studentPDFroutes");
-const latexroutes = require("./routes/latexroutes");
 const app = express();
 
 // Middleware
@@ -58,7 +57,6 @@ app.use("/api", emailRoutes);
 app.use("/api", taskdetailsroutes);
 app.use("/api", activitylogroutes);
 app.use("/api", studentPDFroutes);
-app.use("/api", latexroutes);
 
 
 // Start the server

@@ -78,6 +78,7 @@ const StudentDetails = () => {
   const [payments, setPayments] = useState(null);
   const [interviews, setInterviews] = useState(null);
   const [tasks, setTasks] = useState(null);
+  const [isLoading, setIsLoading] = useState(true); // Add loading state
 
   // Move useContext to the top
   const { isDarkMode } = useContext(ThemeContext);
@@ -145,29 +146,47 @@ const StudentDetails = () => {
     }
   }, []);
 
-  // Fetch initial student data based on selectedStudentid
+  // Fetch initial student data based on selectedStudentid with cleanup
   useEffect(() => {
+    let mounted = true;
+    setIsLoading(true); // Start loading
     if (selectedStudentid) {
       axios
         .get(`https://willowtonbursary.co.za/api/student-data/${selectedStudentid}`)
-        .then((res) => setStudentData(res.data))
-        .catch(console.error);
+        .then((res) => {
+          if (mounted) setStudentData(res.data);
+        })
+        .catch(console.error)
+        .finally(() => {
+          if (mounted) setIsLoading(false); // End loading
+        });
+    } else {
+      setIsLoading(false); // End loading if no selectedStudentid
     }
+    return () => {
+      mounted = false; // Cleanup on unmount
+    };
   }, [selectedStudentid]);
 
-  // Fetch student details on mount
+  // Fetch student details on mount with cleanup
   useEffect(() => {
+    let mounted = true;
     fetchStudentDetails().then((data) => {
-      if (data.length > 0) {
+      if (mounted && data.length > 0) {
         setSelectedStudent(data[0]);
         setSelectedStudentid(data[0].id);
       }
     });
+    return () => {
+      mounted = false; // Cleanup on unmount
+    };
   }, [fetchStudentDetails]);
 
-  // Fetch section data when selectedStudent changes
+  // Fetch section data when selectedStudent changes with cleanup
   useEffect(() => {
+    let mounted = true;
     if (selectedStudent) {
+      setIsLoading(true); // Start loading
       const fetchAllData = async () => {
         try {
           const responses = await Promise.all(
@@ -203,27 +222,31 @@ const StudentDetails = () => {
             });
           };
 
-          setAboutMe(formatResponseData(responses[0]));
-          setParentsDetails(formatResponseData(responses[1]));
-          setUniversityDetails(formatResponseData(responses[2]));
-          setAttachments(formatResponseData(responses[3]));
-          setExpensesSummary(formatResponseData(responses[4]));
-          setAssetsLiabilities(formatResponseData(responses[5]));
-          setAcademicResults(formatResponseData(responses[6]));
-          setVoluntaryServices(formatResponseData(responses[7]));
-          setPayments(formatResponseData(responses[8]));
-          setInterviews(formatResponseData(responses[9]));
-          setTasks(formatResponseData(responses[10]));
+          if (mounted) {
+            setAboutMe(formatResponseData(responses[0]));
+            setParentsDetails(formatResponseData(responses[1]));
+            setUniversityDetails(formatResponseData(responses[2]));
+            setAttachments(formatResponseData(responses[3]));
+            setExpensesSummary(formatResponseData(responses[4]));
+            setAssetsLiabilities(formatResponseData(responses[5]));
+            setAcademicResults(formatResponseData(responses[6]));
+            setVoluntaryServices(formatResponseData(responses[7]));
+            setPayments(formatResponseData(responses[8]));
+            setInterviews(formatResponseData(responses[9]));
+            setTasks(formatResponseData(responses[10]));
+          }
         } catch (error) {
           console.error("Error fetching section data:", error);
+        } finally {
+          if (mounted) setIsLoading(false); // End loading
         }
       };
       fetchAllData();
     }
+    return () => {
+      mounted = false; // Cleanup on unmount
+    };
   }, [selectedStudent]);
-
-  // Early return after all hooks
-  if (!studentData) return <div>Loading...</div>;
 
   const handleDeleteStudent = async (studentId) => {
     if (isStudent) {
@@ -775,7 +798,6 @@ const StudentDetails = () => {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      // Generate filename using student's first name and last name
       const firstName = selectedStudent.student_name || "Unknown";
       const lastName = selectedStudent.student_surname || "User";
       a.download = `${firstName} ${lastName} - Student Details PDF.pdf`;
@@ -995,16 +1017,23 @@ const StudentDetails = () => {
                       padding: "2px 6px",
                       margin: 0,
                       textTransform: "none",
+                      marginLeft: 1,
                     }}
                   >
-                    <DownloadIcon sx={{ marginLeft: 1, marginRight: 1, fontSize: "small" }} />
+                    <DownloadIcon sx={{ marginRight: 1, fontSize: "small" }} />
                     Download PDF
                   </Button>
                 </Box>
               )}
             </Box>
 
-            {selectedStudent ? (
+            {isLoading ? (
+              <Box sx={{ padding: 2 }}>
+                <Typography variant="body1" sx={{ textAlign: "center" }}>
+                  Loading...
+                </Typography>
+              </Box>
+            ) : selectedStudent ? (
               <Box sx={{ padding: 1.5 }}>
                 <Grid container spacing={1}>
                   {Object.entries(selectedStudent).map(([key, value], i) => (

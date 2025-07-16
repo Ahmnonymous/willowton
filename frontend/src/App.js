@@ -1,44 +1,41 @@
-import React, { useState } from "react";
+import React, { useState, lazy, Suspense } from "react";
 import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
 import { Box, CssBaseline } from "@mui/material";
 import { FontSizeProvider } from "./config/FontSizeProvider";
 import { ThemeProvider } from './config/ThemeContext';
 
-// Import NavBars
+// Normal component imports (UI chrome)
 import WebNavBar from "./components/WebNavBar";
 import TopNavBar from "./components/TopNavBar";
 import SideNavMenu from "./components/SideNavMenu";
 
-// Import Pages
-import Home from "./pages/Home";
-import AboutUs from "./pages/AboutUs";
-import ContactUs from "./pages/ContactUs";
-import Eligibility from "./pages/Eligibility";
-import POPIA from "./pages/POPIA";
-import PageNotFound from "./pages/PageNotFound";
-import Dashboard from "./pages/Dashboard";
-import StudentDetails from "./pages/StudentDetails";
-import UserCreation from "./pages/CreateAdmin";
-import LogReg from "./pages/logreg";
-import SendEmail from "./components/SendEmail";
+// Lazy-loaded pages
+const Home = lazy(() => import("./pages/Home"));
+const AboutUs = lazy(() => import("./pages/AboutUs"));
+const ContactUs = lazy(() => import("./pages/ContactUs"));
+const Eligibility = lazy(() => import("./pages/Eligibility"));
+const POPIA = lazy(() => import("./pages/POPIA"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const StudentDetails = lazy(() => import("./pages/StudentDetails"));
+const UserCreation = lazy(() => import("./pages/CreateAdmin"));
+const LogReg = lazy(() => import("./pages/logreg"));
+const PageNotFound = lazy(() => import("./pages/PageNotFound"));
+const SendEmail = lazy(() => import("./components/SendEmail"));
 
-// Import Reports
-import ParentReport from "./pages/reports/ParentReport";
-import StudentEquity from "./pages/reports/StudentEquity";
-import PaymentReport from "./pages/reports/PaymentReport";
-import StudentReport from "./pages/reports/StudentReport";
-import VoluntaryReport from "./pages/reports/VoluntaryReport";
-import ActivityReport from "./pages/reports/ActivityReport";
+// Lazy-loaded reports
+const ParentReport = lazy(() => import("./pages/reports/ParentReport"));
+const StudentEquity = lazy(() => import("./pages/reports/StudentEquity"));
+const PaymentReport = lazy(() => import("./pages/reports/PaymentReport"));
+const StudentReport = lazy(() => import("./pages/reports/StudentReport"));
+const VoluntaryReport = lazy(() => import("./pages/reports/VoluntaryReport"));
+const ActivityReport = lazy(() => import("./pages/reports/ActivityReport"));
 
 // Page title updater component
 const PageTitleUpdater = () => {
   const location = useLocation();
-
   React.useEffect(() => {
     const path = location.pathname;
     let title = "WillowTon";
-    // let favicon = "./willowton_icon.ico";
-
     if (path === "/") title = "Home";
     else if (path === "/about-us") title = "About Us";
     else if (path === "/contact-us") title = "Contact Us";
@@ -60,15 +57,11 @@ const PageTitleUpdater = () => {
     } else {
       title = "Page Not Found";
     }
-
     document.title = title;
-    // document.querySelector('link[rel="icon"]').href = favicon;
   }, [location]);
-
   return null;
 };
 
-// Layout handler to render layout conditionally
 const LayoutHandler = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
@@ -89,12 +82,7 @@ const LayoutHandler = () => {
     location.pathname.startsWith("/add-student") ||
     location.pathname.startsWith("/student-details") ||
     location.pathname.startsWith("/user-info") ||
-    location.pathname.startsWith("/reports/student-report") ||
-    location.pathname.startsWith("/reports/parent-report") ||
-    location.pathname.startsWith("/reports/student-equity") ||
-    location.pathname.startsWith("/reports/payment-report") ||
-    location.pathname.startsWith("/reports/voluntary-report") ||
-    location.pathname.startsWith("/reports/activity-logs");
+    location.pathname.startsWith("/reports");
 
   const isReportPage = location.pathname.startsWith("/reports");
 
@@ -102,8 +90,10 @@ const LayoutHandler = () => {
     "/", "/about-us", "/contact-us", "/eligibility", "/popia",
     "/dashboard", "/add-student", "/student-details", "/user-info",
     "/reports/parent-report", "/reports/student-equity", "/reports/payment-report",
-    "/reports/student-report", "/reports/voluntary-report", "/reports/activity-logs", "/login-register", "/send-email"
+    "/reports/student-report", "/reports/voluntary-report", "/reports/activity-logs",
+    "/login-register", "/send-email"
   ];
+
   const isKnownRoute = validPaths.includes(location.pathname);
   const isWebPage = !isWebAppPage && !isReportPage && isKnownRoute;
 
@@ -111,28 +101,18 @@ const LayoutHandler = () => {
   const isAdmin = isLoggedIn && user.user_type === 'admin';
   const isStudent = isLoggedIn && user.user_type === 'student';
 
-  // Check if the user is allowed to access the current page
   const isAccessiblePage = () => {
     if (!isLoggedIn) {
-      // User is not logged in, allow access to public pages
       return ["/", "/about-us", "/contact-us", "/eligibility", "/popia", "/login-register", "/send-email"].includes(location.pathname);
     }
-    if (isAdmin) {
-      // Admin has access to all pages
-      return true;
-    }
+    if (isAdmin) return true;
     if (isStudent) {
-      // Student has access to all web pages + web app pages (student details & User Information)
-      return validPaths.includes(location.pathname) && (
-        !location.pathname.startsWith("/dashboard") &&
-        !location.pathname.startsWith("/add-student") &&
-        !location.pathname.startsWith("/reports/parent-report") &&
-        !location.pathname.startsWith("/reports/student-equity") &&
-        !location.pathname.startsWith("/reports/payment-report") &&
-        !location.pathname.startsWith("/reports/student-report") &&
-        !location.pathname.startsWith("/reports/voluntary-report") &&
-        !location.pathname.startsWith("/reports/activity-logs")
-      );
+      return validPaths.includes(location.pathname) && ![
+        "/dashboard", "/add-student",
+        "/reports/parent-report", "/reports/student-equity",
+        "/reports/payment-report", "/reports/student-report",
+        "/reports/voluntary-report", "/reports/activity-logs"
+      ].includes(location.pathname);
     }
     return false;
   };
@@ -155,56 +135,47 @@ const LayoutHandler = () => {
       <Box
         component="main"
         sx={{
-          mt: (isLoggedIn && (isAdmin || isStudent)) && (isWebAppPage || isReportPage) && isAccessiblePage() ? 8 : 0,  // Adjust margin-top for authorized users
-          ml: sidebarOpen && (isWebAppPage || isReportPage) && (isAdmin || isStudent) && isAccessiblePage() ? 30 : 0, // Adjust margin-left for sidebar for authorized users
+          mt: (isLoggedIn && (isAdmin || isStudent)) && (isWebAppPage || isReportPage) && isAccessiblePage() ? 8 : 0,
+          ml: sidebarOpen && (isWebAppPage || isReportPage) && (isAdmin || isStudent) && isAccessiblePage() ? 30 : 0,
           transition: "margin 0.3s ease",
-          p: (isLoggedIn && (isAdmin || isStudent)) && (isWebAppPage || isReportPage) && isAccessiblePage() ? 3 : 0, // Adjust padding for authorized users
+          p: (isLoggedIn && (isAdmin || isStudent)) && (isWebAppPage || isReportPage) && isAccessiblePage() ? 3 : 0,
         }}
         className={isWebPage ? 'web-page' : ''}
       >
+        <Suspense fallback={<div>Loading...</div>}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/about-us" element={<AboutUs />} />
+            <Route path="/contact-us" element={<ContactUs />} />
+            <Route path="/eligibility" element={<Eligibility />} />
+            <Route path="/popia" element={<POPIA />} />
+            <Route path="/login-register" element={<LogReg />} />
+            <Route path="/send-email" element={<SendEmail />} />
 
-        <Routes>
-          {/* Public Pages */}
-          <Route path="/" element={<Home />} />
-          <Route path="/about-us" element={<AboutUs />} />
-          <Route path="/contact-us" element={<ContactUs />} />
-          <Route path="/eligibility" element={<Eligibility />} />
-          <Route path="/popia" element={<POPIA />} />
-          <Route path="/login-register" element={<LogReg />} />
-          <Route path="/send-email" element={<SendEmail />} />
+            {isAdmin && (
+              <>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/student-details" element={<StudentDetails />} />
+                <Route path="/user-info" element={<UserCreation />} />
+                <Route path="/reports/parent-report" element={<ParentReport />} />
+                <Route path="/reports/student-equity" element={<StudentEquity />} />
+                <Route path="/reports/payment-report" element={<PaymentReport />} />
+                <Route path="/reports/student-report" element={<StudentReport />} />
+                <Route path="/reports/voluntary-report" element={<VoluntaryReport />} />
+                <Route path="/reports/activity-logs" element={<ActivityReport />} />
+              </>
+            )}
 
-          {/* Admin Pages */}
-          {isAdmin && (
-            <>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/student-details" element={<StudentDetails />} />
-              <Route path="/user-info" element={<UserCreation />} />
-            </>
-          )}
+            {isStudent && (
+              <>
+                <Route path="/student-details" element={<StudentDetails />} />
+                <Route path="/user-info" element={<UserCreation />} />
+              </>
+            )}
 
-          {isStudent && (
-            <>
-              <Route path="/student-details" element={<StudentDetails />} />
-              <Route path="/user-info" element={<UserCreation />} />
-            </>
-          )}
-
-          {isAdmin && (
-            <>
-              {/* Report Pages */}
-              <Route path="/reports/parent-report" element={<ParentReport />} />
-              <Route path="/reports/student-equity" element={<StudentEquity />} />
-              <Route path="/reports/payment-report" element={<PaymentReport />} />
-              <Route path="/reports/student-report" element={<StudentReport />} />
-              <Route path="/reports/voluntary-report" element={<VoluntaryReport />} />
-              <Route path="/reports/activity-logs" element={<ActivityReport />} />
-            </>
-          )}
-
-          {/* Page Not Found */}
-          {/* <Route path="*" element={isAccessiblePage() ? <PageNotFound /> : <PageNotFound /> } /> */}
-          <Route path="*" element={<PageNotFound />} />
-        </Routes>
+            <Route path="*" element={<PageNotFound />} />
+          </Routes>
+        </Suspense>
       </Box>
     </ThemeProvider>
   );

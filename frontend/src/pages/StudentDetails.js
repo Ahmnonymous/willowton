@@ -727,10 +727,6 @@ const StudentDetails = () => {
 
   return (
     <div>
-      <div>
-        <h2>Student PDF Export</h2>
-        <DownloadPDFButton studentData={studentData} />
-      </div>
       <Box sx={{ padding: "12px", backgroundColor: isDarkMode ? '#1e293b' : '#e1f5fe', borderRadius: "8px", marginBottom: "12px", display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid #ccc' }}>
         <Typography variant="h6" sx={{ fontWeight: "bold", color: isDarkMode ? 'white' : 'black' }}>Student Details</Typography>
         {isStudentWithNoData && (
@@ -856,6 +852,9 @@ const StudentDetails = () => {
                   <EditIcon sx={{ marginRight: 1, fontSize: 'small' }} />
                   Edit
                 </Button>
+              )}
+              {isUserWithData && (
+                <DownloadPDFButton studentData={studentData} />
               )}
             </Box>
 

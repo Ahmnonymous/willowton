@@ -52,7 +52,8 @@ router.get("/student-details", async (req, res) => {
           student_emergency_contact_number, student_emergency_contact_relationship, 
           student_emergency_contact_address, user_id, student_status, student_status_comment, 
           employment_status_attachment_name, student_date_stamp 
-      FROM Student_Details_Portal`,
+      FROM Student_Details_Portal
+      order by 1 desc`,
     );
     const formattedResults = result.rows.map(student => ({
       ...student,

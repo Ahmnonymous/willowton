@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useContext } from "react";
+import { useNavigate } from "react-router-dom"; // Add useNavigate
 import {
   Box,
   Grid,
@@ -37,7 +38,7 @@ import StudentPDFDocument from "./StudentPDFDocument";
 import axios from "axios";
 
 const StudentDetails = () => {
-  // Move all useState hooks to the top
+  const navigate = useNavigate(); // Add navigate hook
   const [searchQuery, setSearchQuery] = useState("");
   const [studentDetails, setStudentDetails] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState(null);
@@ -78,23 +79,19 @@ const StudentDetails = () => {
   const [payments, setPayments] = useState(null);
   const [interviews, setInterviews] = useState(null);
   const [tasks, setTasks] = useState(null);
-  const [isLoading, setIsLoading] = useState(true); // Add loading state
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Move useContext to the top
   const { isDarkMode } = useContext(ThemeContext);
 
-  // Define user-related variables
   const user = JSON.parse(localStorage.getItem("user"));
   const isAdmin = user?.user_type === "admin";
   const isStudent = user?.user_type === "student";
 
-  // Define page style
   const pageStyle = {
     backgroundColor: isDarkMode ? "#1e293b" : "#e1f5fe",
     color: isDarkMode ? "#ffffff" : "#000000",
   };
 
-  // Define formatDate function
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const options = {
@@ -109,7 +106,6 @@ const StudentDetails = () => {
     return formattedDate.replace(/\//g, "/");
   };
 
-  // Move useCallback to the top
   const fetchStudentDetails = useCallback(async () => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
@@ -126,7 +122,6 @@ const StudentDetails = () => {
       }
 
       const data = await response.json();
-
       if (data) {
         const updatedStudent = Array.isArray(data) ? data[0] : data;
         Object.keys(updatedStudent).forEach((key) => {
@@ -138,7 +133,6 @@ const StudentDetails = () => {
         setSelectedStudent(updatedStudent);
         setSelectedStudentid(updatedStudent.id);
       }
-
       return data;
     } catch (error) {
       console.error("Error fetching student details:", error);
@@ -146,29 +140,27 @@ const StudentDetails = () => {
     }
   }, []);
 
-  // Fetch initial student data based on selectedStudentid with cleanup
   useEffect(() => {
     let mounted = true;
-    setIsLoading(true); // Start loading
+    setIsLoading(true);
     if (selectedStudentid) {
       axios
         .get(`https://willowtonbursary.co.za/api/student-data/${selectedStudentid}`)
         .then((res) => {
           if (mounted) setStudentData(res.data);
         })
-        .catch(console.error)
+        .catch((error) => console.error("API error:", error))
         .finally(() => {
-          if (mounted) setIsLoading(false); // End loading
+          if (mounted) setIsLoading(false);
         });
     } else {
-      setIsLoading(false); // End loading if no selectedStudentid
+      setIsLoading(false);
     }
     return () => {
-      mounted = false; // Cleanup on unmount
+      mounted = false;
     };
   }, [selectedStudentid]);
 
-  // Fetch student details on mount with cleanup
   useEffect(() => {
     let mounted = true;
     fetchStudentDetails().then((data) => {
@@ -178,15 +170,14 @@ const StudentDetails = () => {
       }
     });
     return () => {
-      mounted = false; // Cleanup on unmount
+      mounted = false;
     };
   }, [fetchStudentDetails]);
 
-  // Fetch section data when selectedStudent changes with cleanup
   useEffect(() => {
     let mounted = true;
     if (selectedStudent) {
-      setIsLoading(true); // Start loading
+      setIsLoading(true);
       const fetchAllData = async () => {
         try {
           const responses = await Promise.all(
@@ -203,9 +194,7 @@ const StudentDetails = () => {
               "interviews",
               "tasks",
             ].map((key) =>
-              fetch(`https://willowtonbursary.co.za/api/${key}/${selectedStudent.id}`)
-                .then((res) => res.json())
-                .catch(() => [])
+              fetch(`https://willowtonbursary.co.za/api/${key}/${selectedStudent.id}`).then((res) => res.json()).catch(() => [])
             )
           );
 
@@ -238,13 +227,13 @@ const StudentDetails = () => {
         } catch (error) {
           console.error("Error fetching section data:", error);
         } finally {
-          if (mounted) setIsLoading(false); // End loading
+          if (mounted) setIsLoading(false);
         }
       };
       fetchAllData();
     }
     return () => {
-      mounted = false; // Cleanup on unmount
+      mounted = false;
     };
   }, [selectedStudent]);
 

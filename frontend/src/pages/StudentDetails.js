@@ -997,7 +997,7 @@ const StudentDetails = () => {
                       textTransform: "none",
                     }}
                   >
-                    <DownloadIcon sx={{ marginRight: 1, fontSize: "small" }} />
+                    <DownloadIcon sx={{ marginLeft: 1, marginRight: 1, fontSize: "small" }} />
                     Download PDF
                   </Button>
                 </Box>

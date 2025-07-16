@@ -21,27 +21,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderBottom: '1 solid #ccc',
-    marginBottom: 15,
-    paddingBottom: 8
+    marginBottom: 8,           // reduced gap
+    paddingBottom: 4           // reduced gap
   },
   logo: {
-    width: 60, // Increased width to ensure the logo is visible
-    height: 60, // Increased height to maintain aspect ratio
+    width: 60,
+    height: 60,
     marginRight: 10,
-    objectFit: 'contain' 
-  },
-  title: {
-    fontSize: 14,
-    fontWeight: 'bold'
+    objectFit: 'contain'
   },
   sectionTitle: {
     fontSize: 10,
     fontWeight: 'bold',
-    backgroundColor: '#E1F5FE',
     padding: 4,
-    marginTop: 12,
+    marginTop: 10,
     marginBottom: 4,
-    textTransform: 'uppercase'
+    textTransform: 'none'     // changed to keep sentence case
   },
   fieldRow: {
     flexDirection: 'row',
@@ -49,19 +44,17 @@ const styles = StyleSheet.create({
     marginBottom: 4
   },
   fieldBox: {
-    width: '50%',
+    flexBasis: '50%',         // more flexible layout
     flexDirection: 'row',
     marginBottom: 2,
     paddingRight: 5
   },
   fieldLabel: {
-    backgroundColor: '#e0e0e0',
-    paddingHorizontal: 4,
     fontWeight: 'bold',
-    minWidth: 80
+    paddingRight: 4
   },
   fieldValue: {
-    paddingHorizontal: 4
+    paddingRight: 4
   },
   lineSeparator: {
     borderBottom: '0.5 solid #ccc',
@@ -69,16 +62,17 @@ const styles = StyleSheet.create({
   }
 });
 
-// Helper function to convert snake_case to Sentence Case
+// Helper: snake_case to Sentence case
 const toSentenceCase = (str) => {
   return str
-    .replace(/_/g, ' ') // Replace underscores with spaces
+    .replace(/_/g, ' ')
     .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .map((word, idx) => idx === 0
+      ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+      : word.toLowerCase())
     .join(' ');
 };
 
-// Component to render a field with label and value
 const FieldPair = ({ label, value }) => (
   <View style={styles.fieldBox}>
     <Text style={styles.fieldLabel}>{toSentenceCase(label)}:</Text>
@@ -86,12 +80,11 @@ const FieldPair = ({ label, value }) => (
   </View>
 );
 
-// Section for flat objects (single records)
 const RenderSection = ({ title, data }) => {
   const entries = Object.entries(data || {}).filter(([k, v]) => v !== null && v !== '');
   return (
     <View>
-      <Text style={styles.sectionTitle}>{title}</Text>
+      <Text style={styles.sectionTitle}>{toSentenceCase(title)}</Text>
       <View style={styles.fieldRow}>
         {entries.map(([key, value], idx) => (
           <FieldPair key={idx} label={key} value={value} />
@@ -101,13 +94,12 @@ const RenderSection = ({ title, data }) => {
   );
 };
 
-// Section for arrays (multiple records)
 const RenderMultiple = ({ title, data }) => {
   if (!data || data.length === 0) return null;
 
   return (
     <View>
-      <Text style={styles.sectionTitle}>{title}</Text>
+      <Text style={styles.sectionTitle}>{toSentenceCase(title)}</Text>
       {data.map((item, idx) => (
         <View key={idx} wrap={false}>
           <View style={styles.fieldRow}>
@@ -128,12 +120,12 @@ const StudentPDFDocument = ({ studentData }) => (
       {/* Header */}
       <View style={styles.header}>
         <Image src={logo} style={styles.logo} />
-        <Text style={styles.title}>Student Information Report</Text>
+        {/* Removed title text */}
       </View>
 
       {/* Sections */}
       <RenderSection title="Student Details" data={studentData.student_details} />
-      
+
       <RenderMultiple title="About Me" data={[studentData.about_me]} />
       <RenderMultiple title="Assets & Liabilities" data={[studentData.assets_liabilities]} />
       <RenderMultiple title="Expense Details" data={[studentData.expense_details]} />

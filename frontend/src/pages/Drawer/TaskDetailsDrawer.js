@@ -20,6 +20,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useMediaQuery } from "@mui/material";
 import { ThemeContext } from '../../config/ThemeContext';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 const TaskDetailsDrawer = ({
   open,
   onClose,
@@ -41,7 +42,7 @@ const TaskDetailsDrawer = ({
   useEffect(() => {
     if (open) {
       if (taskId) {
-        fetch(`https://willowtonbursary.co.za/api/tasks/id/${taskId}`)
+        fetch(`${API_BASE_URL}/tasks/id/${taskId}`)
           .then((res) => res.json())
           .then((data) => {
             setFormData(data);
@@ -77,8 +78,8 @@ const TaskDetailsDrawer = ({
 
     const isUpdate = !!formData.id;
     const url = isUpdate
-      ? `https://willowtonbursary.co.za/api/tasks/update/${formData.id}`
-      : `https://willowtonbursary.co.za/api/tasks/insert`;
+      ? `${API_BASE_URL}/tasks/update/${formData.id}`
+      : `${API_BASE_URL}/tasks/insert`;
     const method = isUpdate ? "PUT" : "POST";
 
     const body = { ...formData };
@@ -114,7 +115,7 @@ const TaskDetailsDrawer = ({
 
     try {
       const res = await fetch(
-        `https://willowtonbursary.co.za/api/tasks/delete/${formData.id}`,
+        `${API_BASE_URL}/tasks/delete/${formData.id}`,
         { method: "DELETE" }
       );
 

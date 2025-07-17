@@ -22,6 +22,7 @@ import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import WillowTonLogo from "../images/willowton_logo.png";
 import axios from "axios"; // Import axios
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 const WebNavBar = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -55,7 +56,7 @@ const WebNavBar = () => {
   // Function to log user activity
   const logActivity = async (userId, activityType) => {
     try {
-      await axios.post("https://willowtonbursary.co.za/api/activity-log/insert", {
+      await axios.post(`${API_BASE_URL}/activity-log/insert`, {
         user_id: userId,
         activity_type: activityType,
       });

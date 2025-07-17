@@ -19,6 +19,7 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { ThemeContext } from '../../config/ThemeContext'; // Import ThemeContext
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 const InterviewDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
   const { isDarkMode } = useContext(ThemeContext);  // Access theme context
 
@@ -98,7 +99,7 @@ const InterviewDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
         Student_Details_Portal_id: studentId
       });
     } else {
-      fetch(`https://willowtonbursary.co.za/api/interviews/id/${recordId}`)
+      fetch(`${API_BASE_URL}/interviews/id/${recordId}`)
         .then(res => res.json())
         .then(data => {
           setFormData({
@@ -145,8 +146,8 @@ const InterviewDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
   const handleSave = async () => {
     const isUpdate = !!formData.id;
     const url = isUpdate
-      ? `https://willowtonbursary.co.za/api/interviews/update/${formData.id}`
-      : `https://willowtonbursary.co.za/api/interviews/insert`;
+      ? `${API_BASE_URL}/interviews/update/${formData.id}`
+      : `${API_BASE_URL}/interviews/insert`;
     const method = isUpdate ? "PUT" : "POST";
 
     const res = await fetch(url, {
@@ -170,7 +171,7 @@ const InterviewDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
   const handleDeleteConfirm = async () => {
     if (!formData.id) return;
     try {
-      await fetch(`https://willowtonbursary.co.za/api/interviews/delete/${formData.id}`, {
+      await fetch(`${API_BASE_URL}/interviews/delete/${formData.id}`, {
         method: "DELETE"
       });
       onSave(null);

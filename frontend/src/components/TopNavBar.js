@@ -9,6 +9,7 @@ import DashboardIcon from "@mui/icons-material/Home";
 import { ThemeContext } from "../config/ThemeContext";
 import axios from "axios"; // Import axios
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 const TopNavBar = ({ toggleSidebar }) => {
   const { isDarkMode, toggleTheme } = useContext(ThemeContext);
   const [userName, setUserName] = useState("");
@@ -36,7 +37,7 @@ const TopNavBar = ({ toggleSidebar }) => {
   // Function to log user activity
   const logActivity = async (userId, activityType) => {
     try {
-      await axios.post("https://willowtonbursary.co.za/api/activity-log/insert", {
+      await axios.post(`${API_BASE_URL}/activity-log/insert`, {
         user_id: userId,
         activity_type: activityType,
       });

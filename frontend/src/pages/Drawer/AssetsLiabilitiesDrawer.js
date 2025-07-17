@@ -19,6 +19,7 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { ThemeContext } from '../../config/ThemeContext'; // Import ThemeContext
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 const AssetsLiabilitiesDrawer = ({ open, onClose, studentId, assetLiabilityId, onSave }) => {
   const { isDarkMode } = useContext(ThemeContext);  // Access theme context
   // Check for larger or smaller screen size
@@ -39,7 +40,7 @@ const AssetsLiabilitiesDrawer = ({ open, onClose, studentId, assetLiabilityId, o
 
   useEffect(() => {
     if (open && assetLiabilityId) {
-      fetch(`https://willowtonbursary.co.za/api/assets-liabilities/id/${assetLiabilityId}`)
+      fetch(`${API_BASE_URL}/assets-liabilities/id/${assetLiabilityId}`)
         .then(res => res.json())
         .then(data => {
           if (data) {
@@ -69,8 +70,8 @@ const AssetsLiabilitiesDrawer = ({ open, onClose, studentId, assetLiabilityId, o
 
   const handleSave = () => {
     const url = assetLiabilityId
-      ? `https://willowtonbursary.co.za/api/assets-liabilities/update/${assetLiabilityId}`
-      : `https://willowtonbursary.co.za/api/assets-liabilities/insert`;
+      ? `${API_BASE_URL}/assets-liabilities/update/${assetLiabilityId}`
+      : `${API_BASE_URL}/assets-liabilities/insert`;
     const method = assetLiabilityId ? "PUT" : "POST";
 
     fetch(url, {
@@ -94,7 +95,7 @@ const AssetsLiabilitiesDrawer = ({ open, onClose, studentId, assetLiabilityId, o
   const handleDeleteConfirm = async () => {
     if (!assetLiabilityId) return;
     try {
-      await fetch(`https://willowtonbursary.co.za/api/assets-liabilities/delete/${assetLiabilityId}`, {
+      await fetch(`${API_BASE_URL}/assets-liabilities/delete/${assetLiabilityId}`, {
         method: "DELETE"
       });
       onSave(null);

@@ -19,6 +19,7 @@ import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { ThemeContext } from '../../config/ThemeContext';  // Import ThemeContext
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 const AboutusDrawer = ({ open, onClose, studentId, aboutMeId, onSave }) => {
   const { isDarkMode } = useContext(ThemeContext);  // Access theme context
 
@@ -59,7 +60,7 @@ const AboutusDrawer = ({ open, onClose, studentId, aboutMeId, onSave }) => {
     if (open) {
       if (aboutMeId) {
         // Editing mode
-        fetch(`https://willowtonbursary.co.za/api/about-me/id/${aboutMeId}`)
+        fetch(`${API_BASE_URL}/about-me/id/${aboutMeId}`)
           .then((res) => res.json())
           .then((data) => {
             setFormData(data);
@@ -88,8 +89,8 @@ const AboutusDrawer = ({ open, onClose, studentId, aboutMeId, onSave }) => {
   const handleSave = async () => {
     const isUpdate = !!formData.id;
     const url = isUpdate
-      ? `https://willowtonbursary.co.za/api/about-me/update/${formData.id}`
-      : `https://willowtonbursary.co.za/api/about-me/insert`;
+      ? `${API_BASE_URL}/about-me/update/${formData.id}`
+      : `${API_BASE_URL}/about-me/insert`;
     const method = isUpdate ? "PUT" : "POST";
 
     const dataToSend = { ...formData };
@@ -124,7 +125,7 @@ const AboutusDrawer = ({ open, onClose, studentId, aboutMeId, onSave }) => {
 
     try {
       const res = await fetch(
-        `https://willowtonbursary.co.za/api/about-me/delete/${formData.id}`,
+        `${API_BASE_URL}/about-me/delete/${formData.id}`,
         { method: "DELETE" }
       );
 

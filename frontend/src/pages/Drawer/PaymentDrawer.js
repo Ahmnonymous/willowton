@@ -24,6 +24,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { format, parse } from 'date-fns';
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
   const { isDarkMode } = useContext(ThemeContext);
 
@@ -54,7 +55,7 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
       });
       setSelectedDate(null);
     } else {
-      fetch(`https://willowtonbursary.co.za/api/payments/id/${recordId}`)
+      fetch(`${API_BASE_URL}/payments/id/${recordId}`)
         .then(res => res.json())
         .then(data => {
           const date = data.payments_date ? parse(data.payments_date, 'MM/dd/yyyy', new Date()) : null;
@@ -93,15 +94,15 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
 
   const handleViewFile = () => {
     if (formData.id) {
-      window.open(`https://willowtonbursary.co.za/api/payments/view/${formData.id}`, "_blank");
+      window.open(`${API_BASE_URL}/payments/view/${formData.id}`, "_blank");
     }
   };
 
   const handleSave = async () => {
     const isUpdate = !!formData.id;
     const url = isUpdate
-      ? `https://willowtonbursary.co.za/api/payments/update/${formData.id}`
-      : `https://willowtonbursary.co.za/api/payments/insert`;
+      ? `${API_BASE_URL}/payments/update/${formData.id}`
+      : `${API_BASE_URL}/payments/insert`;
     const method = isUpdate ? "PUT" : "POST";
 
     const body = new FormData();
@@ -134,7 +135,7 @@ const PaymentDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
   const handleDeleteConfirm = async () => {
     if (!formData.id) return;
     try {
-      await fetch(`https://willowtonbursary.co.za/api/payments/delete/${formData.id}`, {
+      await fetch(`${API_BASE_URL}/payments/delete/${formData.id}`, {
         method: "DELETE"
       });
       onSave(null);

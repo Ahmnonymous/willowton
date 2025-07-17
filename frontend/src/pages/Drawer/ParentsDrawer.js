@@ -21,6 +21,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { ThemeContext } from '../../config/ThemeContext';  // Import ThemeContext
 import { parentRelationship, employmentStatus, highestEducation } from "../../components/lov"; // Import LOVs
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 const ParentsDrawer = ({ open, onClose, studentId, parentId, onSave }) => {
   const { isDarkMode } = useContext(ThemeContext);  // Access theme context
 
@@ -51,7 +52,7 @@ const ParentsDrawer = ({ open, onClose, studentId, parentId, onSave }) => {
   useEffect(() => {
     if (open) {
       if (parentId) {
-        fetch(`https://willowtonbursary.co.za/api/parents-details/id/${parentId}`)
+        fetch(`${API_BASE_URL}/parents-details/id/${parentId}`)
           .then((res) => res.json())
           .then((data) => {
             setFormData(data);
@@ -123,8 +124,8 @@ const ParentsDrawer = ({ open, onClose, studentId, parentId, onSave }) => {
 
     const isUpdate = !!formData.id;
     const url = isUpdate
-      ? `https://willowtonbursary.co.za/api/parents-details/update/${formData.id}`
-      : "https://willowtonbursary.co.za/api/parents-details/insert";
+      ? `${API_BASE_URL}/parents-details/update/${formData.id}`
+      : "${API_BASE_URL}/parents-details/insert";
     const method = isUpdate ? "PUT" : "POST";
 
     const body = { ...formData };
@@ -149,7 +150,7 @@ const ParentsDrawer = ({ open, onClose, studentId, parentId, onSave }) => {
   const handleDelete = async () => {
     if (!formData.id) return;
     setDeleteConfirmationOpen(false);
-    const res = await fetch(`https://willowtonbursary.co.za/api/parents-details/delete/${formData.id}`, {
+    const res = await fetch(`${API_BASE_URL}/parents-details/delete/${formData.id}`, {
       method: "DELETE",
     });
     if (res.ok) {

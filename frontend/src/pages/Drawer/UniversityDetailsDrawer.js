@@ -21,6 +21,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { ThemeContext } from '../../config/ThemeContext';
 import { semesters, highestEducation } from "../../components/lov";
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 const UniversityDetailsDrawer = ({
   open,
   onClose,
@@ -39,7 +40,7 @@ const UniversityDetailsDrawer = ({
   useEffect(() => {
     if (open) {
       if (universityDetailsId) {
-        fetch(`https://willowtonbursary.co.za/api/university-details/id/${universityDetailsId}`)
+        fetch(`${API_BASE_URL}/university-details/id/${universityDetailsId}`)
           .then((res) => res.json())
           .then((data) => {
             // Normalize the conditional fields to match yes_no options
@@ -118,8 +119,8 @@ const UniversityDetailsDrawer = ({
   const handleSave = async () => {
     const isUpdate = !!formData.id;
     const url = isUpdate
-      ? `https://willowtonbursary.co.za/api/university-details/update/${formData.id}`
-      : `https://willowtonbursary.co.za/api/university-details/insert`;
+      ? `${API_BASE_URL}/university-details/update/${formData.id}`
+      : `${API_BASE_URL}/university-details/insert`;
     const method = isUpdate ? "PUT" : "POST";
 
     const body = { ...formData };
@@ -150,7 +151,7 @@ const UniversityDetailsDrawer = ({
 
     try {
       const res = await fetch(
-        `https://willowtonbursary.co.za/api/university-details/delete/${formData.id}`,
+        `${API_BASE_URL}/university-details/delete/${formData.id}`,
         { method: "DELETE" }
       );
 

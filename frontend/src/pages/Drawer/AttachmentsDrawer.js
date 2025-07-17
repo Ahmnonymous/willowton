@@ -20,6 +20,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { ThemeContext } from '../../config/ThemeContext'; // Import ThemeContext
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 const AttachmentsDrawer = ({ open, onClose, studentId, attachmentId, onSave }) => {
   const { isDarkMode } = useContext(ThemeContext);  // Access theme context
 
@@ -49,7 +50,7 @@ const AttachmentsDrawer = ({ open, onClose, studentId, attachmentId, onSave }) =
     }
 
     // Editing mode
-    fetch(`https://willowtonbursary.co.za/api/attachments/id/${attachmentId}`)
+    fetch(`${API_BASE_URL}/attachments/id/${attachmentId}`)
       .then((res) => res.json())
       .then((data) => {
         setFormData({
@@ -82,8 +83,8 @@ const AttachmentsDrawer = ({ open, onClose, studentId, attachmentId, onSave }) =
   const handleSave = async () => {
     const isUpdate = !!formData.id;
     const url = isUpdate
-      ? `https://willowtonbursary.co.za/api/attachments/update/${formData.id}`
-      : `https://willowtonbursary.co.za/api/attachments/insert`;
+      ? `${API_BASE_URL}/attachments/update/${formData.id}`
+      : `${API_BASE_URL}/attachments/insert`;
     const method = isUpdate ? "PUT" : "POST";
 
     const body = new FormData();
@@ -113,7 +114,7 @@ const AttachmentsDrawer = ({ open, onClose, studentId, attachmentId, onSave }) =
   const handleDeleteConfirm = async () => {
     if (!formData.id) return;
     try {
-      await fetch(`https://willowtonbursary.co.za/api/attachments/delete/${formData.id}`, {
+      await fetch(`${API_BASE_URL}/attachments/delete/${formData.id}`, {
         method: "DELETE",
       });
       onSave(null);
@@ -131,7 +132,7 @@ const AttachmentsDrawer = ({ open, onClose, studentId, attachmentId, onSave }) =
 
   const handleViewFile = () => {
     if (formData.id) {
-      window.open(`https://willowtonbursary.co.za/api/attachments/view/${formData.id}`, "_blank");
+      window.open(`${API_BASE_URL}/attachments/view/${formData.id}`, "_blank");
     }
   };
 

@@ -1,6 +1,7 @@
 // frontend/src/components/SendEmail.js
 import React, { useState } from 'react';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 const SendEmail = () => {
   const [email, setEmail] = useState('');
   const [subject, setSubject] = useState('');
@@ -8,7 +9,7 @@ const SendEmail = () => {
 
   const sendEmail = async () => {
     try {
-      const response = await fetch('https://willowtonbursary.co.za/api/send-email', {
+      const response = await fetch(`${API_BASE_URL}/send-email`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

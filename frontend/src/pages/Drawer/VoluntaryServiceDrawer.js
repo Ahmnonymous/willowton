@@ -20,6 +20,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { ThemeContext } from '../../config/ThemeContext'; // Import ThemeContext
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 const VoluntaryServiceDrawer = ({ open, onClose, studentId, recordId, onSave }) => {
   const { isDarkMode } = useContext(ThemeContext);  // Access theme context
 
@@ -45,7 +46,7 @@ const VoluntaryServiceDrawer = ({ open, onClose, studentId, recordId, onSave }) 
         Student_Details_Portal_id: studentId
       });
     } else {
-      fetch(`https://willowtonbursary.co.za/api/voluntary-service/id/${recordId}`)
+      fetch(`${API_BASE_URL}/voluntary-service/id/${recordId}`)
         .then(res => res.json())
         .then(data => {
           setFormData({
@@ -81,8 +82,8 @@ const VoluntaryServiceDrawer = ({ open, onClose, studentId, recordId, onSave }) 
   const handleSave = async () => {
     const isUpdate = !!formData.id;
     const url = isUpdate
-      ? `https://willowtonbursary.co.za/api/voluntary-service/update/${formData.id}`
-      : `https://willowtonbursary.co.za/api/voluntary-service/insert`;
+      ? `${API_BASE_URL}/voluntary-service/update/${formData.id}`
+      : `${API_BASE_URL}/voluntary-service/insert`;
     const method = isUpdate ? "PUT" : "POST";
   
     const body = new FormData();
@@ -114,7 +115,7 @@ const VoluntaryServiceDrawer = ({ open, onClose, studentId, recordId, onSave }) 
   const handleDeleteConfirm = async () => {
     if (!formData.id) return;
     try {
-      await fetch(`https://willowtonbursary.co.za/api/voluntary-service/delete/${formData.id}`, {
+      await fetch(`${API_BASE_URL}/voluntary-service/delete/${formData.id}`, {
         method: "DELETE"
       });
       onSave(null);
@@ -131,7 +132,7 @@ const VoluntaryServiceDrawer = ({ open, onClose, studentId, recordId, onSave }) 
 
   const handleViewFile = () => {
     if (formData.id) {
-      window.open(`https://willowtonbursary.co.za/api/voluntary-service/view/${formData.id}`, "_blank");
+      window.open(`${API_BASE_URL}/voluntary-service/view/${formData.id}`, "_blank");
     }
   };
 

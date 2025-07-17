@@ -38,6 +38,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { format, parse } from 'date-fns';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => {
   const { isDarkMode } = useContext(ThemeContext);
   const [selectedDate, setSelectedDate] = useState(null);
@@ -127,7 +128,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
         const fetchStudentData = async () => {
           setIsLoading(true);
           try {
-            const response = await fetch(`https://willowtonbursary.co.za/api/student-details/${studentId}`);
+            const response = await fetch(`${API_BASE_URL}/student-details/${studentId}`);
             if (!response.ok) {
               throw new Error(`Failed to fetch student data: ${response.statusText}`);
             }
@@ -288,7 +289,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
 
   const handleViewFile = () => {
     if (studentId) {
-      window.open(`https://willowtonbursary.co.za/api/student-details/view-attachment/${studentId}`, "_blank");
+      window.open(`${API_BASE_URL}/student-details/view-attachment/${studentId}`, "_blank");
     }
   };
 
@@ -300,7 +301,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     if (!studentId) return;
     setIsLoading(true);
     try {
-      const response = await fetch(`https://willowtonbursary.co.za/api/student-details/delete-attachment/${studentId}`, {
+      const response = await fetch(`${API_BASE_URL}/student-details/delete-attachment/${studentId}`, {
         method: "PUT",
       });
       if (response.ok) {
@@ -370,8 +371,8 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
 
   const userId = user?.user_id;
   const url = studentId
-    ? `https://willowtonbursary.co.za/api/student-details/update/${studentId}`
-    : `https://willowtonbursary.co.za/api/student-details/insert`;
+    ? `${API_BASE_URL}/student-details/update/${studentId}`
+    : `${API_BASE_URL}/student-details/insert`;
   const method = studentId ? "PUT" : "POST";
 
   const body = new FormData();
@@ -425,7 +426,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     setIsLoading(true);
     try {
       const response = await fetch(
-        `https://willowtonbursary.co.za/api/student-details/delete/${studentId}`,
+        `${API_BASE_URL}/student-details/delete/${studentId}`,
         { method: "DELETE" }
       );
 

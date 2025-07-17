@@ -125,7 +125,7 @@ const ParentsDrawer = ({ open, onClose, studentId, parentId, onSave }) => {
     const isUpdate = !!formData.id;
     const url = isUpdate
       ? `${API_BASE_URL}/parents-details/update/${formData.id}`
-      : "${API_BASE_URL}/parents-details/insert";
+      : `${API_BASE_URL}/parents-details/insert`;
     const method = isUpdate ? "PUT" : "POST";
 
     const body = { ...formData };

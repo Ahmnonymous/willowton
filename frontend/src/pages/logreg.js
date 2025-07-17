@@ -4,6 +4,7 @@ import { AccountCircle, Lock, PersonAdd, Email, Visibility, VisibilityOff } from
 import axios from "axios";
 import footerImage from '../images/footer.png';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 const LoginSignup = () => {
   const [authMode, setAuthMode] = useState("login");
   const [showPassword, setShowPassword] = useState(false);
@@ -42,7 +43,7 @@ const LoginSignup = () => {
 
   const handleForgotPasswordSubmit = async () => {
     try {
-      const response = await axios.get("https://willowtonbursary.co.za/api/users");
+      const response = await axios.get(`${API_BASE_URL}/users`);
       const users = response.data;
       const userExists = users.some(user => user.email_address === forgotPasswordEmail);
 
@@ -61,7 +62,7 @@ const LoginSignup = () => {
 
   const logActivity = async (userId, activityType) => {
     try {
-      await axios.post("https://willowtonbursary.co.za/api/activity-log/insert", {
+      await axios.post(`${API_BASE_URL}/activity-log/insert`, {
         user_id: userId,
         activity_type: activityType,
       });
@@ -99,7 +100,7 @@ const LoginSignup = () => {
     try {
       let response;
       if (authMode === "login") {
-        response = await axios.post("https://willowtonbursary.co.za/api/login", {
+        response = await axios.post(`${API_BASE_URL}/login`, {
           email_address: formData.email_address,
           password: formData.password,
         });
@@ -130,9 +131,9 @@ const LoginSignup = () => {
           window.location.href = "/dashboard";
         }
       } else {
-        response = await axios.post("https://willowtonbursary.co.za/api/users", formData);
+        response = await axios.post(`${API_BASE_URL}/users`, formData);
 
-        const loginResponse = await axios.post("https://willowtonbursary.co.za/api/login", {
+        const loginResponse = await axios.post(`${API_BASE_URL}/login`, {
           email_address: formData.email_address,
           password: formData.password,
         });

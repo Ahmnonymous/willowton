@@ -28,6 +28,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { ThemeContext } from '../config/ThemeContext';  // Import ThemeContext
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 // Validation Schema for Form
 const validationSchema = yup.object({
   first_name: yup.string().required("First name is required"),
@@ -61,10 +62,10 @@ const UserReport = () => {
     const fetchUsers = async () => {
       let apiUrl = "";
       if (userType === "admin") {
-        apiUrl = "https://willowtonbursary.co.za/api/users";
+        apiUrl = `${API_BASE_URL}/users`;
       } else if (userType === "student") {
         const userId = JSON.parse(localStorage.getItem("user"))?.user_id;
-        apiUrl = `https://willowtonbursary.co.za/api/users/${userId}`;
+        apiUrl = `${API_BASE_URL}/users/${userId}`;
       }
       try {
         const response = await fetch(apiUrl);
@@ -90,7 +91,7 @@ const UserReport = () => {
 
   // Fetch user by ID for editing
   const fetchUserById = async (id) => {
-    const response = await fetch(`https://willowtonbursary.co.za/api/users/${id}`);
+    const response = await fetch(`${API_BASE_URL}/users/${id}`);
     const data = await response.json();
     setEditUser(data);
   };
@@ -108,12 +109,12 @@ const UserReport = () => {
     enableReinitialize: true, // Reinitialize when `editUser` changes
     onSubmit: async (values) => {
       const response = editUser
-        ? await fetch(`https://willowtonbursary.co.za/api/users/${editUser.user_id}`, {
+        ? await fetch(`${API_BASE_URL}/users/${editUser.user_id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(values),
         })
-        : await fetch("https://willowtonbursary.co.za/api/users", {
+        : await fetch(`${API_BASE_URL}/users`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(values),
@@ -150,7 +151,7 @@ const UserReport = () => {
   const handleDeleteConfirm = async () => {
     if (!editUser) return;
     try {
-      await fetch(`https://willowtonbursary.co.za/api/users/${editUser.user_id}`, {
+      await fetch(`${API_BASE_URL}/users/${editUser.user_id}`, {
         method: "DELETE",
       });
       setUsers((prevUsers) => prevUsers.filter((user) => user.user_id !== editUser.user_id));

@@ -35,6 +35,7 @@ import DownloadIcon from "@mui/icons-material/Download";
 import { pdf } from "@react-pdf/renderer";
 import StudentPDFDocument from "./StudentPDFDocument";
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 const StudentDetails = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [studentDetails, setStudentDetails] = useState([]);
@@ -108,9 +109,9 @@ const StudentDetails = () => {
       const userId = user.user_id;
       let response;
       if (isAdmin) {
-        response = await fetch("https://willowtonbursary.co.za/api/student-details");
+        response = await fetch(`${API_BASE_URL}/student-details`);
       } else if (isStudent && userId) {
-        response = await fetch(`https://willowtonbursary.co.za/api/student-detail/${userId}`);
+        response = await fetch(`${API_BASE_URL}/student-detail/${userId}`);
       } else {
         console.error("User type is neither admin nor student or user ID is missing");
         return {};
@@ -143,7 +144,7 @@ const StudentDetails = () => {
     }
     try {
       setIsLoading(true);
-      const response = await fetch(`https://willowtonbursary.co.za/api/student-data/${studentId}`);
+      const response = await fetch(`${API_BASE_URL}/student-data/${studentId}`);
       const data = await response.json();
       setStudentData(data);
     } catch (error) {
@@ -195,7 +196,7 @@ const StudentDetails = () => {
               "interviews",
               "tasks",
             ].map((key) =>
-              fetch(`https://willowtonbursary.co.za/api/${key}/${selectedStudent.id}`)
+              fetch(`${API_BASE_URL}/${key}/${selectedStudent.id}`)
                 .then((res) => res.json())
                 .catch(() => [])
             )
@@ -268,7 +269,7 @@ const StudentDetails = () => {
 
   const fetchAboutMe = async (studentId) => {
     try {
-      const response = await fetch(`https://willowtonbursary.co.za/api/about-me/${studentId}`);
+      const response = await fetch(`${API_BASE_URL}/about-me/${studentId}`);
       const data = await response.json();
       const formattedData = Array.isArray(data)
         ? data.map((item) => {
@@ -290,7 +291,7 @@ const StudentDetails = () => {
 
   const fetchParentsDetails = async (studentId) => {
     try {
-      const response = await fetch(`https://willowtonbursary.co.za/api/parents-details/${studentId}`);
+      const response = await fetch(`${API_BASE_URL}/parents-details/${studentId}`);
       const data = await response.json();
       const formattedData = Array.isArray(data)
         ? data.map((item) => {
@@ -312,7 +313,7 @@ const StudentDetails = () => {
 
   const fetchUniversityDetails = async (studentId) => {
     try {
-      const response = await fetch(`https://willowtonbursary.co.za/api/university-details/${studentId}`);
+      const response = await fetch(`${API_BASE_URL}/university-details/${studentId}`);
       const data = await response.json();
       const formattedData = Array.isArray(data)
         ? data.map((item) => {
@@ -334,7 +335,7 @@ const StudentDetails = () => {
 
   const fetchAttachmentsDetails = async (studentId) => {
     try {
-      const response = await fetch(`https://willowtonbursary.co.za/api/attachments/${studentId}`);
+      const response = await fetch(`${API_BASE_URL}/attachments/${studentId}`);
       const data = await response.json();
       const formattedData = Array.isArray(data)
         ? data.map((item) => {
@@ -356,7 +357,7 @@ const StudentDetails = () => {
 
   const fetchExpenseDetails = async (studentId) => {
     try {
-      const response = await fetch(`https://willowtonbursary.co.za/api/expense-details/${studentId}`);
+      const response = await fetch(`${API_BASE_URL}/expense-details/${studentId}`);
       const data = await response.json();
       const formattedData = Array.isArray(data)
         ? data.map((item) => {
@@ -378,7 +379,7 @@ const StudentDetails = () => {
 
   const fetchAssetsLiabilities = async (studentId) => {
     try {
-      const response = await fetch(`https://willowtonbursary.co.za/api/assets-liabilities/${studentId}`);
+      const response = await fetch(`${API_BASE_URL}/assets-liabilities/${studentId}`);
       const data = await response.json();
       const formattedData = Array.isArray(data)
         ? data.map((item) => {
@@ -400,7 +401,7 @@ const StudentDetails = () => {
 
   const fetchAcademicResults = async (studentId) => {
     try {
-      const response = await fetch(`https://willowtonbursary.co.za/api/academic-results/${studentId}`);
+      const response = await fetch(`${API_BASE_URL}/academic-results/${studentId}`);
       const data = await response.json();
       const formattedData = Array.isArray(data)
         ? data.map((item) => {
@@ -422,7 +423,7 @@ const StudentDetails = () => {
 
   const fetchVoluntaryServices = async (studentId) => {
     try {
-      const response = await fetch(`https://willowtonbursary.co.za/api/voluntary-service/${studentId}`);
+      const response = await fetch(`${API_BASE_URL}/voluntary-service/${studentId}`);
       const data = await response.json();
       const formattedData = Array.isArray(data)
         ? data.map((item) => {
@@ -444,7 +445,7 @@ const StudentDetails = () => {
 
   const fetchPaymentsDetails = async (studentId) => {
     try {
-      const response = await fetch(`https://willowtonbursary.co.za/api/payments/${studentId}`);
+      const response = await fetch(`${API_BASE_URL}/payments/${studentId}`);
       const data = await response.json();
       const formattedData = Array.isArray(data)
         ? data.map((item) => {
@@ -466,7 +467,7 @@ const StudentDetails = () => {
 
   const fetchInterviewsDetails = async (studentId) => {
     try {
-      const response = await fetch(`https://willowtonbursary.co.za/api/interviews/${studentId}`);
+      const response = await fetch(`${API_BASE_URL}/interviews/${studentId}`);
       const data = await response.json();
       const formattedData = Array.isArray(data)
         ? data.map((item) => {
@@ -488,7 +489,7 @@ const StudentDetails = () => {
 
   const fetchTasks = async (studentId) => {
     try {
-      const response = await fetch(`https://willowtonbursary.co.za/api/tasks/${studentId}`);
+      const response = await fetch(`${API_BASE_URL}/tasks/${studentId}`);
       const data = await response.json();
       const formattedData = Array.isArray(data)
         ? data.map((item) => {

@@ -6,6 +6,7 @@ import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recha
 import { useContext } from 'react';
 import { ThemeContext } from '../config/ThemeContext';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 const Dashboard = () => {
   const { isDarkMode } = useContext(ThemeContext); // Use theme context
   const [dashboardData, setDashboardData] = useState(null);
@@ -38,7 +39,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const response = await axios.get('https://willowtonbursary.co.za/api/dashboard');
+        const response = await axios.get(`${API_BASE_URL}/dashboard`);
         setDashboardData(response.data);
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
@@ -49,7 +50,7 @@ const Dashboard = () => {
 
     const fetchNationalityData = async () => {
       try {
-        const response = await axios.get('https://willowtonbursary.co.za/api/student-nationality-distribution');
+        const response = await axios.get(`${API_BASE_URL}/student-nationality-distribution`);
         const updatedData = response.data.map(item => ({
           ...item,
           count: Number(item.count),
@@ -62,7 +63,7 @@ const Dashboard = () => {
 
     const fetchEducationData = async () => {
       try {
-        const response = await axios.get('https://willowtonbursary.co.za/api/student-highest-education-distribution');
+        const response = await axios.get(`${API_BASE_URL}/student-highest-education-distribution`);
         const updatedData = response.data.map(item => ({
           ...item,
           count: Number(item.count),
@@ -75,7 +76,7 @@ const Dashboard = () => {
 
     const fetchCurrentEducationData = async () => {
       try {
-        const response = await axios.get('https://willowtonbursary.co.za/api/student-current-education-distribution');
+        const response = await axios.get(`${API_BASE_URL}/student-current-education-distribution`);
         const updatedData = response.data.map(item => ({
           ...item,
           count: Number(item.count),
@@ -88,7 +89,7 @@ const Dashboard = () => {
 
     const fetchRaceData = async () => {
       try {
-        const response = await axios.get('https://willowtonbursary.co.za/api/student-race-distribution');
+        const response = await axios.get(`${API_BASE_URL}/student-race-distribution`);
         const updatedData = response.data.map(item => ({
           ...item,
           count: Number(item.count),
@@ -101,7 +102,7 @@ const Dashboard = () => {
 
     const fetchMaritalData = async () => {
       try {
-        const response = await axios.get('https://willowtonbursary.co.za/api/student-marital-status-distribution');
+        const response = await axios.get(`${API_BASE_URL}/student-marital-status-distribution`);
         const updatedData = response.data.map(item => ({
           ...item,
           count: Number(item.count),
@@ -114,7 +115,7 @@ const Dashboard = () => {
 
     const fetchEmploymentData = async () => {
       try {
-        const response = await axios.get('https://willowtonbursary.co.za/api/student-employment-status-distribution');
+        const response = await axios.get(`${API_BASE_URL}/student-employment-status-distribution`);
         const updatedData = response.data.map(item => ({
           ...item,
           count: Number(item.count),

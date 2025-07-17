@@ -5,6 +5,7 @@ import axios from 'axios';
 import { ThemeContext } from '../../config/ThemeContext.js'; // Import ThemeContext
 import './GenericTable.css'; // Updated generic class names for styling
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 function GenericTable() {
   const { isDarkMode } = useContext(ThemeContext); // Access theme context
   const [students, setStudents] = useState([]);
@@ -23,7 +24,7 @@ function GenericTable() {
   // Fetch student details when the component mounts
   useEffect(() => {
     const fetchStudents = async () => {
-      const response = await axios.get('https://willowtonbursary.co.za/api/student-details');
+      const response = await axios.get(`${API_BASE_URL}/student-details`);
 
       if (response.data.length > 0) {
         // Dynamically set the columns from the first student's object, remove the 'id' column

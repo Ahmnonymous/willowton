@@ -5,6 +5,7 @@ import axios from 'axios';
 import { ThemeContext } from '../../config/ThemeContext.js';
 import './GenericTable.css';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 function ActivityLogTable() {
   const { isDarkMode } = useContext(ThemeContext);
   const [logs, setLogs] = useState([]);
@@ -18,7 +19,7 @@ function ActivityLogTable() {
     const fetchActivityLogs = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('https://willowtonbursary.co.za/api/activity-log');
+        const response = await axios.get(`${API_BASE_URL}/activity-log`);
         
         if (response.data.length > 0) {
           // Set columns based on the keys of the first log entry

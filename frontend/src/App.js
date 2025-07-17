@@ -74,8 +74,8 @@ const LayoutHandler = () => {
   const user = JSON.parse(localStorage.getItem("user"));
 
   const isLoggedIn = !!user;
-  const isAdmin = user?.user_type === "admin";
-  const isStudent = user?.user_type === "student";
+  // const isAdmin = user?.user_type === "admin";
+  // const isStudent = user?.user_type === "student";
 
   const pageBackgroundColors = {
     "/": "#FFB612",

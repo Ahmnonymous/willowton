@@ -31,8 +31,8 @@ import PaymentDrawer from './Drawer/PaymentDrawer';
 import InterviewDrawer from './Drawer/InterviewDrawer';
 import TaskDetailsDrawer from './Drawer/TaskDetailsDrawer';
 import { ThemeContext } from '../config/ThemeContext';
-import DownloadPDFButton from './DownloadPDFButton';
-import axios from 'axios';
+// import DownloadPDFButton from './DownloadPDFButton';
+// import axios from 'axios';
 
 const StudentDetails = () => {
   // Move all useState hooks to the top
@@ -144,11 +144,11 @@ const StudentDetails = () => {
   }, []);
 
   // Fetch initial student data
-  useEffect(() => {
-    axios.get("https://willowtonbursary.co.za/api/student-data/73")
-      .then((res) => setStudentData(res.data))
-      .catch(console.error);
-  }, []);
+  // useEffect(() => {
+  //   axios.get("https://willowtonbursary.co.za/api/student-data/73")
+  //     .then((res) => setStudentData(res.data))
+  //     .catch(console.error);
+  // }, []);
 
   // Fetch student details on mount
   useEffect(() => {
@@ -853,7 +853,7 @@ const StudentDetails = () => {
                   Edit
                 </Button>
               )}
-              <DownloadPDFButton studentData={studentData} />
+              {/* <DownloadPDFButton studentData={studentData} /> */}
             </Box>
 
             {selectedStudent ? (

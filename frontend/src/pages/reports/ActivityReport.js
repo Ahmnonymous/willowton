@@ -6,7 +6,7 @@ import { ThemeContext } from '../../config/ThemeContext.js';
 import './GenericTable.css';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
-function ActivityLogTable() {
+function GenericTable() {
   const { isDarkMode } = useContext(ThemeContext);
   const [logs, setLogs] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -149,9 +149,11 @@ function ActivityLogTable() {
             </thead>
             <tbody>
               {filteredLogs.length > 0 ? (
-                filteredLogs.map((log, index) => (
+                filteredLogs.map((log) => (
+                  // Use a unique key based on username, act_date, and act_time
+                  // If the API provides a unique 'id' field, replace with: key={log.id}
                   <tr
-                    key={`${log.username}-${log.act_date}-${index}`}
+                    key={`${log.username}-${log.act_date}-${log.act_time}`}
                     style={{ borderBottom: isDarkMode ? '1px solid #4B5563' : '1px solid #E2E8F0' }}
                   >
                     {columns.map((column) => (
@@ -195,4 +197,4 @@ function ActivityLogTable() {
   );
 }
 
-export default ActivityLogTable;
+export default GenericTable;

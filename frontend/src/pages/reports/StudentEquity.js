@@ -83,7 +83,7 @@ function GenericTable() {
                   <tr key={student.id}>
                     {columns.map((column) => (
                       <td key={column}>
-                        {/* Format dates for 'student_date_stamp' and 'student_dob' columns */}
+                        {/* Format dates for 'assets_liabilities_date_stamp' and 'student_dob' columns */}
                         {column === 'assets_liabilities_date_stamp' || column === 'student_dob'
                           ? formatDate(student[column]) // Format the date fields
                           : student[column]}

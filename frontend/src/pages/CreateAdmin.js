@@ -218,7 +218,7 @@ const UserReport = () => {
                     <TableCell sx={{ padding: "5px" }}>
                       <Button
                         onClick={() => handleEditClick(user)}
-                        fontsize="small"
+                        fontSize="small"
                         sx={{ cursor: "pointer" }}
                       >
                         <EditIcon />

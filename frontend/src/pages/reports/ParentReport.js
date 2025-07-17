@@ -6,6 +6,7 @@ import { ThemeContext } from '../../config/ThemeContext'; // Import ThemeContext
 import './GenericTable.css'; // Updated generic class names for styling
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
 function GenericTable() {
   const { isDarkMode } = useContext(ThemeContext); // Access theme context
   const [students, setStudents] = useState([]);
@@ -15,7 +16,7 @@ function GenericTable() {
   // Format the date to mm/dd/yyyy
   const formatDate = (date) => {
     const d = new Date(date);
-    const month = d.getMonth() + 1; // Months are zero-indexed, so add 1
+    const month = d.getMonth() + 1;
     const day = d.getDate();
     const year = d.getFullYear();
     return `${month}/${day}/${year}`;
@@ -24,29 +25,30 @@ function GenericTable() {
   // Fetch student details when the component mounts
   useEffect(() => {
     const fetchStudents = async () => {
-      const response = await axios.get(`${API_BASE_URL}/view/parent-detail-report`);
-
-      if (response.data.length > 0) {
-        // Dynamically set the columns from the first student's object, remove the 'id' column
-        setColumns(Object.keys(response.data[0]).filter((column) => column !== 'id')); // Remove 'id' column
+      try {
+        const response = await axios.get(`${API_BASE_URL}/view/parent-detail-report`);
+        if (response.data.length > 0) {
+          setColumns(Object.keys(response.data[0]).filter((column) => column !== 'id'));
+        }
+        setStudents(response.data);
+      } catch (error) {
+        console.error("Error fetching student data:", error);
       }
-
-      setStudents(response.data);
     };
 
     fetchStudents();
-  }, []); // Only run once when component mounts
+  }, []);
 
-  // Handle the search term and filter students based on it
-  const filteredStudents = students.filter((student) => {
-    return columns.some((column) => {
+  // Filter students based on search term
+  const filteredStudents = students.filter((student) =>
+    columns.some((column) => {
       const value = student[column];
       if (value && typeof value === 'string') {
         return value.toLowerCase().includes(searchTerm.toLowerCase());
       }
       return false;
-    });
-  });
+    })
+  );
 
   return (
     <Box sx={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC', minHeight: '100vh', padding: '1px' }}>
@@ -71,8 +73,8 @@ function GenericTable() {
                 {columns.map((column) => (
                   <th key={column}>
                     {column
-                      .replace(/_/g, ' ') // Replace underscores with spaces
-                      .replace(/\b\w/g, (char) => char.toUpperCase())} {/* Convert to Title Case */}
+                      .replace(/_/g, ' ')
+                      .replace(/\b\w/g, (char) => char.toUpperCase())}
                   </th>
                 ))}
               </tr>
@@ -82,10 +84,9 @@ function GenericTable() {
                 filteredStudents.map((student) => (
                   <tr key={student.id}>
                     {columns.map((column) => (
-                      <td key={column}>
-                        {/* Format dates for 'student_date_stamp' and 'student_dob' columns */}
+                      <td key={`${student.id}-${column}`}>
                         {column === 'student_date_stamp' || column === 'student_dob'
-                          ? formatDate(student[column]) // Format the date fields
+                          ? formatDate(student[column])
                           : student[column]}
                       </td>
                     ))}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useMemo } from "react";
 import {
   Drawer,
   Box,
@@ -9,8 +9,8 @@ import {
   Divider,
   Dialog,
   DialogActions,
-  DialogContent,
   DialogTitle,
+  DialogContent,
   Autocomplete,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
@@ -21,6 +21,7 @@ import { useMediaQuery } from "@mui/material";
 import { ThemeContext } from '../../config/ThemeContext';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
 const TaskDetailsDrawer = ({
   open,
   onClose,
@@ -32,7 +33,8 @@ const TaskDetailsDrawer = ({
   const isLargeScreen = useMediaQuery("(min-width:600px)");
   const drawerWidth = isLargeScreen ? 500 : 330;
 
-  const user = JSON.parse(localStorage.getItem("user"));
+  // Memoize user to prevent new object reference on every render
+  const user = useMemo(() => JSON.parse(localStorage.getItem("user")), []);
   const isAdmin = user?.user_type === 'admin';
   const isStudent = user?.user_type === 'student';
 
@@ -60,7 +62,7 @@ const TaskDetailsDrawer = ({
     } else {
       setFormData({});
     }
-  }, [open, studentId, taskId, isAdmin, user]); // Added user to dependency array
+  }, [open, studentId, taskId, isAdmin, user]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

@@ -3,7 +3,6 @@ import { Box, Container, Typography, List, ListItem, ListItemText, Divider } fro
 import footerImage from '../images/footer.png';
 
 const EligibilityPage = () => {
-  // Define font sizes as variables
   const fontSizes = {
     h4: '2.5rem',
     body1: '1.2rem',
@@ -12,7 +11,11 @@ const EligibilityPage = () => {
     caption: '1rem',
   };
 
-  const textStyle = { color: "black", fontFamily: "Sansation Light", fontSize: fontSizes.body1 };
+  const textStyle = {
+    color: "black",
+    fontFamily: "Sansation Light",
+    fontSize: fontSizes.body1,
+  };
 
   return (
     <div>
@@ -20,26 +23,21 @@ const EligibilityPage = () => {
         sx={{
           py: 4,
           mb: -1,
-          maxWidth: 'none', // Removes the max-width constraint
+          maxWidth: 'none',
           '@media (min-width:1200px)': {
-            maxWidth: '100%', // Ensures the container spans the full width on larger screens
+            maxWidth: '100%',
           },
         }}
       >
-        <Typography variant="h4" align="center" gutterBottom sx={{ ...textStyle, mb: 4, fontWeight: "bold", fontSize: fontSizes.h4 }}>
+        <Typography variant="h4" align="center" gutterBottom sx={{ ...textStyle, mb: 4, fontWeight: "bold", fontSize: fontSizes.h4 }} component="div">
           Eligibility Requirements
         </Typography>
 
-        <Typography variant="body1" paragraph sx={textStyle}>
+        <Typography variant="body1" sx={textStyle} component="div">
           Applicants must meet the following minimum requirements to be considered for the bursary. Failure to meet all requirements will result in the application not being considered:
         </Typography>
 
-        <Box
-          component="ul"
-          sx={{
-            pl: 2, m: 0, color: "black", fontFamily: "Sansation Light", listStyleType: "disc"
-          }}
-        >
+        <Box component="ul" sx={{ pl: 2, m: 0, color: "black", fontFamily: "Sansation Light", listStyleType: "disc" }}>
           {[
             "You must be a South African citizen or a foreign national with a valid study permit.",
             "You must reside in the province for which you are applying.",
@@ -48,11 +46,7 @@ const EligibilityPage = () => {
             "You must be currently studying or planning to study at a recognized University, University of Technology, or TVET College in South Africa.",
             "You must fall under one of the following categories:"
           ].map((text, idx) => (
-            <Box
-              key={idx}
-              component="li"
-              sx={{ mb: 1, fontSize: fontSizes.body1 }}
-            >
+            <Box key={idx} component="li" sx={{ mb: 1, fontSize: fontSizes.body1 }}>
               {text}
             </Box>
           ))}
@@ -60,16 +54,20 @@ const EligibilityPage = () => {
 
         <ListItem>
           <ListItemText
-            primaryTypographyProps={textStyle}
+            primaryTypographyProps={{ ...textStyle, component: 'div' }}
+            secondaryTypographyProps={{ component: 'div' }}
             secondary={
-              <List sx={{ pl: 1, listStyleType: "circle", marginTop: -3 }}>
+              <List sx={{ pl: 1, listStyleType: "circle", mt: -3 }}>
                 {[
                   "A current Matric student.",
                   "A current tertiary student who was self-sponsored or sponsored by a family member last year.",
                   "A current tertiary student who was sponsored by Willowton/SANZAF last year."
                 ].map((text, idx) => (
                   <ListItem key={idx} sx={{ display: "list-item", mb: -2 }}>
-                    <ListItemText primary={text} primaryTypographyProps={textStyle} />
+                    <ListItemText
+                      primary={text}
+                      primaryTypographyProps={{ ...textStyle, component: 'div' }}
+                    />
                   </ListItem>
                 ))}
               </List>
@@ -77,30 +75,30 @@ const EligibilityPage = () => {
           />
         </ListItem>
 
-        <Typography variant="h6" gutterBottom sx={{ ...textStyle, mt: 2, mb: 1, fontWeight: "bold", fontSize: fontSizes.h6 }}>
+        <Typography variant="h6" sx={{ ...textStyle, mt: 2, mb: 1, fontWeight: "bold", fontSize: fontSizes.h6 }} component="div">
           Scholarship Awards
         </Typography>
         <Divider />
-        <Typography variant="body1" paragraph mt={1} sx={textStyle}>
+        <Typography variant="body1" sx={textStyle} component="div">
           Applicants may be required to achieve a minimum of 65% in a subject/module to be considered for the bursary.
         </Typography>
 
-        <Typography variant="h6" gutterBottom sx={{ ...textStyle, mt: 4, mb: 1, fontWeight: "bold", fontSize: fontSizes.h6 }}>
+        <Typography variant="h6" sx={{ ...textStyle, mt: 4, mb: 1, fontWeight: "bold", fontSize: fontSizes.h6 }} component="div">
           Eligibility for Zakah
         </Typography>
         <Divider />
-        <Typography variant="body1" paragraph mb={1} mt={1} sx={textStyle}>
+        <Typography variant="body1" sx={textStyle} component="div">
           Zakah, as per Shariah (Islamic Law), is intended for eight categories of recipients:
         </Typography>
 
-        <List sx={{ listStyleType: "numbered", pl: 3, m: 0, color: 'black' }}>
+        <List sx={{ listStyleType: "decimal", pl: 3, m: 0, color: 'black' }}>
           {[
-            "The Poor: Those who are unemployed due to a lack of work opportunities or inability to secure work due to a lack of skills. This does not include individuals unwilling to take on other forms of employment, even if unrelated to their profession.",
-            "The Needy: Those who are employed but whose income is insufficient to meet basic living expenses. Zakah allows for basic necessities to be exempt, but encourages moderation and living within one’s means.",
+            "The Poor...",
+            "The Needy...",
             "The Administrators of Zakah",
             "The Reverts",
-            "Those in Debt: Individuals who find themselves in debt due to circumstances beyond their control and cannot settle their debt from existing assets.",
-            "Zakah is an outright grant and does not require repayment. However, voluntary contributions or ‘repayment’ may be made if desired, and this will be judged by Allah."
+            "Those in Debt...",
+            "Zakah is an outright grant and does not require repayment..."
           ].map((text, idx) => (
             <Box key={idx} component="li" sx={{ mb: 1, fontSize: fontSizes.body1 }}>
               {text}
@@ -108,11 +106,11 @@ const EligibilityPage = () => {
           ))}
         </List>
 
-        <Typography variant="h6" gutterBottom sx={{ ...textStyle, mt: 2, mb: 1, fontWeight: "bold", fontSize: fontSizes.h6 }}>
+        <Typography variant="h6" sx={{ ...textStyle, mt: 2, mb: 1, fontWeight: "bold", fontSize: fontSizes.h6 }} component="div">
           Bursary Coverage
         </Typography>
         <Divider />
-        <Typography variant="body1" paragraph mb={1} mt={1} sx={textStyle}>
+        <Typography variant="body1" sx={textStyle} component="div">
           The bursary will cover the following expenses:
         </Typography>
         <List sx={{ listStyleType: "disc", pl: 3, m: 0, color: 'black' }}>
@@ -123,19 +121,19 @@ const EligibilityPage = () => {
           ))}
         </List>
 
-        <Typography variant="h6" gutterBottom sx={{ ...textStyle, mt: 2, mb: 1, fontWeight: "bold", fontSize: fontSizes.h6 }}>
+        <Typography variant="h6" sx={{ ...textStyle, mt: 2, mb: 1, fontWeight: "bold", fontSize: fontSizes.h6 }} component="div">
           How to Apply
         </Typography>
         <Divider />
-        <Typography variant="body1" paragraph mb={0} mt={1} sx={textStyle}>
+        <Typography variant="body1" sx={textStyle} component="div">
           To apply for the bursary, follow these steps:
         </Typography>
 
         <List>
-          <List sx={{ listStyleType: "numbered", pl: 2, m: 0, color: 'black' }}>
+          <List sx={{ listStyleType: "decimal", pl: 2, m: 0, color: 'black' }}>
             {[
               "Submit your application online at www.wosanzafbursary.online.",
-              "Upload clear copies of the required supporting documentation (failure to submit any of these documents may result in disqualification):"
+              "Upload clear copies of the required supporting documentation..."
             ].map((text, idx) => (
               <Box key={idx} component="li" sx={{ mb: 1, fontSize: fontSizes.body1 }}>
                 {text}
@@ -143,48 +141,54 @@ const EligibilityPage = () => {
             ))}
           </List>
 
-          <ListItem sx={{ mb: 0 }}>
+          <ListItem>
             <ListItemText
-              primaryTypographyProps={textStyle}
+              primaryTypographyProps={{ ...textStyle, component: 'div' }}
+              secondaryTypographyProps={{ component: 'div' }}
               secondary={
                 <Box sx={{ pl: 1 }}>
                   {[
                     {
                       title: "For Matric Students:",
                       items: [
-                        "Certified copy of your ID or study permit (for foreign nationals)",
-                        "Certified copy of trial results",
-                        "Motivational letter explaining why you deserve the bursary",
-                        "Testimonial from your school",
-                        "Proof of income (parents’/guardians’/spouse’s latest payslips, affidavit if unemployed, death certificate if deceased)"
+                        "Certified copy of your ID or study permit...",
+                        "Certified copy of trial results...",
+                        "Motivational letter explaining...",
+                        "Testimonial from your school...",
+                        "Proof of income..."
                       ]
                     },
                     {
                       title: "For Tertiary Students (Not Sponsored by Willowton/SANZAF Previously):",
                       items: [
-                        "Certified copy of your ID or study permit (for foreign nationals)",
-                        "Certified copy of your Matric final results/certificate",
-                        "Full academic record from your tertiary institution (on letterhead)",
-                        "Motivational letter explaining why you deserve the bursary",
-                        "Testimonial from your University, Imaam, or religious leader",
-                        "Proof of income (latest payslips, affidavit if unemployed, proof of grant/pension, or death certificate)"
+                        "Certified copy of your ID or study permit...",
+                        "Certified copy of your Matric final results...",
+                        "Full academic record from your tertiary institution...",
+                        "Motivational letter explaining...",
+                        "Testimonial from your University or religious leader...",
+                        "Proof of income..."
                       ]
                     },
                     {
                       title: "For Tertiary Students Sponsored by Willowton/SANZAF:",
                       items: [
-                        "Certified copy of your Matric final results/certificate",
-                        "Mid-year tertiary results (on letterhead from the institution)",
-                        "Proof of income (parents'/guardians'/spouse’s latest payslips, affidavit if unemployed, death certificate)"
+                        "Certified copy of your Matric final results...",
+                        "Mid-year tertiary results...",
+                        "Proof of income..."
                       ]
                     }
                   ].map((section, idx) => (
                     <Box key={idx} sx={{ mb: 2 }}>
-                      <Typography sx={{ ...textStyle, fontWeight: "bold" }} mb={-1} >{section.title}</Typography>
-                      <List sx={{ listStyleType: "disc", pl: 3 }} >
+                      <Typography sx={{ ...textStyle, fontWeight: "bold" }} component="div">
+                        {section.title}
+                      </Typography>
+                      <List sx={{ listStyleType: "disc", pl: 3 }}>
                         {section.items.map((item, i) => (
                           <ListItem key={i} sx={{ display: "list-item", mb: -2 }}>
-                            <ListItemText primary={item} primaryTypographyProps={textStyle} mb={1} />
+                            <ListItemText
+                              primary={item}
+                              primaryTypographyProps={{ ...textStyle, component: 'div' }}
+                            />
                           </ListItem>
                         ))}
                       </List>
@@ -196,32 +200,32 @@ const EligibilityPage = () => {
           </ListItem>
         </List>
 
-        <Typography variant="h6" gutterBottom sx={{ ...textStyle, fontWeight: "bold", fontSize: fontSizes.h6 }}>
+        <Typography variant="h6" sx={{ ...textStyle, fontWeight: "bold", fontSize: fontSizes.h6 }} component="div">
           Closing Date for Applications
         </Typography>
         <Divider />
         <List sx={{ listStyleType: "disc", pl: 3, m: 0, color: 'black', fontSize: fontSizes.body1 }}>
-          <Box component="li" sx={{ mb: 1, color: 'black' }}>
+          <Box component="li" sx={{ mb: 1 }}>
             Applications for 2023 must be submitted by 30th September 2022.
           </Box>
-          <Box component="li" sx={{ mb: 3, color: 'black' }}>
+          <Box component="li" sx={{ mb: 3 }}>
             All supporting documentation must be submitted by the closing date. Incomplete applications will be disqualified.
           </Box>
         </List>
 
-        <Typography variant="h6" gutterBottom sx={{ ...textStyle, fontWeight: "bold", fontSize: fontSizes.h6 }}>
+        <Typography variant="h6" sx={{ ...textStyle, fontWeight: "bold", fontSize: fontSizes.h6 }} component="div">
           Application and Selection Process
         </Typography>
-        <List sx={{ listStyleType: "numbered", pl: 3, m: 0, color: 'black', mb: 2 }}>
+        <List sx={{ listStyleType: "decimal", pl: 3, m: 0, color: 'black', mb: 2 }}>
           {[
             "The Bursary Committee will review and shortlist candidates.",
             "Shortlisted candidates will be contacted via email with interview details.",
-            "Interviews will be conducted, and applicants must ensure they are available on the scheduled dates.",
-            "Applicants will be notified of their application status via their regional office.",
+            "Interviews will be conducted...",
+            "Applicants will be notified...",
             "Successful applicants will receive a Confirmation of Pledge email/letter.",
             "All bursary payments will be made directly to the institution’s account.",
-            "Students will not be entitled to withdraw any funds paid by Willowton/SANZAF, even if a balance remains in their favour.",
-            "All information submitted in the application is confidential. Certain details may be shared with SANZAF members when necessary."
+            "Students will not be entitled to withdraw...",
+            "All information submitted is confidential..."
           ].map((text, idx) => (
             <Box key={idx} component="li" sx={{ mb: 1, color: 'black', fontSize: fontSizes.body1 }}>
               {text}
@@ -237,7 +241,7 @@ const EligibilityPage = () => {
         sx={{ width: '100%', height: 'auto', mb: 1 }}
       />
       <Box sx={{ textAlign: 'center', py: 2, mt: 0, color: 'black' }}>
-        <Typography variant="caption" sx={{ color: 'black', fontFamily: 'Sansation Light, sans-serif', fontSize: fontSizes.caption }}>
+        <Typography variant="caption" component="div" sx={{ color: 'black', fontFamily: 'Sansation Light', fontSize: fontSizes.caption }}>
           Developed by Uchakide.co.za
         </Typography>
       </Box>

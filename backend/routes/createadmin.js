@@ -57,7 +57,7 @@ router.post("/login", async (req, res) => {
 
     // Check if user exists
     if (result.rows.length === 0) {
-      return res.status(400).json({ msg: "User not found" });
+      return res.status(400).json({ msg: "Email not found! New User? Please Register first then Login." });
     }
 
     const user = result.rows[0];

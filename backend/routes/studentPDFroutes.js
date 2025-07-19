@@ -12,7 +12,7 @@ router.get('/student-data/:id', async (req, res) => {
       `SELECT 
         student_name, 
         student_surname, 
-        TO_CHAR(student_date_of_birth, 'DD-MON-YYYY') AS student_date_of_birth, 
+        TO_CHAR(student_date_of_birth, 'DD/MM/YYYY') AS student_date_of_birth, 
         student_id_passport_number, 
         student_nationality, 
         student_race, 
@@ -48,7 +48,7 @@ router.get('/student-data/:id', async (req, res) => {
         relation_branch,
         student_status, 
         student_status_comment,
-        TO_CHAR(student_date_stamp, 'DD-MON-YYYY HH12:MI:SS PM') AS student_date_stamp
+        TO_CHAR(student_date_stamp, 'DDth Mon YYYY HH12:MI:SS PM') AS created_on
        FROM student_details_portal WHERE id = $1`,
       [id]
     );
@@ -81,7 +81,7 @@ router.get('/student-data/:id', async (req, res) => {
         about_me_q19, 
         about_me_q20,
         about_me_q21, 
-        TO_CHAR(about_me_date_stamp, 'DD-MON-YYYY HH12:MI:SS PM') AS about_me_date_stamp
+        TO_CHAR(about_me_date_stamp, 'DDth Mon YYYY HH12:MI:SS PM') AS created_on
        FROM student_portal_about_me WHERE student_details_portal_id = $1`,
       [id]
     );
@@ -92,7 +92,7 @@ router.get('/student-data/:id', async (req, res) => {
         gold_silver, 
         investments, 
         liabilities, 
-        TO_CHAR(assets_liabilities_date_stamp, 'DD-MON-YYYY HH12:MI:SS PM') AS assets_liabilities_date_stamp
+        TO_CHAR(assets_liabilities_date_stamp, 'DDth Mon YYYY HH12:MI:SS PM') AS created_on
        FROM student_portal_assets_liabilities WHERE student_details_portal_id = $1`,
       [id]
     );
@@ -101,7 +101,7 @@ router.get('/student-data/:id', async (req, res) => {
       `SELECT 
         attachments_name, 
         attachments_description, 
-        TO_CHAR(attachments_date_stamp, 'DD-MON-YYYY HH12:MI:SS PM') AS attachments_date_stamp
+        TO_CHAR(attachments_date_stamp, 'DDth Mon YYYY HH12:MI:SS PM') AS created_on
        FROM student_portal_attachments WHERE student_details_portal_id = $1`,
       [id]
     );
@@ -126,7 +126,7 @@ router.get('/student-data/:id', async (req, res) => {
         other_expense,
         total_income, 
         total_expenses, 
-        TO_CHAR(expense_date_stamp, 'DD-MON-YYYY HH12:MI:SS PM') AS expense_date_stamp
+        TO_CHAR(expense_date_stamp, 'DDth Mon YYYY HH12:MI:SS PM') AS created_on
        FROM student_portal_expense_details WHERE student_details_portal_id = $1`,
       [id]
     );
@@ -160,7 +160,7 @@ router.get('/student-data/:id', async (req, res) => {
         interview_q23, 
         interview_q24, 
         interview_created_by,
-        TO_CHAR(interview_date_stamp, 'DD-MON-YYYY HH12:MI:SS PM') AS interview_date_stamp
+        TO_CHAR(interview_date_stamp, 'DDth Mon YYYY HH12:MI:SS PM') AS created_on
        FROM student_portal_interview WHERE student_details_portal_id = $1`,
       [id]
     );
@@ -178,7 +178,7 @@ router.get('/student-data/:id', async (req, res) => {
         parent_highest_education, 
         parent_grant, 
         parent_other_income,
-        TO_CHAR(parent_date_stamp, 'DD-MON-YYYY HH12:MI:SS PM') AS parent_date_stamp
+        TO_CHAR(parent_date_stamp, 'DDth Mon YYYY HH12:MI:SS PM') AS created_on
        FROM student_portal_parents_details WHERE student_details_portal_id = $1`,
       [id]
     );
@@ -192,7 +192,7 @@ router.get('/student-data/:id', async (req, res) => {
         payments_vendor, 
         payment_created_by,
         payments_attachment_name, 
-        TO_CHAR(payments_date_stamp, 'DD-MON-YYYY HH12:MI:SS PM') AS payments_date_stamp
+        TO_CHAR(payments_date_stamp, 'DDth Mon YYYY HH12:MI:SS PM') AS created_on
        FROM student_portal_payments WHERE student_details_portal_id = $1`,
       [id]
     );
@@ -202,7 +202,7 @@ router.get('/student-data/:id', async (req, res) => {
         results_module, 
         results_percentage, 
         results_attachment_name, 
-        TO_CHAR(results_date_stamp, 'DD-MON-YYYY HH12:MI:SS PM') AS results_date_stamp
+        TO_CHAR(results_date_stamp, 'DDth Mon YYYY HH12:MI:SS PM') AS created_on
        FROM student_portal_results WHERE student_details_portal_id = $1`,
       [id]
     );
@@ -213,7 +213,7 @@ router.get('/student-data/:id', async (req, res) => {
         task_status, 
         task_comment, 
         created_by, 
-        TO_CHAR(task_date_stamp, 'DD-MON-YYYY HH12:MI:SS PM') AS task_date_stamp
+        TO_CHAR(task_date_stamp, 'DDth Mon YYYY HH12:MI:SS PM') AS created_on
        FROM student_portal_tasks WHERE student_details_portal_id = $1`,
       [id]
     );
@@ -254,7 +254,7 @@ router.get('/student-data/:id', async (req, res) => {
         other_bursary_org_3, 
         other_bursary_org_3_contact,
         application_process_status, 
-        TO_CHAR(university_details_date_stamp, 'DD-MON-YYYY HH12:MI:SS PM') AS university_details_date_stamp
+        TO_CHAR(university_details_date_stamp, 'DDth Mon YYYY HH12:MI:SS PM') AS created_on
        FROM student_portal_university_details WHERE student_details_portal_id = $1`,
       [id]
     );
@@ -266,7 +266,7 @@ router.get('/student-data/:id', async (req, res) => {
         contact_person, 
         contact_person_number,
         service_attachment_name, 
-        TO_CHAR(voluntary_service_date_stamp, 'DD-MON-YYYY HH12:MI:SS PM') AS voluntary_service_date_stamp
+        TO_CHAR(voluntary_service_date_stamp, 'DDth Mon YYYY HH12:MI:SS PM') AS created_on
        FROM student_portal_voluntary_service WHERE student_details_portal_id = $1`,
       [id]
     );

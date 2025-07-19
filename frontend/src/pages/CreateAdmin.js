@@ -772,7 +772,7 @@ const UserReport = () => {
               startIcon={editUser ? <SaveIcon /> : <AddIcon />}
               variant="contained"
               size="small"
-              sx={{ backgroundColor: isDarkMode ? 'white' : 'black', color: isDarkMode ? 'black' : 'white' }}
+              sx={{ backgroundColor: '#1976d2', color: 'white' }}
             >
               {editUser ? "Save" : "Create"}
             </Button>

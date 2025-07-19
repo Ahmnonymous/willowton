@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useContext } from "react";
+import React, { useState, useEffect, useCallback, useContext, useRef } from "react";
 import {
   Box,
   Grid,
@@ -10,14 +10,33 @@ import {
   Button,
   Tab,
   Tabs,
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
+  IconButton,
+  InputBase,
+  Checkbox,
+  FormControlLabel,
+  Menu,
+  MenuItem,
+  Tooltip,
+  Divider,
+  ListItemIcon,
+  ListItemText,
+  Select,
+  MenuItem as MuiMenuItem,
+  CircularProgress,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
+import SearchIcon from "@mui/icons-material/Search";
+import ViewColumnIcon from "@mui/icons-material/ViewColumn";
+import DownloadIcon from "@mui/icons-material/Download";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDownward";
+import ArrowDropUpIcon from "@mui/icons-material/ArrowUpward";
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import ClearIcon from "@mui/icons-material/Clear";
+import { useTheme, useMediaQuery } from "@mui/material";
+import * as XLSX from "xlsx";
 import DrawerForm from "./Drawer/StudentDetailDrawer";
 import AboutusDrawer from "./Drawer/AboutUsDrawer";
 import ParentsDrawer from "./Drawer/ParentsDrawer";
@@ -31,11 +50,472 @@ import PaymentDrawer from "./Drawer/PaymentDrawer";
 import InterviewDrawer from "./Drawer/InterviewDrawer";
 import TaskDetailsDrawer from "./Drawer/TaskDetailsDrawer";
 import { ThemeContext } from "../config/ThemeContext";
-import DownloadIcon from "@mui/icons-material/Download";
 import { pdf } from "@react-pdf/renderer";
 import StudentPDFDocument from "./StudentPDFDocument";
+import '../pages/reports/GenericTable.css';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
+const SectionTable = ({ data, sectionKey, sectionLabel, isDarkMode, selectedStudentid, onEdit, onAdd }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [columns, setColumns] = useState([]);
+  const [visibleColumns, setVisibleColumns] = useState([]);
+  const [columnWidths, setColumnWidths] = useState({});
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [showSearch, setShowSearch] = useState(false);
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [columnSearchTerm, setColumnSearchTerm] = useState('');
+  const [totalRecords, setTotalRecords] = useState(0);
+  const searchRef = useRef(null);
+  const resizingRef = useRef(null);
+  const open = Boolean(anchorEl);
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
+  const sentenceCase = useCallback((str) => {
+    if (str === 'student_id_passport_number') return 'Student ID/Passport Number';
+    if (str === 'student_willow_relationship') return 'Willowton Group Relationship';
+    return str.replace(/^student /i, '').replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  }, []);
+
+  const calculateColumnWidth = useCallback((col) => {
+    const headerText = sentenceCase(col);
+    const charCount = headerText.length;
+    const pixelsPerChar = 10;
+    const minWidth = 50;
+    const calculatedWidth = charCount * pixelsPerChar + 40;
+    return Math.max(minWidth, calculatedWidth);
+  }, [sentenceCase]);
+
+  useEffect(() => {
+    if (data && data.length > 0) {
+      const cols = Object.keys(data[0]).filter((c) => c !== 'id' && c !== 'student_details_portal_id');
+      setColumns(cols);
+      setVisibleColumns(cols);
+      setColumnWidths(cols.reduce((acc, col) => ({
+        ...acc,
+        [col]: calculateColumnWidth(col),
+      }), {}));
+      setTotalRecords(data.length);
+    } else {
+      setColumns([]);
+      setVisibleColumns([]);
+      setColumnWidths({});
+      setTotalRecords(0);
+    }
+  }, [data, calculateColumnWidth]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setShowSearch(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleMouseMove = useCallback((e) => {
+    if (resizingRef.current) {
+      const { col, startX, startWidth } = resizingRef.current;
+      const newWidth = Math.max(50, startWidth + (e.clientX - startX));
+      setColumnWidths((prev) => ({ ...prev, [col]: newWidth }));
+    }
+  }, []);
+
+  const stopResizing = useCallback(() => {
+    resizingRef.current = null;
+    document.removeEventListener('mousemove', handleMouseMove);
+    document.removeEventListener('mouseup', stopResizing);
+    document.body.style.userSelect = '';
+  }, [handleMouseMove]);
+
+  const startResizing = useCallback(
+    (e, col) => {
+      e.preventDefault();
+      resizingRef.current = { col, startX: e.clientX, startWidth: columnWidths[col] || calculateColumnWidth(col) };
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', stopResizing);
+      document.body.style.userSelect = 'none';
+    },
+    [columnWidths, calculateColumnWidth, handleMouseMove, stopResizing]
+  );
+
+  const formatDate = (date) => (date ? new Date(date).toLocaleDateString() : 'N/A');
+
+  const toggleColumn = (col) => {
+    if (visibleColumns.includes(col)) {
+      setVisibleColumns((prev) => prev.filter((c) => c !== col));
+    } else {
+      const idx = columns.indexOf(col);
+      const updated = [...visibleColumns];
+      updated.splice(idx, 0, col);
+      setVisibleColumns(updated);
+    }
+  };
+
+  const resetColumns = () => {
+    setVisibleColumns(columns);
+    setColumnWidths(columns.reduce((acc, col) => ({
+      ...acc,
+      [col]: calculateColumnWidth(col),
+    }), {}));
+  };
+
+  const exportToExcel = () => {
+    const exportData = data.map((s) =>
+      Object.fromEntries(visibleColumns.map((col) => [sentenceCase(col), s[col]]))
+    );
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, sectionKey);
+    XLSX.writeFile(wb, `${sectionKey}_report.xlsx`);
+  };
+
+  const handleSort = (col) => {
+    setSortConfig((prev) => {
+      if (prev.key === col) {
+        return {
+          key: col,
+          direction: prev.direction === 'asc' ? 'desc' : prev.direction === 'desc' ? null : 'asc',
+        };
+      } else {
+        return { key: col, direction: 'asc' };
+      }
+    });
+    setPage(0);
+  };
+
+  const filteredData = data
+    .filter((item) =>
+      visibleColumns.some((col) => {
+        const val = item[col];
+        return val != null && val.toString().toLowerCase().includes(searchTerm.toLowerCase());
+      })
+    )
+    .sort((a, b) => {
+      if (!sortConfig.key || !sortConfig.direction) return 0;
+      const aVal = a[sortConfig.key];
+      const bVal = b[sortConfig.key];
+      if (aVal == null || bVal == null) return 0;
+      return sortConfig.direction === 'asc'
+        ? aVal.toString().localeCompare(bVal.toString())
+        : bVal.toString().localeCompare(aVal.toString());
+    });
+
+  const paginatedData = filteredData.slice(page * rowsPerPage, (page + 1) * rowsPerPage);
+
+  useEffect(() => {
+    setTotalRecords(filteredData.length);
+  }, [filteredData]);
+
+  const filteredColumns = columns.filter((col) => {
+    const lowerTerm = columnSearchTerm.toLowerCase();
+    const raw = col.toLowerCase();
+    const formatted = sentenceCase(col).toLowerCase();
+    return raw.includes(lowerTerm) || formatted.includes(lowerTerm);
+  });
+
+  return (
+    <Box
+      sx={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC', p: 2 }}
+      className={isDarkMode ? 'dark-mode' : ''}
+    >
+      <Box sx={{ padding: "12px", backgroundColor: isDarkMode ? '#1e293b' : '#e1f5fe', borderRadius: "8px", marginBottom: "12px", border: '1px solid #ccc', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Typography variant="h6" sx={{ color: isDarkMode ? 'white' : 'black', fontWeight: "bold" }}>
+          {sectionLabel}
+        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Box
+            ref={searchRef}
+            sx={{
+              width: showSearch ? (isSmallScreen ? 120 : 220) : 0,
+              height: 36,
+              overflow: 'hidden',
+              transition: 'width 0.3s ease-in-out, opacity 0.3s ease-in-out',
+              display: 'flex',
+              alignItems: 'center',
+              opacity: showSearch ? 1 : 0,
+            }}
+          >
+            <InputBase
+              placeholder="Search"
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setPage(0);
+              }}
+              sx={{
+                backgroundColor: isDarkMode ? '#1e293b' : '#fff',
+                color: isDarkMode ? 'white' : 'black',
+                px: 1.5,
+                height: '100%',
+                fontSize: '0.85rem',
+                borderRadius: 1,
+                border: `1px solid ${isDarkMode ? '#4A5568' : '#CBD5E0'}`,
+                width: '100%',
+                minWidth: 0,
+              }}
+              startAdornment={<SearchIcon sx={{ mr: 1 }} fontSize="small" />}
+              endAdornment={
+                searchTerm && (
+                  <IconButton
+                    size="small"
+                    onClick={() => {
+                      setSearchTerm('');
+                      setPage(0);
+                    }}
+                    sx={{ color: isDarkMode ? 'white' : 'black' }}
+                  >
+                    <ClearIcon fontSize="small" />
+                  </IconButton>
+                )
+              }
+            />
+          </Box>
+          <Tooltip title={showSearch ? 'Close Search' : 'Search'}>
+            <IconButton
+              size="small"
+              onClick={() => setShowSearch((prev) => !prev)}
+              sx={{ color: isDarkMode ? 'white' : 'black' }}
+            >
+              {showSearch ? <ClearIcon fontSize="small" /> : <SearchIcon fontSize="small" />}
+            </IconButton>
+          </Tooltip>
+          {!(isSmallScreen && showSearch) && (
+            <>
+              <Typography sx={{ color: isDarkMode ? 'white' : 'black', fontSize: '1rem' }}>|</Typography>
+              <Tooltip title="Column Visibility">
+                <IconButton size="small" onClick={(e) => setAnchorEl(e.currentTarget)} sx={{ color: isDarkMode ? 'white' : 'black' }}>
+                  <ViewColumnIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+              <Typography sx={{ color: isDarkMode ? 'white' : 'black', fontSize: '1rem' }}>|</Typography>
+              <Tooltip title="Export to Excel">
+                <IconButton size="small" onClick={exportToExcel} sx={{ color: isDarkMode ? 'white' : 'black' }}>
+                  <DownloadIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+              {onAdd && (
+                <>
+                  <Typography sx={{ color: isDarkMode ? 'white' : 'black', fontSize: '1rem' }}>|</Typography>
+                  <Tooltip title="Add New">
+                    <IconButton size="small" onClick={onAdd} sx={{ color: isDarkMode ? 'white' : 'black' }}>
+                      <AddIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                </>
+              )}
+            </>
+          )}
+        </Box>
+      </Box>
+
+      <Menu
+        anchorEl={anchorEl}
+        open={open}
+        onClose={() => setAnchorEl(null)}
+        PaperProps={{
+          sx: {
+            minWidth: 200,
+            maxHeight: 300,
+            p: 1,
+            backgroundColor: isDarkMode ? '#1e293b' : '#fff',
+            color: isDarkMode ? '#F7FAFC' : '#1e293b',
+            boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.15)',
+            borderRadius: 2,
+          },
+        }}
+      >
+        <InputBase
+          autoFocus
+          placeholder="Search Columns"
+          value={columnSearchTerm}
+          onChange={(e) => setColumnSearchTerm(e.target.value)}
+          onKeyDown={(e) => e.stopPropagation()}
+          sx={{
+            mb: 1,
+            px: 1,
+            fontSize: '0.7rem',
+            backgroundColor: isDarkMode ? '#334155' : '#f1f5f9',
+            borderRadius: 1,
+            width: '100%',
+            height: '28px',
+            color: isDarkMode ? '#F7FAFC' : '#1e293b',
+          }}
+        />
+        {filteredColumns.map((col) => (
+          <MenuItem key={col} dense>
+            <FormControlLabel
+              control={<Checkbox size="small" checked={visibleColumns.includes(col)} onChange={() => toggleColumn(col)} />}
+              label={<span style={{ fontSize: '0.7rem' }}>{sentenceCase(col)}</span>}
+            />
+          </MenuItem>
+        ))}
+        <Divider sx={{ my: 1 }} />
+        <MenuItem dense onClick={() => { resetColumns(); setAnchorEl(null); }}>
+          <ListItemIcon><RefreshIcon fontSize="small" /></ListItemIcon>
+          <ListItemText primary="Reset Columns" primaryTypographyProps={{ fontSize: '0.7rem' }} />
+        </MenuItem>
+      </Menu>
+
+      <div className="generic-table-container">
+        <table className="generic-table" style={{ backgroundColor: isDarkMode ? '#1e293b' : '#fff', tableLayout: 'fixed' }}>
+          <thead>
+            <tr>
+              {onEdit && <th style={{ width: 50, color: isDarkMode ? 'white' : '#1e293b' }}></th>}
+              {visibleColumns.map((col) => (
+                <th
+                  key={col}
+                  style={{
+                    color: isDarkMode ? 'white' : '#1e293b',
+                    cursor: 'pointer',
+                    position: 'relative',
+                    width: columnWidths[col] || calculateColumnWidth(col),
+                    minWidth: 50,
+                  }}
+                  onClick={(e) => {
+                    if (e.target.className !== 'resize-handle') {
+                      handleSort(col);
+                    }
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingRight: '10px' }}>
+                    <span>{sentenceCase(col)}</span>
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      {sortConfig.key === col && sortConfig.direction === 'asc' && <ArrowDropUpIcon fontSize="small" />}
+                      {sortConfig.key === col && sortConfig.direction === 'desc' && <ArrowDropDownIcon fontSize="small" />}
+                      {sortConfig.key === col && sortConfig.direction === null}
+                    </Box>
+                  </Box>
+                  <span
+                    className="resize-handle"
+                    onMouseDown={(e) => startResizing(e, col)}
+                    style={{
+                      position: 'absolute',
+                      right: 0,
+                      top: 0,
+                      height: '100%',
+                      width: '5px',
+                      cursor: 'col-resize',
+                      background: isDarkMode ? '#4A5568' : '#CBD5E0',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      userSelect: 'none',
+                    }}
+                  >
+                    <span style={{ fontSize: '12px', color: isDarkMode ? '#F7FAFC' : '#1e293b' }}>|</span>
+                  </span>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {paginatedData.length > 0 ? (
+              paginatedData.map((row, i) => (
+                <tr key={i}>
+                  {onEdit && (
+                    <td style={{ width: 50 }}>
+                      <EditIcon
+                        sx={{ cursor: 'pointer', fontSize: 'large', color: isDarkMode ? 'white' : 'black' }}
+                        onClick={() => onEdit(row.id)}
+                      />
+                    </td>
+                  )}
+                  {visibleColumns.map((col) => (
+                    <td
+                      key={col}
+                      style={{
+                        color: isDarkMode ? 'white' : '#1e293b',
+                        width: columnWidths[col] || calculateColumnWidth(col),
+                        minWidth: 50,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {col.includes('date') ? formatDate(row[col]) :
+                        typeof row[col] === 'object' && row[col] !== null ?
+                          col.toLowerCase().includes('attachment') ||
+                            col.toLowerCase().includes('proof_of_service') ||
+                            col.toLowerCase().includes('proof_of_payment') ?
+                            '📎 File attached' :
+                            JSON.stringify(row[col]) :
+                          row[col] || 'N/A'}
+                    </td>
+                  ))}
+                </tr>
+              ))
+            ) : (
+              <tr><td colSpan={visibleColumns.length + (onEdit ? 1 : 0)} className="no-matching-records">No matching records found</td></tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 2,
+          border: '1px solid',
+          borderColor: isDarkMode ? '#4A5568' : '#CBD5E0',
+          borderRadius: '8px',
+          padding: '6px 12px',
+          backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+          color: isDarkMode ? '#F7FAFC' : '#1e293b',
+        }}>
+          <Typography variant="caption" sx={{ whiteSpace: 'nowrap' }}>
+            Rows per page:
+          </Typography>
+          <Select
+            value={rowsPerPage}
+            onChange={(e) => {
+              setRowsPerPage(parseInt(e.target.value));
+              setPage(0);
+            }}
+            size="small"
+            sx={{
+              color: isDarkMode ? '#F7FAFC' : '#1e293b',
+              '.MuiSelect-icon': { color: isDarkMode ? '#F7FAFC' : '#1e293b' },
+              backgroundColor: isDarkMode ? '#4A5568' : '#E2E8F0',
+              borderRadius: '4px',
+              fontSize: '0.85rem',
+              minWidth: '60px',
+            }}
+          >
+            {[10, 15, 25, 50, 100].map((n) => (
+              <MuiMenuItem key={n} value={n}>{n}</MuiMenuItem>
+            ))}
+          </Select>
+          <Typography variant="caption" sx={{ whiteSpace: 'nowrap' }}>
+            {page * rowsPerPage + 1}-{Math.min((page + 1) * rowsPerPage, totalRecords)} of {totalRecords}
+          </Typography>
+          <IconButton
+            onClick={() => setPage((p) => Math.max(0, p - 1))}
+            disabled={page === 0}
+            size="small"
+            sx={{ color: isDarkMode ? '#F7FAFC' : '#1e293b' }}
+          >
+            <ArrowBackIosIcon fontSize="small" />
+          </IconButton>
+          <IconButton
+            onClick={() => setPage((p) => (p + 1) * rowsPerPage < totalRecords ? p + 1 : p)}
+            disabled={(page + 1) * rowsPerPage >= totalRecords}
+            size="small"
+            sx={{ color: isDarkMode ? '#F7FAFC' : '#1e293b' }}
+          >
+            <ArrowForwardIosIcon fontSize="small" />
+          </IconButton>
+        </Box>
+      </Box>
+    </Box>
+  );
+};
+
 const StudentDetails = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [studentDetails, setStudentDetails] = useState([]);
@@ -77,8 +557,8 @@ const StudentDetails = () => {
   const [payments, setPayments] = useState(null);
   const [interviews, setInterviews] = useState(null);
   const [tasks, setTasks] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-
+  const [isLoading, setIsLoading] = useState(false);
+  const [pendingRequests, setPendingRequests] = useState(0);
   const { isDarkMode } = useContext(ThemeContext);
 
   const user = JSON.parse(localStorage.getItem("user")) || {};
@@ -104,8 +584,16 @@ const StudentDetails = () => {
     return formattedDate.replace(/\//g, "/");
   };
 
+  const incrementPending = () => setPendingRequests((prev) => prev + 1);
+  const decrementPending = () => setPendingRequests((prev) => {
+    const newCount = Math.max(0, prev - 1);
+    if (newCount === 0) setIsLoading(false);
+    return newCount;
+  });
+
   const fetchStudentDetails = useCallback(async () => {
     try {
+      incrementPending();
       const userId = user.user_id;
       let response;
       if (isAdmin) {
@@ -128,22 +616,27 @@ const StudentDetails = () => {
         setStudentDetails(Array.isArray(data) ? data : [updatedStudent]);
         setSelectedStudent(updatedStudent);
         setSelectedStudentid(updatedStudent.id);
+      } else {
+        if (isStudent) {
+          setIsLoading(false);
+        }
       }
       return data;
     } catch (error) {
       console.error("Error fetching student details:", error);
       return {};
+    } finally {
+      decrementPending();
     }
   }, [isAdmin, isStudent, user.user_id]);
 
   const fetchStudentData = async (studentId) => {
     if (!studentId) {
       setStudentData(null);
-      setIsLoading(false);
       return;
     }
     try {
-      setIsLoading(true);
+      incrementPending();
       const response = await fetch(`${API_BASE_URL}/student-data/${studentId}`);
       const data = await response.json();
       setStudentData(data);
@@ -151,96 +644,141 @@ const StudentDetails = () => {
       console.error("Error fetching student data:", error);
       setStudentData(null);
     } finally {
-      setIsLoading(false);
+      decrementPending();
+    }
+  };
+
+  const fetchSectionData = async (key, studentId) => {
+    try {
+      incrementPending();
+      const response = await fetch(`${API_BASE_URL}/${key}/${studentId}`);
+      const data = await response.json();
+      const formattedData = Array.isArray(data)
+        ? data.map((item) => {
+          const updatedItem = { ...item };
+          Object.keys(updatedItem).forEach((key) => {
+            if (key.toLowerCase().endsWith("date_stamp")) {
+              updatedItem[key] = formatDate(updatedItem[key]);
+            }
+          });
+          return updatedItem;
+        })
+        : [];
+      return formattedData;
+    } catch (error) {
+      console.error(`Error fetching ${key}:`, error);
+      return [];
+    } finally {
+      decrementPending();
     }
   };
 
   useEffect(() => {
     let mounted = true;
     const initializeData = async () => {
-      try {
+      if (isStudent) {
+        const data = await fetchStudentDetails();
+        if (mounted && data.length > 0) {
+          setIsLoading(true);
+          setPendingRequests(0);
+          setSelectedStudent(data[0]);
+          setSelectedStudentid(data[0].id);
+          await fetchStudentData(data[0].id);
+
+          const sectionKeys = [
+            "about-me",
+            "parents-details",
+            "university-details",
+            "attachments",
+            "expenses-summary",
+            "assets-liabilities",
+            "academic-results",
+            "voluntary-services",
+            "tasks",
+          ].filter((key) => isAdmin || (key !== "payments" && key !== "interviews"));
+
+          const responses = await Promise.all(
+            sectionKeys.map((key) => fetchSectionData(key, data[0].id))
+          );
+
+          if (mounted) {
+            setAboutMe(responses[sectionKeys.indexOf("about-me")]);
+            setParentsDetails(responses[sectionKeys.indexOf("parents-details")]);
+            setUniversityDetails(responses[sectionKeys.indexOf("university-details")]);
+            setAttachments(responses[sectionKeys.indexOf("attachments")]);
+            setExpensesSummary(responses[sectionKeys.indexOf("expenses-summary")]);
+            setAssetsLiabilities(responses[sectionKeys.indexOf("assets-liabilities")]);
+            setAcademicResults(responses[sectionKeys.indexOf("academic-results")]);
+            setVoluntaryServices(responses[sectionKeys.indexOf("voluntary-services")]);
+            if (isAdmin) {
+              setPayments(responses[sectionKeys.indexOf("payments")]);
+              setInterviews(responses[sectionKeys.indexOf("interviews")]);
+            }
+            setTasks(responses[sectionKeys.indexOf("tasks")]);
+          }
+        } else if (mounted) {
+          setStudentDetails([]);
+          setSelectedStudent(null);
+          setSelectedStudentid(null);
+          setStudentData(null);
+          setIsLoading(false);
+        }
+      } else if (isAdmin) {
         setIsLoading(true);
+        setPendingRequests(0);
         const data = await fetchStudentDetails();
         if (mounted && data.length > 0) {
           setSelectedStudent(data[0]);
           setSelectedStudentid(data[0].id);
           await fetchStudentData(data[0].id);
+
+          const sectionKeys = [
+            "about-me",
+            "parents-details",
+            "university-details",
+            "attachments",
+            "expenses-summary",
+            "assets-liabilities",
+            "academic-results",
+            "voluntary-services",
+            "payments",
+            "interviews",
+            "tasks",
+          ].filter((key) => isAdmin || (key !== "payments" && key !== "interviews"));
+
+          const responses = await Promise.all(
+            sectionKeys.map((key) => fetchSectionData(key, data[0].id))
+          );
+
+          if (mounted) {
+            setAboutMe(responses[sectionKeys.indexOf("about-me")]);
+            setParentsDetails(responses[sectionKeys.indexOf("parents-details")]);
+            setUniversityDetails(responses[sectionKeys.indexOf("university-details")]);
+            setAttachments(responses[sectionKeys.indexOf("attachments")]);
+            setExpensesSummary(responses[sectionKeys.indexOf("expenses-summary")]);
+            setAssetsLiabilities(responses[sectionKeys.indexOf("assets-liabilities")]);
+            setAcademicResults(responses[sectionKeys.indexOf("academic-results")]);
+            setVoluntaryServices(responses[sectionKeys.indexOf("voluntary-services")]);
+            if (isAdmin) {
+              setPayments(responses[sectionKeys.indexOf("payments")]);
+              setInterviews(responses[sectionKeys.indexOf("interviews")]);
+            }
+            setTasks(responses[sectionKeys.indexOf("tasks")]);
+          }
+        } else if (mounted) {
+          setStudentDetails([]);
+          setSelectedStudent(null);
+          setSelectedStudentid(null);
+          setStudentData(null);
         }
-      } finally {
-        if (mounted) setIsLoading(false);
       }
     };
+
     initializeData();
     return () => {
       mounted = false;
     };
-  }, [fetchStudentDetails]);
-
-  useEffect(() => {
-    let mounted = true;
-    if (selectedStudent) {
-      setIsLoading(true);
-      const fetchAllData = async () => {
-        try {
-          const responses = await Promise.all(
-            [
-              "about-me",
-              "parents-details",
-              "university-details",
-              "attachments",
-              "expenses-summary",
-              "assets-liabilities",
-              "academic-results",
-              "voluntary-services",
-              "payments",
-              "interviews",
-              "tasks",
-            ].map((key) =>
-              fetch(`${API_BASE_URL}/${key}/${selectedStudent.id}`)
-                .then((res) => res.json())
-                .catch(() => [])
-            )
-          );
-
-          const formatResponseData = (data) => {
-            if (!Array.isArray(data)) return [];
-            return data.map((item) => {
-              const updatedItem = { ...item };
-              Object.keys(updatedItem).forEach((key) => {
-                if (key.toLowerCase().endsWith("date_stamp") && updatedItem[key]) {
-                  updatedItem[key] = formatDate(updatedItem[key]);
-                }
-              });
-              return updatedItem;
-            });
-          };
-
-          if (mounted) {
-            setAboutMe(formatResponseData(responses[0]));
-            setParentsDetails(formatResponseData(responses[1]));
-            setUniversityDetails(formatResponseData(responses[2]));
-            setAttachments(formatResponseData(responses[3]));
-            setExpensesSummary(formatResponseData(responses[4]));
-            setAssetsLiabilities(formatResponseData(responses[5]));
-            setAcademicResults(formatResponseData(responses[6]));
-            setVoluntaryServices(formatResponseData(responses[7]));
-            setPayments(formatResponseData(responses[8]));
-            setInterviews(formatResponseData(responses[9]));
-            setTasks(formatResponseData(responses[10]));
-            await fetchStudentData(selectedStudent.id); // Fetch student data after other data
-          }
-        } catch (error) {
-          console.error("Error fetching section data:", error);
-        } finally {
-          if (mounted) setIsLoading(false);
-        }
-      };
-      fetchAllData();
-    }
-    return () => {
-      mounted = false;
-    };
-  }, [selectedStudent]);
+  }, [fetchStudentDetails, isAdmin, isStudent]);
 
   const handleDeleteStudent = async (studentId) => {
     if (isStudent) {
@@ -263,249 +801,124 @@ const StudentDetails = () => {
     }
   };
 
-  const isStudentWithNoData = isStudent && !selectedStudent;
-  const isUserWithData = (isAdmin || isStudent) && selectedStudent;
-  const isSelectedStudent = selectedStudent;
-
   const fetchAboutMe = async (studentId) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/about-me/${studentId}`);
-      const data = await response.json();
-      const formattedData = Array.isArray(data)
-        ? data.map((item) => {
-            const updatedItem = { ...item };
-            Object.keys(updatedItem).forEach((key) => {
-              if (key.toLowerCase().endsWith("date_stamp")) {
-                updatedItem[key] = formatDate(updatedItem[key]);
-              }
-            });
-            return updatedItem;
-          })
-        : [];
-      setAboutMe(formattedData);
-      await fetchStudentData(studentId); // Refresh student data
-    } catch (error) {
-      console.error("Error refetching About Me:", error);
+      incrementPending();
+      const data = await fetchSectionData("about-me", studentId);
+      setAboutMe(data);
+      await fetchStudentData(studentId);
+    } finally {
+      decrementPending();
     }
   };
 
   const fetchParentsDetails = async (studentId) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/parents-details/${studentId}`);
-      const data = await response.json();
-      const formattedData = Array.isArray(data)
-        ? data.map((item) => {
-            const updatedItem = { ...item };
-            Object.keys(updatedItem).forEach((key) => {
-              if (key.toLowerCase().endsWith("date_stamp")) {
-                updatedItem[key] = formatDate(updatedItem[key]);
-              }
-            });
-            return updatedItem;
-          })
-        : [];
-      setParentsDetails(formattedData);
-      await fetchStudentData(studentId); // Refresh student data
-    } catch (error) {
-      console.error("Error fetching parent details:", error);
+      incrementPending();
+      const data = await fetchSectionData("parents-details", studentId);
+      setParentsDetails(data);
+      await fetchStudentData(studentId);
+    } finally {
+      decrementPending();
     }
   };
 
   const fetchUniversityDetails = async (studentId) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/university-details/${studentId}`);
-      const data = await response.json();
-      const formattedData = Array.isArray(data)
-        ? data.map((item) => {
-            const updatedItem = { ...item };
-            Object.keys(updatedItem).forEach((key) => {
-              if (key.toLowerCase().endsWith("date_stamp")) {
-                updatedItem[key] = formatDate(updatedItem[key]);
-              }
-            });
-            return updatedItem;
-          })
-        : [];
-      setUniversityDetails(formattedData);
-      await fetchStudentData(studentId); // Refresh student data
-    } catch (error) {
-      console.error("Error fetching university details:", error);
+      incrementPending();
+      const data = await fetchSectionData("university-details", studentId);
+      setUniversityDetails(data);
+      await fetchStudentData(studentId);
+    } finally {
+      decrementPending();
     }
   };
 
   const fetchAttachmentsDetails = async (studentId) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/attachments/${studentId}`);
-      const data = await response.json();
-      const formattedData = Array.isArray(data)
-        ? data.map((item) => {
-            const updatedItem = { ...item };
-            Object.keys(updatedItem).forEach((key) => {
-              if (key.toLowerCase().endsWith("date_stamp")) {
-                updatedItem[key] = formatDate(updatedItem[key]);
-              }
-            });
-            return updatedItem;
-          })
-        : [];
-      setAttachments(formattedData);
-      await fetchStudentData(studentId); // Refresh student data
-    } catch (error) {
-      console.error("Error fetching attachments:", error);
+      incrementPending();
+      const data = await fetchSectionData("attachments", studentId);
+      setAttachments(data);
+      await fetchStudentData(studentId);
+    } finally {
+      decrementPending();
     }
   };
 
   const fetchExpenseDetails = async (studentId) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/expense-details/${studentId}`);
-      const data = await response.json();
-      const formattedData = Array.isArray(data)
-        ? data.map((item) => {
-            const updatedItem = { ...item };
-            Object.keys(updatedItem).forEach((key) => {
-              if (key.toLowerCase().endsWith("date_stamp")) {
-                updatedItem[key] = formatDate(updatedItem[key]);
-              }
-            });
-            return updatedItem;
-          })
-        : [];
-      setExpensesSummary(formattedData);
-      await fetchStudentData(studentId); // Refresh student data
-    } catch (error) {
-      console.error("Error fetching expense details:", error);
+      incrementPending();
+      const data = await fetchSectionData("expenses-summary", studentId);
+      setExpensesSummary(data);
+      await fetchStudentData(studentId);
+    } finally {
+      decrementPending();
     }
   };
 
   const fetchAssetsLiabilities = async (studentId) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/assets-liabilities/${studentId}`);
-      const data = await response.json();
-      const formattedData = Array.isArray(data)
-        ? data.map((item) => {
-            const updatedItem = { ...item };
-            Object.keys(updatedItem).forEach((key) => {
-              if (key.toLowerCase().endsWith("date_stamp")) {
-                updatedItem[key] = formatDate(updatedItem[key]);
-              }
-            });
-            return updatedItem;
-          })
-        : [];
-      setAssetsLiabilities(formattedData);
-      await fetchStudentData(studentId); // Refresh student data
-    } catch (error) {
-      console.error("Error fetching assets & liabilities:", error);
+      incrementPending();
+      const data = await fetchSectionData("assets-liabilities", studentId);
+      setAssetsLiabilities(data);
+      await fetchStudentData(studentId);
+    } finally {
+      decrementPending();
     }
   };
 
   const fetchAcademicResults = async (studentId) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/academic-results/${studentId}`);
-      const data = await response.json();
-      const formattedData = Array.isArray(data)
-        ? data.map((item) => {
-            const updatedItem = { ...item };
-            Object.keys(updatedItem).forEach((key) => {
-              if (key.toLowerCase().endsWith("date_stamp")) {
-                updatedItem[key] = formatDate(updatedItem[key]);
-              }
-            });
-            return updatedItem;
-          })
-        : [];
-      setAcademicResults(formattedData);
-      await fetchStudentData(studentId); // Refresh student data
-    } catch (error) {
-      console.error("Error fetching academic results:", error);
+      incrementPending();
+      const data = await fetchSectionData("academic-results", studentId);
+      setAcademicResults(data);
+      await fetchStudentData(studentId);
+    } finally {
+      decrementPending();
     }
   };
 
   const fetchVoluntaryServices = async (studentId) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/voluntary-service/${studentId}`);
-      const data = await response.json();
-      const formattedData = Array.isArray(data)
-        ? data.map((item) => {
-            const updatedItem = { ...item };
-            Object.keys(updatedItem).forEach((key) => {
-              if (key.toLowerCase().endsWith("date_stamp")) {
-                updatedItem[key] = formatDate(updatedItem[key]);
-              }
-            });
-            return updatedItem;
-          })
-        : [];
-      setVoluntaryServices(formattedData);
-      await fetchStudentData(studentId); // Refresh student data
-    } catch (error) {
-      console.error("Error fetching voluntary services:", error);
+      incrementPending();
+      const data = await fetchSectionData("voluntary-services", studentId);
+      setVoluntaryServices(data);
+      await fetchStudentData(studentId);
+    } finally {
+      decrementPending();
     }
   };
 
   const fetchPaymentsDetails = async (studentId) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/payments/${studentId}`);
-      const data = await response.json();
-      const formattedData = Array.isArray(data)
-        ? data.map((item) => {
-            const updatedItem = { ...item };
-            Object.keys(updatedItem).forEach((key) => {
-              if (key.toLowerCase().endsWith("date_stamp")) {
-                updatedItem[key] = formatDate(updatedItem[key]);
-              }
-            });
-            return updatedItem;
-          })
-        : [];
-      setPayments(formattedData);
-      await fetchStudentData(studentId); // Refresh student data
-    } catch (error) {
-      console.error("Error fetching payments details:", error);
+      incrementPending();
+      const data = await fetchSectionData("payments", studentId);
+      setPayments(data);
+      await fetchStudentData(studentId);
+    } finally {
+      decrementPending();
     }
   };
 
   const fetchInterviewsDetails = async (studentId) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/interviews/${studentId}`);
-      const data = await response.json();
-      const formattedData = Array.isArray(data)
-        ? data.map((item) => {
-            const updatedItem = { ...item };
-            Object.keys(updatedItem).forEach((key) => {
-              if (key.toLowerCase().endsWith("date_stamp")) {
-                updatedItem[key] = formatDate(updatedItem[key]);
-              }
-            });
-            return updatedItem;
-          })
-        : [];
-      setInterviews(formattedData);
-      await fetchStudentData(studentId); // Refresh student data
-    } catch (error) {
-      console.error("Error fetching interview details:", error);
+      incrementPending();
+      const data = await fetchSectionData("interviews", studentId);
+      setInterviews(data);
+      await fetchStudentData(studentId);
+    } finally {
+      decrementPending();
     }
   };
 
   const fetchTasks = async (studentId) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/tasks/${studentId}`);
-      const data = await response.json();
-      const formattedData = Array.isArray(data)
-        ? data.map((item) => {
-            const updatedItem = { ...item };
-            Object.keys(updatedItem).forEach((key) => {
-              if (key.toLowerCase().endsWith("date_stamp")) {
-                updatedItem[key] = formatDate(updatedItem[key]);
-              }
-            });
-            return updatedItem;
-          })
-        : [];
-      setTasks(formattedData);
-      await fetchStudentData(studentId); // Refresh student data
-    } catch (error) {
-      console.error("Error fetching tasks:", error);
+      incrementPending();
+      const data = await fetchSectionData("tasks", studentId);
+      setTasks(data);
+      await fetchStudentData(studentId);
+    } finally {
+      decrementPending();
     }
   };
 
@@ -541,7 +954,7 @@ const StudentDetails = () => {
           });
           setSelectedStudent(formattedStudent);
           setSelectedStudentid(formattedStudent.id);
-          await fetchStudentData(formattedStudent.id); // Refresh student data
+          await fetchStudentData(formattedStudent.id);
         } else {
           console.error("Invalid savedStudent data:", savedStudent);
         }
@@ -614,187 +1027,113 @@ const StudentDetails = () => {
 
     if ((isPayments || isInterview) && !isAdmin) return null;
 
+    const section = tabSections.find((sec) => sec.key === sectionKey);
+    const sectionLabel = section ? section.label : sectionKey;
+
+    const handleEdit = (id) => {
+      if (isAboutMe) {
+        setEditingAboutMeId(id);
+        setAboutMeDrawerOpen(true);
+      }
+      if (isParents) {
+        setEditingParentId(id);
+        setParentsDrawerOpen(true);
+      }
+      if (isUniversityDetails) {
+        setEditingUniversityId(id);
+        setUniversityDetailsDrawerOpen(true);
+      }
+      if (isAttachments) {
+        setEditingAttachmentId(id);
+        setAttachmentsDrawerOpen(true);
+      }
+      if (isExpenses) {
+        setEditingExpenseDetailsId(id);
+        setExpensesSummaryDrawerOpen(true);
+      }
+      if (isAssetsLiabilities) {
+        setEditingAssetLiabilityId(id);
+        setAssetsLiabilitiesDrawerOpen(true);
+      }
+      if (isAcademicResults) {
+        setEditingAcademicResultId(id);
+        setAcademicResultsDrawerOpen(true);
+      }
+      if (isVoluntaryServices) {
+        setEditingVoluntaryServiceId(id);
+        setVoluntaryServiceDrawerOpen(true);
+      }
+      if (isPayments) {
+        setEditingPaymentId(id);
+        setPaymentDrawerOpen(true);
+      }
+      if (isInterview) {
+        setEditingInterviewId(id);
+        setInterviewDrawerOpen(true);
+      }
+      if (isTasks) {
+        setEditingTaskId(id);
+        setTasksDrawerOpen(true);
+      }
+    };
+
+    const handleAdd = () => {
+      if (isAboutMe) {
+        setEditingAboutMeId(null);
+        setAboutMeDrawerOpen(true);
+      }
+      if (isParents) {
+        setEditingParentId(null);
+        setParentsDrawerOpen(true);
+      }
+      if (isUniversityDetails) {
+        setEditingUniversityId(null);
+        setUniversityDetailsDrawerOpen(true);
+      }
+      if (isAttachments) {
+        setEditingAttachmentId(null);
+        setAttachmentsDrawerOpen(true);
+      }
+      if (isExpenses) {
+        setEditingExpenseDetailsId(null);
+        setExpensesSummaryDrawerOpen(true);
+      }
+      if (isAssetsLiabilities) {
+        setEditingAssetLiabilityId(null);
+        setAssetsLiabilitiesDrawerOpen(true);
+      }
+      if (isAcademicResults) {
+        setEditingAcademicResultId(null);
+        setAcademicResultsDrawerOpen(true);
+      }
+      if (isVoluntaryServices) {
+        setEditingVoluntaryServiceId(null);
+        setVoluntaryServiceDrawerOpen(true);
+      }
+      if (isPayments) {
+        setEditingPaymentId(null);
+        setPaymentDrawerOpen(true);
+      }
+      if (isInterview) {
+        setEditingInterviewId(null);
+        setInterviewDrawerOpen(true);
+      }
+      if (isTasks) {
+        setEditingTaskId(null);
+        setTasksDrawerOpen(true);
+      }
+    };
+
     return (
-      <Box sx={{ padding: 0, border: "1px solid #ccc", marginBottom: 2, backgroundColor: isDarkMode ? "#1e293b" : "white", color: pageStyle.color }}>
-        <Box sx={{ padding: 1, display: "flex", alignItems: "center", marginBottom: 0.5, borderBottom: 1, borderBottomColor: "#ccc", height: 40, backgroundColor: isDarkMode ? "#1e293b" : "#e1f5fe" }}>
-          <Typography variant="h6" sx={{ fontWeight: "bold", marginLeft: 1 }}>
-            {capitalizeWords(sectionKey === "expenses-summary" ? "financial-details" : sectionKey)}
-          </Typography>
-          {isSelectedStudent &&
-            (isAboutMe ||
-              isParents ||
-              isUniversityDetails ||
-              isAttachments ||
-              isExpenses ||
-              isAssetsLiabilities ||
-              isAcademicResults ||
-              isVoluntaryServices ||
-              isPayments ||
-              isInterview ||
-              isTasks) && (
-              <Button
-                sx={{ marginLeft: "auto", color: isDarkMode ? "white" : "black" }}
-                onClick={() => {
-                  if (isAboutMe) {
-                    setEditingAboutMeId(null);
-                    setAboutMeDrawerOpen(true);
-                  }
-                  if (isParents) {
-                    setEditingParentId(null);
-                    setParentsDrawerOpen(true);
-                  }
-                  if (isUniversityDetails) {
-                    setEditingUniversityId(null);
-                    setUniversityDetailsDrawerOpen(true);
-                  }
-                  if (isAttachments) {
-                    setEditingAttachmentId(null);
-                    setAttachmentsDrawerOpen(true);
-                  }
-                  if (isExpenses) {
-                    setEditingExpenseDetailsId(null);
-                    setExpensesSummaryDrawerOpen(true);
-                  }
-                  if (isAssetsLiabilities) {
-                    setEditingAssetLiabilityId(null);
-                    setAssetsLiabilitiesDrawerOpen(true);
-                  }
-                  if (isAcademicResults) {
-                    setEditingAcademicResultId(null);
-                    setAcademicResultsDrawerOpen(true);
-                  }
-                  if (isVoluntaryServices) {
-                    setEditingVoluntaryServiceId(null);
-                    setVoluntaryServiceDrawerOpen(true);
-                  }
-                  if (isPayments) {
-                    setEditingPaymentId(null);
-                    setPaymentDrawerOpen(true);
-                  }
-                  if (isInterview) {
-                    setEditingInterviewId(null);
-                    setInterviewDrawerOpen(true);
-                  }
-                  if (isTasks) {
-                    setEditingTaskId(null);
-                    setTasksDrawerOpen(true);
-                  }
-                }}
-              >
-                <AddIcon fontSize="small" />
-              </Button>
-            )}
-        </Box>
-        {data.length > 0 && (
-          <Table sx={{ maxHeight: 400, overflowY: "auto", display: "block" }}>
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ fontWeight: "bold", width: "50px" }} />
-                {Object.keys(data[0])
-                  .filter((field) => field !== "id" && field !== "student_details_portal_id")
-                  .map((field, idx) => (
-                    <TableCell
-                      key={idx}
-                      sx={{
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        maxWidth: 300,
-                        fontWeight: "bold",
-                        textTransform: "capitalize",
-                        color: isDarkMode ? "white" : "black",
-                      }}
-                    >
-                      {capitalizeWords(field.replace(/_/g, " "))}
-                    </TableCell>
-                  ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {data.map((row, i) => (
-                <TableRow key={i}>
-                  <TableCell sx={{ width: "50px" }}>
-                    {(isAboutMe ||
-                      isParents ||
-                      isUniversityDetails ||
-                      isAttachments ||
-                      isExpenses ||
-                      isAssetsLiabilities ||
-                      isAcademicResults ||
-                      isVoluntaryServices ||
-                      isPayments ||
-                      isInterview ||
-                      isTasks) && (
-                      <EditIcon
-                        sx={{ cursor: "pointer", fontSize: "large", color: isDarkMode ? "white" : "black" }}
-                        onClick={() => {
-                          if (isAboutMe) {
-                            setEditingAboutMeId(row.id);
-                            setAboutMeDrawerOpen(true);
-                          }
-                          if (isParents) {
-                            setEditingParentId(row.id);
-                            setParentsDrawerOpen(true);
-                          }
-                          if (isUniversityDetails) {
-                            setEditingUniversityId(row.id);
-                            setUniversityDetailsDrawerOpen(true);
-                          }
-                          if (isAttachments) {
-                            setEditingAttachmentId(row.id);
-                            setAttachmentsDrawerOpen(true);
-                          }
-                          if (isExpenses) {
-                            setEditingExpenseDetailsId(row.id);
-                            setExpensesSummaryDrawerOpen(true);
-                          }
-                          if (isAssetsLiabilities) {
-                            setEditingAssetLiabilityId(row.id);
-                            setAssetsLiabilitiesDrawerOpen(true);
-                          }
-                          if (isAcademicResults) {
-                            setEditingAcademicResultId(row.id);
-                            setAcademicResultsDrawerOpen(true);
-                          }
-                          if (isVoluntaryServices) {
-                            setEditingVoluntaryServiceId(row.id);
-                            setVoluntaryServiceDrawerOpen(true);
-                          }
-                          if (isPayments) {
-                            setEditingPaymentId(row.id);
-                            setPaymentDrawerOpen(true);
-                          }
-                          if (isInterview) {
-                            setEditingInterviewId(row.id);
-                            setInterviewDrawerOpen(true);
-                          }
-                          if (isTasks) {
-                            setEditingTaskId(row.id);
-                            setTasksDrawerOpen(true);
-                          }
-                        }}
-                      />
-                    )}
-                  </TableCell>
-                  {Object.entries(row).map(([key, val], j) =>
-                    key !== "id" && key !== "student_details_portal_id" && (
-                      <TableCell key={j} sx={{ color: isDarkMode ? "white" : "black" }}>
-                        {typeof val === "object" && val !== null
-                          ? key.toLowerCase().includes("attachment") ||
-                            key.toLowerCase().includes("proof_of_service") ||
-                            key.toLowerCase().includes("proof_of_payment")
-                            ? "📎 File attached"
-                            : JSON.stringify(val)
-                          : val}
-                      </TableCell>
-                    )
-                  )}
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-      </Box>
+      <SectionTable
+        data={data}
+        sectionKey={sectionKey}
+        sectionLabel={sectionLabel}
+        isDarkMode={isDarkMode}
+        selectedStudentid={selectedStudentid}
+        onEdit={selectedStudent ? handleEdit : null}
+        onAdd={selectedStudent ? handleAdd : null}
+      />
     );
   };
 
@@ -804,12 +1143,12 @@ const StudentDetails = () => {
     const section = tabSections[tabValue];
     return section.key === "show_all"
       ? tabSections
-          .filter((s) => s.key !== "show_all")
-          .map((sec, i) => (
-            (isAdmin || (sec.key !== "payments" && sec.key !== "interviews")) && (
-              <TabContent key={i} sectionKey={sec.key} data={dataForSection(sec.key)} />
-            )
-          ))
+        .filter((s) => s.key !== "show_all")
+        .map((sec, i) => (
+          (isAdmin || (sec.key !== "payments" && sec.key !== "interviews")) && (
+            <TabContent key={i} sectionKey={sec.key} data={dataForSection(sec.key)} />
+          )
+        ))
       : <TabContent sectionKey={section.key} data={dataForSection(section.key)} />;
   };
 
@@ -832,6 +1171,9 @@ const StudentDetails = () => {
       console.error("Failed to generate PDF:", error);
     }
   };
+
+  const isStudentWithNoData = isStudent && !selectedStudent;
+  const isUserWithData = (isAdmin || isStudent) && selectedStudent;
 
   return (
     <div>
@@ -970,7 +1312,38 @@ const StudentDetails = () => {
                         onClick={async () => {
                           setSelectedStudent(student);
                           setSelectedStudentid(student.id);
+                          setIsLoading(true);
+                          setPendingRequests(0);
                           await fetchStudentData(student.id);
+                          const sectionKeys = [
+                            "about-me",
+                            "parents-details",
+                            "university-details",
+                            "attachments",
+                            "expenses-summary",
+                            "assets-liabilities",
+                            "academic-results",
+                            "voluntary-services",
+                            "payments",
+                            "interviews",
+                            "tasks",
+                          ].filter((key) => isAdmin || (key !== "payments" && key !== "interviews"));
+                          const responses = await Promise.all(
+                            sectionKeys.map((key) => fetchSectionData(key, student.id))
+                          );
+                          setAboutMe(responses[sectionKeys.indexOf("about-me")]);
+                          setParentsDetails(responses[sectionKeys.indexOf("parents-details")]);
+                          setUniversityDetails(responses[sectionKeys.indexOf("university-details")]);
+                          setAttachments(responses[sectionKeys.indexOf("attachments")]);
+                          setExpensesSummary(responses[sectionKeys.indexOf("expenses-summary")]);
+                          setAssetsLiabilities(responses[sectionKeys.indexOf("assets-liabilities")]);
+                          setAcademicResults(responses[sectionKeys.indexOf("academic-results")]);
+                          setVoluntaryServices(responses[sectionKeys.indexOf("voluntary-services")]);
+                          if (isAdmin) {
+                            setPayments(responses[sectionKeys.indexOf("payments")]);
+                            setInterviews(responses[sectionKeys.indexOf("interviews")]);
+                          }
+                          setTasks(responses[sectionKeys.indexOf("tasks")]);
                         }}
                       >
                         <CardContent sx={{ padding: "10px" }}>
@@ -987,128 +1360,135 @@ const StudentDetails = () => {
           </Grid>
         )}
 
-        <Grid item xs={12} sm={9} md={isStudent ? 12 : 10}>
-          <Paper
-            sx={{
-              border: "1px solid #ccc",
-              backgroundColor: isDarkMode ? "#1e293b" : "white",
-              color: pageStyle.color,
-            }}
-          >
-            <Box
+        {(isAdmin || selectedStudent) && (
+          <Grid item xs={12} sm={9} md={isStudent ? 12 : 10}>
+            <Paper
               sx={{
-                backgroundColor: isDarkMode ? "#1e293b" : "#e1f5fe",
-                borderBottom: isDarkMode ? "1px solid white" : "1px solid #ccc",
-                padding: "6px",
-                display: "flex",
-                justifyContent: "space-between",
+                border: "1px solid #ccc",
+                backgroundColor: isDarkMode ? "#1e293b" : "white",
+                color: pageStyle.color,
               }}
             >
-              <Typography
-                variant="h6"
-                sx={{ fontWeight: "bold", color: isDarkMode ? "white" : "#1e293b", marginLeft: 1 }}
-              >
-                Student Details Portal
-              </Typography>
-              {isUserWithData && (
-                <Box sx={{ display: "flex", alignItems: "center", gap: 0, margin: 0, padding: 0 }}>
-                  <Button
-                    variant="contained"
-                    onClick={() => {
-                      setDrawerOpen(false);
-                      setTimeout(() => setDrawerOpen(true), 50);
-                      setSelectedStudentid(selectedStudent?.id);
-                    }}
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      backgroundColor: isDarkMode ? "white" : "black",
-                      color: isDarkMode ? "black" : "white",
-                      padding: "2px 6px",
-                      margin: 0,
-                      textTransform: "none",
-                    }}
-                  >
-                    <EditIcon sx={{ marginRight: 1, fontSize: "small" }} />
-                    Edit
-                  </Button>
-                  <Button
-                    variant="contained"
-                    onClick={handleDownloadPDF}
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      backgroundColor: isDarkMode ? "white" : "black",
-                      color: isDarkMode ? "black" : "white",
-                      padding: "2px 6px",
-                      margin: 0,
-                      textTransform: "none",
-                      marginLeft: 1,
-                    }}
-                  >
-                    <DownloadIcon sx={{ marginRight: 1, fontSize: "small" }} />
-                    Download PDF
-                  </Button>
-                </Box>
-              )}
-            </Box>
-
-            {isLoading ? (
-              <Box sx={{ padding: 2 }}>
-                <Typography variant="body1" sx={{ textAlign: "center" }}>
-                  Loading...
-                </Typography>
-              </Box>
-            ) : selectedStudent ? (
-              <Box sx={{ padding: 1.5 }}>
-                <Grid container spacing={1}>
-                  {Object.entries(selectedStudent).map(([key, value], i) => (
-                    key !== "id" &&
-                    key !== "user_id" &&
-                    key !== "employment_status_attachment" && (
-                      <React.Fragment key={i}>
-                        <Grid item xs={6} sx={{ borderBottom: "1px solid #ccc", pb: "6px" }}>
-                          <Typography variant="body1">
-                            <strong>{capitalizeWords(key.replace(/_/g, " "))}</strong>
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={6} sx={{ borderBottom: "1px solid #ccc", pb: "6px" }}>
-                          <Typography variant="body1">{value}</Typography>
-                        </Grid>
-                      </React.Fragment>
-                    )
-                  ))}
-                </Grid>
-              </Box>
-            ) : (
-              <Typography variant="body1" sx={{ m: 2, fontWeight: "bold" }}>
-                No Record Selected
-              </Typography>
-            )}
-
-            <Box sx={{ p: 1, overflowX: "auto" }}>
-              <Tabs
-                value={tabValue}
-                onChange={handleTabChange}
-                aria-label="tabs"
+              <Box
                 sx={{
-                  "& .MuiTab-root": {
-                    fontWeight: "600",
-                    textTransform: "capitalize",
-                    mr: -2,
-                    color: isDarkMode ? "white" : "black",
-                  },
+                  backgroundColor: isDarkMode ? "#1e293b" : "#e1f5fe",
+                  borderBottom: isDarkMode ? "1px solid white" : "1px solid #ccc",
+                  padding: "6px",
+                  display: "flex",
+                  justifyContent: "space-between",
                 }}
               >
-                {tabSections.map((section, i) => (
-                  <Tab key={i} label={section.label} />
-                ))}
-              </Tabs>
-            </Box>
+                <Typography
+                  variant="h6"
+                  sx={{ fontWeight: "bold", color: isDarkMode ? "white" : "#1e293b", marginLeft: 1 }}
+                >
+                  Student Details Portal
+                </Typography>
+                {isUserWithData && (
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 0, margin: 0, padding: 0 }}>
+                    <Button
+                      variant="contained"
+                      onClick={() => {
+                        setDrawerOpen(false);
+                        setTimeout(() => setDrawerOpen(true), 50);
+                        setSelectedStudentid(selectedStudent?.id);
+                      }}
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        backgroundColor: isDarkMode ? "white" : "black",
+                        color: isDarkMode ? "black" : "white",
+                        padding: "2px 6px",
+                        margin: 0,
+                        textTransform: "none",
+                      }}
+                    >
+                      <EditIcon sx={{ marginRight: 1, fontSize: "small" }} />
+                      Edit
+                    </Button>
+                    <Button
+                      variant="contained"
+                      onClick={handleDownloadPDF}
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        backgroundColor: isDarkMode ? "white" : "black",
+                        color: isDarkMode ? "black" : "white",
+                        padding: "2px 6px",
+                        margin: 0,
+                        textTransform: "none",
+                        marginLeft: 1,
+                      }}
+                    >
+                      <DownloadIcon sx={{ marginRight: 1, fontSize: "small" }} />
+                      Download PDF
+                    </Button>
+                  </Box>
+                )}
+              </Box>
 
-            <Box sx={{ p: 2 }}>{renderTabContent(tabValue)}</Box>
-          </Paper>
-        </Grid>
+              {isLoading ? (
+                <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", padding: 4 }}>
+                  <CircularProgress sx={{ color: isDarkMode ? "white" : "black" }} />
+                  <Typography variant="body1" sx={{ ml: 2, color: isDarkMode ? "white" : "black" }}>
+                    Loading...
+                  </Typography>
+                </Box>
+              ) : selectedStudent ? (
+                <Box sx={{ padding: 1.5 }}>
+                  <Grid container spacing={1}>
+                    {Object.entries(selectedStudent).map(([key, value], i) => (
+                      key !== "id" &&
+                      key !== "user_id" &&
+                      key !== "employment_status_attachment" && (
+                        <React.Fragment key={i}>
+                          <Grid item xs={6} sx={{ borderBottom: "1px solid #ccc", pb: "6px" }}>
+                            <Typography variant="body1">
+                              <strong>{capitalizeWords(key.replace(/_/g, " "))}</strong>
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={6} sx={{ borderBottom: "1px solid #ccc", pb: "6px" }}>
+                            <Typography variant="body1">{value}</Typography>
+                          </Grid>
+                        </React.Fragment>
+                      )
+                    ))}
+                  </Grid>
+                </Box>
+              ) : (
+                <Typography variant="body1" sx={{ m: 2, fontWeight: "bold", color: isDarkMode ? "white" : "black" }}>
+                  No Record Selected
+                </Typography>
+              )}
+
+              {!isLoading && selectedStudent && (
+                <Box sx={{ p: 1, overflowX: "auto" }}>
+                  <Tabs
+                    value={tabValue}
+                    onChange={handleTabChange}
+                    aria-label="tabs"
+                    sx={{
+                      "& .MuiTab-root": {
+                        fontWeight: "600",
+                        textTransform: "capitalize",
+                        mr: -2,
+                        color: isDarkMode ? "white" : "black",
+                      },
+                    }}
+                  >
+                    {tabSections.map((section, i) => (
+                      <Tab key={i} label={section.label} />
+                    ))}
+                  </Tabs>
+                </Box>
+              )}
+
+              {!isLoading && selectedStudent && (
+                <Box sx={{ p: 2 }}>{renderTabContent(tabValue)}</Box>
+              )}
+            </Paper>
+          </Grid>
+        )}
       </Grid>
 
       {renderDrawer()}

@@ -24,6 +24,17 @@ const LoginSignup = () => {
   const [forgotPasswordError, setForgotPasswordError] = useState("");
   const [forgotPasswordSuccess, setForgotPasswordSuccess] = useState("");
 
+  const checkEmailDomainExists = async (email) => {
+    const domain = email.split("@")[1];
+    try {
+      const response = await fetch(`https://dns.google/resolve?name=${domain}&type=MX`);
+      const data = await response.json();
+      return data?.Answer && data.Answer.length > 0;
+    } catch (error) {
+      return false;
+    }
+  };
+
   const handleAuthToggle = (_, newAuthMode) => {
     if (newAuthMode !== null) setAuthMode(newAuthMode);
   };
@@ -56,7 +67,11 @@ const LoginSignup = () => {
         setTimeout(() => setOpenForgotPassword(false), 3000);
       }
     } catch (error) {
-      setForgotPasswordError("An error occurred. Please try again.");
+      setForgotPasswordError(error.response?.data?.msg);
+      //       setErrors((prevErrors) => ({
+      //   ...prevErrors,
+      //   email: error.response?.data?.msg,
+      // }))
     }
   };
 
@@ -84,6 +99,13 @@ const LoginSignup = () => {
       if (!formData.email_address) {
         newErrors.email = "Email is required";
         formValid = false;
+      }
+      else {
+        const domainExists = await checkEmailDomainExists(formData.email_address);
+        if (!domainExists) {
+          newErrors.email = "Email domain does not exist. Please enter a valid email.";
+          formValid = false;
+        }
       }
 
       if (formData.password.length < 8) {
@@ -152,19 +174,17 @@ const LoginSignup = () => {
       }
     } catch (error) {
       console.error("Error submitting form", error);
+      const msg = error.response?.data?.msg?.toLowerCase();
 
-      if (error.response?.data?.msg === "Email address is already in use") {
-        setErrors((prevErrors) => ({
-          ...prevErrors,
-          email: "Email address is already in use",
-        }));
+      if (msg?.includes("password")) {
+        setErrors({ email: "", password: error.response.data.msg });
+      } else if (msg?.includes("email") || msg?.includes("user")) {
+        setErrors({ email: error.response.data.msg, password: "" });
       } else {
-        setErrors((prevErrors) => ({
-          ...prevErrors,
-          email: "An error occurred. Please try again.",
-        }));
+        setErrors({ email: "", password: "" });
       }
     }
+
   };
 
   return (

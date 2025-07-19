@@ -24,9 +24,9 @@ router.get('/activity-log', async (req, res) => {
         SELECT 
             (d.first_name || ' ' || d.last_name) AS username, 
           d.email_address,
-            INITCAP(m.activity_type) AS ACT_TYPE, 
-            TO_CHAR(ACTIVITY_DATE_STAMP, 'DD-Mon-YYYY') AS ACT_DATE,
-            TO_CHAR(ACTIVITY_DATE_STAMP, 'HH:MI:SS PM') AS ACT_TIME
+            INITCAP(m.activity_type) AS activity_type, 
+            TO_CHAR(ACTIVITY_DATE_STAMP, 'DD-Mon-YYYY') AS ACTIVITY_DATE,
+            TO_CHAR(ACTIVITY_DATE_STAMP, 'HH:MI:SS PM') AS ACTIVITY_TIME
         FROM 
             student_portal_activity_log m,
             student_portal_users d

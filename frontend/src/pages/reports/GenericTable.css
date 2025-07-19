@@ -1,87 +1,114 @@
+:root {
+  --hover-bg-color: #f1f5f9; /* Light mode hover */
+}
+
+.dark-mode {
+  --hover-bg-color: #4B5EAA; /* Dark mode hover */
+}
+
+.generic-table tbody tr:hover {
+  background-color: var(--hover-bg-color);
+  transition: background-color 0.2s ease;
+}
+
+.generic-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
 /* Body and general layout styles */
 body {
   margin: 0;
   font-family: Arial, sans-serif;
   min-height: 100vh; /* Ensures the body takes up the full height */
-  background-color: #F7FAFC; /* Light background */
 }
 
+/* Table container to support horizontal scrolling */
 .generic-table-container {
-  margin-top: 20px;
-  max-width: 100%;
   overflow-x: auto;
-  margin-left: auto;
-  margin-right: auto;
+  width: 100%;
 }
 
+/* Table styling */
 .generic-table {
   width: 100%;
   border-collapse: collapse;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  /* background-color: #ffffff; Light table background */
+  table-layout: fixed; /* Ensures column widths are respected */
+  font-size: 0.85rem; /* Consistent font size for table content */
 }
 
+/* Table header and cell styling */
 .generic-table th,
 .generic-table td {
+  padding: 8px;
   text-align: left;
-  padding: 12px;
-  font-size: 12px;
-  border-bottom: 1px solid #ddd;
+  border: 1px solid #ddd; /* Light border for light mode */
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-/* Column header styling */
+/* Position header for resize handle */
 .generic-table th {
-  font-weight: 600;
-  text-transform: none;
+  position: relative;
+  font-weight: 500; /* Slightly bolder headers for better distinction */
+}
+
+/* Row hover effect */
+.generic-table tbody tr:hover {
+  background-color: var(--hover-bg-color, #f1f5f9); /* Light mode hover */
 }
 
 /* Dark mode adjustments */
-body.dark-mode {
-  background-color: #2D3748;
+.dark-mode .generic-table {
+  background-color: #1e293b; /* Dark table background */
+  border-color: #4A5568; /* Darker border for dark mode */
 }
 
-body.dark-mode .generic-table {
-  background-color: #1A202C; /* Dark table background */
-}
-
-body.dark-mode .generic-table th,
-body.dark-mode .generic-table td {
+.dark-mode .generic-table th,
+.dark-mode .generic-table td {
   color: #F7FAFC; /* Light text color in dark mode */
+  border-color: #4A5568; /* Consistent border color */
 }
 
-body.dark-mode .generic-search-input {
-  border: 1px solid #ddd;
-  background-color: #2D3748;
-  color: white;
+.dark-mode .generic-table tbody tr:hover {
+  background-color: var(--hover-bg-color, #4B5EAA); /* Dark mode hover - distinct dark blue */
+  color: #F7FAFC; /* Ensure text remains white for contrast */
 }
 
 /* No records found styling */
 .no-matching-records {
   text-align: center;
   padding: 20px;
-  color: #666;
+  color: #666; /* Gray text for light mode */
   font-size: 16px;
 }
 
-/* Search input styling */
-.generic-search-container {
-  margin-bottom: 10px;
-  text-align: left;
+.dark-mode .no-matching-records {
+  color: #A0AEC0; /* Lighter gray for dark mode */
 }
 
-.generic-search-input {
-  padding: 10px;
-  font-size: 14px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  width: 200px;
-  background-color: #ffffff; /* Default background for search bar */
-  color: #1e293b; /* Default text color */
+/* Resize handle styling */
+.resize-handle {
+  cursor: col-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 5px;
+  height: 100%;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 1;
+  background: #CBD5E0; /* Light mode background */
+  color: #1e293b; /* Light mode separator color */
 }
 
-.generic-search-input:focus {
-  outline: none;
-  border-color: #1e293b;
+.dark-mode .resize-handle {
+  background: #4A5568; /* Dark mode background */
+  color: #F7FAFC; /* Dark mode separator color */
 }
+
+.resize-handle:hover {
+  background: #888 !important; /* Highlight on hover for both modes */
+}
+

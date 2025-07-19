@@ -21,7 +21,50 @@ const formatDate = (date) => {
 // Route for Student details
 router.get("/view/student-details", async (req, res) => {
   try {
-    const result = await pool.query("SELECT * FROM Student_Details_Portal ORDER BY STUDENT_NAME,STUDENT_SURNAME");
+    const result = await pool.query(
+            `SELECT 
+        student_name, 
+        student_surname, 
+        TO_CHAR(student_date_of_birth, 'DD/MM/YYYY') AS student_date_of_birth, 
+        student_id_passport_number, 
+        student_nationality, 
+        student_race, 
+        student_religion,
+        student_marital_status, 
+        student_home_address, 
+        student_suburb, 
+        student_province,
+        student_area_code, 
+        student_whatsapp_number, 
+        student_alternative_number,
+        student_email_address, 
+        student_employment_status, 
+        student_company_of_employment,
+        student_job_title, 
+        student_current_salary, 
+        student_highest_education, 
+        student_number_of_siblings, 
+        student_siblings_bursary,
+        student_type, 
+        student_finance_type,
+        student_emergency_contact_name, 
+        student_emergency_contact_relationship,
+        student_emergency_contact_number, 
+        student_emergency_contact_address,
+        student_willow_relationship, 
+        relation_name, 
+        relation_surname, 
+        relation_type, 
+        relation_reference,
+        relation_employee_code, 
+        relation_hr_contact, 
+        relation_branch,
+        student_status, 
+        student_status_comment,
+        TO_CHAR(student_date_stamp, 'DDth Mon YYYY HH12:MI:SS PM') AS created_on
+       FROM student_details_portal
+       order by id desc`
+      );
 
     // Format the dob field before sending response
     const formattedResults = result.rows.map(student => {
@@ -54,7 +97,8 @@ router.get('/view/parent-detail-report', async (req, res) => {
           p.Parent_Name,
           p.Parent_Surname,
           p.Parent_Cell_Number,
-          p.Parent_Employment_Status
+          p.Parent_Employment_Status,
+          TO_CHAR(p.parent_date_stamp, 'DDth Mon YYYY HH12:MI:SS PM') AS created_on
         FROM 
           Student_Details_Portal s
         JOIN 
@@ -94,13 +138,13 @@ router.get('/view/student-equity', async (req, res) => {
         a.Cash_in_Bank,
         a.Investments,
         a.Liabilities,
-        a.Assets_Liabilities_Date_Stamp,
         (
           COALESCE(CAST(NULLIF(a.Gold_Silver, '') AS float), 0) +
           COALESCE(CAST(NULLIF(a.Cash_in_Bank, '') AS float), 0) +
           COALESCE(CAST(NULLIF(a.Investments, '') AS float), 0) -
           COALESCE(CAST(NULLIF(a.Liabilities, '') AS float), 0)
-        ) AS Equity
+        ) AS Equity,
+        TO_CHAR(a.Assets_Liabilities_Date_Stamp, 'DDth Mon YYYY HH12:MI:SS PM') AS created_on
       FROM 
         Student_Details_Portal s
       JOIN 
@@ -149,7 +193,7 @@ router.get('/view/student-payments-report', async (req, res) => {
           p.Payments_Date,
           p.Payments_ET_Number,
           p.Payment_Created_By,
-          p.Payments_Date_Stamp
+          TO_CHAR(p.Payments_Date_Stamp, 'DDth Mon YYYY HH12:MI:SS PM') AS created_on
         FROM 
           Student_Details_Portal s
         JOIN 
@@ -190,7 +234,7 @@ router.get('/view/student-voluntary-service', async (req, res) => {
           v.Contact_Person,
           v.Contact_Person_Number,
           v.Hours_Contributed,
-          v.Voluntary_Service_Date_Stamp
+          TO_CHAR(v.Voluntary_Service_Date_Stamp, 'DDth Mon YYYY HH12:MI:SS PM') AS created_on
         FROM 
           Student_Details_Portal s
         JOIN 

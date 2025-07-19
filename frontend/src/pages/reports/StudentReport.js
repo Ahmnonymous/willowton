@@ -14,21 +14,20 @@ import {
   Select,
   MenuItem as MuiMenuItem,
   Typography,
-  Button,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
 import DownloadIcon from '@mui/icons-material/Download';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDownward';
+import ArrowDropUpIcon from '@mui/icons-material/ArrowUpward';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ClearIcon from '@mui/icons-material/Clear';
+import { useTheme, useMediaQuery } from '@mui/material';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
 import { ThemeContext } from '../../config/ThemeContext.js';
-import Breadcrumb from "../../components/Breadcrumb.js";
 import './GenericTable.css';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
@@ -39,6 +38,7 @@ function GenericTable() {
   const [searchTerm, setSearchTerm] = useState('');
   const [columns, setColumns] = useState([]);
   const [visibleColumns, setVisibleColumns] = useState([]);
+  const [columnWidths, setColumnWidths] = useState({});
   const [anchorEl, setAnchorEl] = useState(null);
   const [showSearch, setShowSearch] = useState(false);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
@@ -47,17 +47,43 @@ function GenericTable() {
   const [columnSearchTerm, setColumnSearchTerm] = useState('');
   const [totalRecords, setTotalRecords] = useState(0);
   const searchRef = useRef(null);
+  const resizingRef = useRef(null);
   const open = Boolean(anchorEl);
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
+  const sentenceCase = useCallback((str) => {
+    if (str === 'student_id_passport_number') {
+      return 'Student ID/Passport Number';
+    }
+    return str.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  }, []);
+
+
+  // Calculate default column width based on header length
+  const calculateColumnWidth = useCallback((col) => {
+    const headerText = sentenceCase(col);
+    const charCount = headerText.length;
+    const pixelsPerChar = 10; // Adjust this value based on your font size/style
+    const minWidth = 50; // Minimum width to ensure usability
+    const calculatedWidth = charCount * pixelsPerChar + 40; // Add padding for sort icons and separator
+    return Math.max(minWidth, calculatedWidth);
+  }, [sentenceCase]);
 
   const fetchStudents = useCallback(async () => {
     try {
-      const res = await axios.get(`${API_BASE_URL}/student-details`);
+      const res = await axios.get(`${API_BASE_URL}/view/student-details`);
       const records = Array.isArray(res.data) ? res.data : res?.data?.records ?? [];
 
       if (records.length > 0) {
         const cols = Object.keys(records[0]).filter((c) => c !== 'id');
         setColumns(cols);
         setVisibleColumns(cols);
+        // Initialize column widths based on header length
+        setColumnWidths(cols.reduce((acc, col) => ({
+          ...acc,
+          [col]: calculateColumnWidth(col),
+        }), {}));
       }
 
       setAllStudents(records);
@@ -65,7 +91,7 @@ function GenericTable() {
       console.error("Failed to fetch students:", error);
       setAllStudents([]);
     }
-  }, []);
+  }, [calculateColumnWidth]);
 
   useEffect(() => {
     fetchStudents();
@@ -81,8 +107,33 @@ function GenericTable() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // const sentenceCase = (str) => str.replace(/_/g, ' ').replace(/\w/g, (c) => c.toUpperCase());
-  const sentenceCase = (str) => str.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  // Column resizing handlers
+  const handleMouseMove = useCallback((e) => {
+    if (resizingRef.current) {
+      const { col, startX, startWidth } = resizingRef.current;
+      const newWidth = Math.max(50, startWidth + (e.clientX - startX));
+      setColumnWidths((prev) => ({ ...prev, [col]: newWidth }));
+    }
+  }, []);
+
+  const stopResizing = useCallback(() => {
+    resizingRef.current = null;
+    document.removeEventListener('mousemove', handleMouseMove);
+    document.removeEventListener('mouseup', stopResizing);
+    document.body.style.userSelect = '';
+  }, [handleMouseMove]);
+
+  const startResizing = useCallback(
+    (e, col) => {
+      e.preventDefault();
+      resizingRef.current = { col, startX: e.clientX, startWidth: columnWidths[col] || calculateColumnWidth(col) };
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', stopResizing);
+      document.body.style.userSelect = 'none';
+    },
+    [columnWidths, calculateColumnWidth, handleMouseMove, stopResizing]
+  );
+
   const formatDate = (date) => (date ? new Date(date).toLocaleDateString() : 'N/A');
 
   const toggleColumn = (col) => {
@@ -96,7 +147,14 @@ function GenericTable() {
     }
   };
 
-  const resetColumns = () => setVisibleColumns(columns);
+  const resetColumns = () => {
+    setVisibleColumns(columns);
+    // Reset column widths based on header length
+    setColumnWidths(columns.reduce((acc, col) => ({
+      ...acc,
+      [col]: calculateColumnWidth(col),
+    }), {}));
+  };
 
   const exportToExcel = () => {
     const data = allStudents.map((s) =>
@@ -145,32 +203,38 @@ function GenericTable() {
     setTotalRecords(filteredStudents.length);
   }, [filteredStudents]);
 
-  const filteredColumns = columns.filter((col) =>
-    col.toLowerCase().includes(columnSearchTerm.toLowerCase()) ||
-    sentenceCase(col).toLowerCase().includes(columnSearchTerm.toLowerCase())
-  );
+  const filteredColumns = columns.filter((col) => {
+    const lowerTerm = columnSearchTerm.toLowerCase();
+    const raw = col.toLowerCase();
+    const formatted = sentenceCase(col).toLowerCase();
+    return raw.includes(lowerTerm) || formatted.includes(lowerTerm);
+  });
 
   return (
-    <Box sx={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC', minHeight: '100vh', p: 2 }}>
-      <Breadcrumb title="Student Report" />
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-        {!showSearch && (
-          <Tooltip title="Search">
-            <IconButton size="small" onClick={() => setShowSearch(true)} sx={{ color: isDarkMode ? 'white' : 'black' }}>
-              <SearchIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-        )}
-        <Box
-          ref={searchRef}
-          sx={{
-            width: showSearch ? 220 : 0,
-            height: 36,
-            transition: 'width 0.3s ease',
-            overflow: 'hidden',
-          }}
-        >
-          {showSearch && (
+    <Box
+      sx={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC', minHeight: '100vh', p: 2 }}
+      className={isDarkMode ? 'dark-mode' : ''}
+    >
+      {/* Inline Breadcrumb with Search and Icons */}
+      <Box sx={{ padding: "12px", backgroundColor: isDarkMode ? '#1e293b' : '#e1f5fe', borderRadius: "8px", marginBottom: "12px", border: '1px solid #ccc', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Typography variant="h6" sx={{ color: isDarkMode ? 'white' : 'black', fontWeight: "bold" }}>
+          Student Report
+        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          {/* Search input field */}
+          <Box
+            ref={searchRef}
+            sx={{
+              width: showSearch ? (isSmallScreen ? 120 : 220) : 0, // Adjust width based on screen size
+              height: 36,
+              overflow: 'hidden',
+              transition: 'width 0.3s ease-in-out, opacity 0.3s ease-in-out',
+              display: 'flex',
+              alignItems: 'center',
+              opacity: showSearch ? 1 : 0,
+            }}
+          >
+
             <InputBase
               placeholder="Search"
               value={searchTerm}
@@ -187,46 +251,98 @@ function GenericTable() {
                 borderRadius: 1,
                 border: `1px solid ${isDarkMode ? '#4A5568' : '#CBD5E0'}`,
                 width: '100%',
+                minWidth: 0,
               }}
               startAdornment={<SearchIcon sx={{ mr: 1 }} fontSize="small" />}
+              endAdornment={
+                searchTerm && (
+                  <IconButton
+                    size="small"
+                    onClick={() => {
+                      setSearchTerm('');
+                      setPage(0);
+                    }}
+                    sx={{ color: isDarkMode ? 'white' : 'black' }}
+                  >
+                    <ClearIcon fontSize="small" />
+                  </IconButton>
+                )
+              }
             />
+
+          </Box>
+
+          {/* Search icon toggle */}
+          <Tooltip title={showSearch ? 'Close Search' : 'Search'}>
+            <IconButton
+              size="small"
+              onClick={() => setShowSearch((prev) => !prev)}
+              sx={{ color: isDarkMode ? 'white' : 'black' }}
+            >
+              {showSearch ? <ClearIcon fontSize="small" /> : <SearchIcon fontSize="small" />}
+            </IconButton>
+          </Tooltip>
+
+          {/* Other icons – hidden on small screen when search is open */}
+          {!(isSmallScreen && showSearch) && (
+            <>
+              <Typography sx={{ color: isDarkMode ? 'white' : 'black', fontSize: '1rem' }}>|</Typography>
+              <Tooltip title="Column Visibility">
+                <IconButton size="small" onClick={(e) => setAnchorEl(e.currentTarget)} sx={{ color: isDarkMode ? 'white' : 'black' }}>
+                  <ViewColumnIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+              <Typography sx={{ color: isDarkMode ? 'white' : 'black', fontSize: '1rem' }}>|</Typography>
+              <Tooltip title="Export to Excel">
+                <IconButton size="small" onClick={exportToExcel} sx={{ color: isDarkMode ? 'white' : 'black' }}>
+                  <DownloadIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </>
           )}
         </Box>
 
-        <Tooltip title="Column Visibility">
-          <IconButton size="small" onClick={(e) => setAnchorEl(e.currentTarget)} sx={{ color: isDarkMode ? 'white' : 'black' }}>
-            <ViewColumnIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
-
-        <Tooltip title="Export to Excel">
-          <IconButton size="small" onClick={exportToExcel} sx={{ color: isDarkMode ? 'white' : 'black' }}>
-            <DownloadIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
       </Box>
 
-      {/* Column Toggle Menu */}
-      <Menu anchorEl={anchorEl} open={open} onClose={() => setAnchorEl(null)} PaperProps={{ sx: { minWidth: 200, maxHeight: 300, p: 1 } }}>
+      <Menu
+        anchorEl={anchorEl}
+        open={open}
+        onClose={() => setAnchorEl(null)}
+        PaperProps={{
+          sx: {
+            minWidth: 200,
+            maxHeight: 300,
+            p: 1,
+            backgroundColor: isDarkMode ? '#1e293b' : '#fff',
+            color: isDarkMode ? '#F7FAFC' : '#1e293b',
+            boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.15)',
+            borderRadius: 2,
+          },
+        }}
+      >
         <InputBase
+          autoFocus
           placeholder="Search Columns"
           value={columnSearchTerm}
           onChange={(e) => setColumnSearchTerm(e.target.value)}
+          onKeyDown={(e) => e.stopPropagation()}
           sx={{
             mb: 1,
             px: 1,
             fontSize: '0.7rem',
-            backgroundColor: '#f1f5f9',
+            backgroundColor: isDarkMode ? '#334155' : '#f1f5f9',
             borderRadius: 1,
-            width: '100%', // Stretch to full width
-            height: '28px', // Match column name height
+            width: '100%',
+            height: '28px',
+            color: isDarkMode ? '#F7FAFC' : '#1e293b',
           }}
         />
+
         {filteredColumns.map((col) => (
           <MenuItem key={col} dense>
             <FormControlLabel
               control={<Checkbox size="small" checked={visibleColumns.includes(col)} onChange={() => toggleColumn(col)} />}
-              label={<span style={{ fontSize: '0.7rem' }}>{sentenceCase(col)}</span>} // Smaller font size
+              label={<span style={{ fontSize: '0.7rem' }}>{sentenceCase(col)}</span>}
             />
           </MenuItem>
         ))}
@@ -238,7 +354,7 @@ function GenericTable() {
       </Menu>
 
       <div className="generic-table-container">
-        <table className="generic-table" style={{ backgroundColor: isDarkMode ? '#1e293b' : '#fff' }}>
+        <table className="generic-table" style={{ backgroundColor: isDarkMode ? '#1e293b' : '#fff', tableLayout: 'fixed' }}>
           <thead>
             <tr>
               {visibleColumns.map((col) => (
@@ -248,17 +364,42 @@ function GenericTable() {
                     color: isDarkMode ? 'white' : '#1e293b',
                     cursor: 'pointer',
                     position: 'relative',
+                    width: columnWidths[col] || calculateColumnWidth(col),
+                    minWidth: 50,
                   }}
-                  onClick={() => handleSort(col)}
+                  onClick={(e) => {
+                    if (e.target.className !== 'resize-handle') {
+                      handleSort(col);
+                    }
+                  }}
                 >
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    {sentenceCase(col)}
-                    <Box sx={{ ml: 0.5, display: 'flex', alignItems: 'center' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingRight: '10px' }}>
+                    <span>{sentenceCase(col)}</span>
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
                       {sortConfig.key === col && sortConfig.direction === 'asc' && <ArrowDropUpIcon fontSize="small" />}
                       {sortConfig.key === col && sortConfig.direction === 'desc' && <ArrowDropDownIcon fontSize="small" />}
-                      {sortConfig.key === col && sortConfig.direction === null && <ClearIcon fontSize="small" />}
+                      {sortConfig.key === col && sortConfig.direction === null}
                     </Box>
                   </Box>
+                  <span
+                    className="resize-handle"
+                    onMouseDown={(e) => startResizing(e, col)}
+                    style={{
+                      position: 'absolute',
+                      right: 0,
+                      top: 0,
+                      height: '100%',
+                      width: '5px',
+                      cursor: 'col-resize',
+                      background: isDarkMode ? '#4A5568' : '#CBD5E0',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      userSelect: 'none',
+                    }}
+                  >
+                    <span style={{ fontSize: '12px', color: isDarkMode ? '#F7FAFC' : '#1e293b' }}>|</span>
+                  </span>
                 </th>
               ))}
             </tr>
@@ -268,7 +409,17 @@ function GenericTable() {
               paginatedStudents.map((student) => (
                 <tr key={student.id}>
                   {visibleColumns.map((col) => (
-                    <td key={col} style={{ color: isDarkMode ? 'white' : '#1e293b' }}>
+                    <td
+                      key={col}
+                      style={{
+                        color: isDarkMode ? 'white' : '#1e293b',
+                        width: columnWidths[col] || calculateColumnWidth(col),
+                        minWidth: 50,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
                       {col.includes('date') ? formatDate(student[col]) : student[col]}
                     </td>
                   ))}
@@ -281,25 +432,71 @@ function GenericTable() {
         </table>
       </div>
 
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
-        <Typography variant="caption">
-          {page * rowsPerPage + 1}-{Math.min((page + 1) * rowsPerPage, totalRecords)} of {totalRecords}
-        </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Button onClick={() => setPage((p) => Math.max(0, p - 1))} disabled={page === 0} size="small" variant="outlined" startIcon={<ArrowBackIosIcon fontSize="small" />}>Prev</Button>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          mt: 2,
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+            border: '1px solid',
+            borderColor: isDarkMode ? '#4A5568' : '#CBD5E0',
+            borderRadius: '8px',
+            padding: '6px 12px',
+            backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+            color: isDarkMode ? '#F7FAFC' : '#1e293b',
+          }}
+        >
+          <Typography variant="caption" sx={{ whiteSpace: 'nowrap' }}>
+            Rows per page:
+          </Typography>
           <Select
             value={rowsPerPage}
-            onChange={(e) => { setRowsPerPage(parseInt(e.target.value)); setPage(0); }}
+            onChange={(e) => {
+              setRowsPerPage(parseInt(e.target.value));
+              setPage(0);
+            }}
             size="small"
-            sx={{ fontSize: '0.85rem' }}
+            sx={{
+              color: isDarkMode ? '#F7FAFC' : '#1e293b',
+              '.MuiSelect-icon': { color: isDarkMode ? '#F7FAFC' : '#1e293b' },
+              backgroundColor: isDarkMode ? '#4A5568' : '#E2E8F0',
+              borderRadius: '4px',
+              fontSize: '0.85rem',
+              minWidth: '60px',
+            }}
           >
-            {[5, 10, 20, 50].map((n) => (
+            {[10, 15, 25, 50, 100].map((n) => (
               <MuiMenuItem key={n} value={n}>{n}</MuiMenuItem>
             ))}
           </Select>
-          <Button onClick={() => setPage((p) => (p + 1) * rowsPerPage < totalRecords ? p + 1 : p)} disabled={(page + 1) * rowsPerPage >= totalRecords} size="small" variant="outlined" endIcon={<ArrowForwardIosIcon fontSize="small" />}>Next</Button>
+          <Typography variant="caption" sx={{ whiteSpace: 'nowrap' }}>
+            {page * rowsPerPage + 1}-{Math.min((page + 1) * rowsPerPage, totalRecords)} of {totalRecords}
+          </Typography>
+          <IconButton
+            onClick={() => setPage((p) => Math.max(0, p - 1))}
+            disabled={page === 0}
+            size="small"
+            sx={{ color: isDarkMode ? '#F7FAFC' : '#1e293b' }}
+          >
+            <ArrowBackIosIcon fontSize="small" />
+          </IconButton>
+          <IconButton
+            onClick={() => setPage((p) => (p + 1) * rowsPerPage < totalRecords ? p + 1 : p)}
+            disabled={(page + 1) * rowsPerPage >= totalRecords}
+            size="small"
+            sx={{ color: isDarkMode ? '#F7FAFC' : '#1e293b' }}
+          >
+            <ArrowForwardIosIcon fontSize="small" />
+          </IconButton>
         </Box>
       </Box>
+
     </Box>
   );
 }

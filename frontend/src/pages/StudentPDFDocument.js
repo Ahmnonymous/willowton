@@ -303,7 +303,7 @@ const StudentPDFDocument = ({ studentData }) => (
       <View style={styles.header}>
         <Image src={logo} style={styles.logo} />
         <View style={styles.headerText}>
-          <Text style={styles.headerTitle1}>WillowTon Group</Text>
+          <Text style={styles.headerTitle1}>SANZAF Bursary</Text>
           <Text style={styles.headerTitle2}>Student Detailed Report</Text>
         </View>
         <Text style={styles.reportTime}>{getCurrentDateTime()}</Text>

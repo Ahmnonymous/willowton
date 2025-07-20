@@ -112,17 +112,20 @@ const UniversityDetailsDrawer = ({
     return sum + value;
   }, 0);
 
-  setFormData(prev => ({
-    ...prev,
-    total_university_expense: total
-  }));
+  if (formData.total_university_expense !== total) {
+    setFormData((prev) => ({
+      ...prev,
+      total_university_expense: total
+    }));
+  }
+// eslint-disable-next-line react-hooks/exhaustive-deps
 }, [
-  formData,
   formData.tuition_amount,
   formData.accommodation_fee,
   formData.textbooks_fee,
   formData.travel_fee
 ]);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;

@@ -42,14 +42,25 @@ const UniversityDetailsDrawer = ({
         fetch(`${API_BASE_URL}/university-details/id/${universityDetailsId}`)
           .then((res) => res.json())
           .then((data) => {
-            const normalizedData = { ...data };
+            const normalizedData = {
+              ...data,
+              // Normalize previous_bursary_org_X fields to "Yes" or "No"
+              // previous_bursary_org_1: data.previous_bursary_org_1 ? "Yes" : "No",
+              // previous_bursary_org_2: data.previous_bursary_org_2 ? "Yes" : "No",
+              // previous_bursary_org_3: data.previous_bursary_org_3 ? "Yes" : "No",
+              // previously_funded: data.previously_funded ? "Yes" : "No",
+              // tuition: data.tuition ? "Yes" : "No",
+              // accommodation: data.accommodation ? "Yes" : "No",
+              // textbooks: data.textbooks ? "Yes" : "No",
+              // travel: data.travel ? "Yes" : "No",
+            };
             setFormData(normalizedData);
           });
       } else {
         const initialData = {
           student_details_portal_id: studentId,
-          Institution_Name: "",
-          Name_of_Course: "",
+          Institution_name: "",
+          name_of_Course: "",
           Intake_Year: "",
           Semester: "",
           NQF_Level: "",
@@ -65,22 +76,19 @@ const UniversityDetailsDrawer = ({
           textbooks_fee: "",
           travel: "",
           travel_fee: "",
-          Total_University_Expense: "",
-          Other_Bursary_Org_1: "",
-          Other_Bursary_Org_1_Contact: "",
-          Other_Bursary_Org_2: "",
-          Other_Bursary_Org_2_Contact: "",
-          Other_Bursary_Org_3: "",
-          Other_Bursary_Org_3_Contact: "",
-          Previous_Bursary_Org_1: "",
-          Previous_Bursary_Org_1_Amount: "",
-          Previous_Bursary_Org_1_Contact: "",
-          Previous_Bursary_Org_2: "",
-          Previous_Bursary_Org_2_Amount: "",
-          Previous_Bursary_Org_2_Contact: "",
-          Previous_Bursary_Org_3: "",
-          Previous_Bursary_Org_3_Amount: "",
-          Previous_Bursary_Org_3_Contact: "",
+          total_university_expense: "",
+          previous_bursary_org_1: "",
+          previous_bursary_org_1_name: "",
+          previous_bursary_org_1_amount: "",
+          previous_bursary_org_1_contact: "",
+          previous_bursary_org_2: "",
+          previous_bursary_org_2_name: "",
+          previous_bursary_org_2_amount: "",
+          previous_bursary_org_2_contact: "",
+          previous_bursary_org_3: "",
+          previous_bursary_org_3_name: "",
+          previous_bursary_org_3_amount: "",
+          previous_bursary_org_3_contact: "",
           Application_Process_Status: "",
         };
         setFormData(initialData);
@@ -89,6 +97,32 @@ const UniversityDetailsDrawer = ({
       setFormData({});
     }
   }, [open, studentId, universityDetailsId]);
+
+  // Calculate total university expense whenever relevant fields change
+  useEffect(() => {
+  const amountFields = [
+    'tuition_amount',
+    'accommodation_fee',
+    'textbooks_fee',
+    'travel_fee'
+  ];
+
+  const total = amountFields.reduce((sum, field) => {
+    const value = parseFloat(formData[field]) || 0;
+    return sum + value;
+  }, 0);
+
+  setFormData(prev => ({
+    ...prev,
+    total_university_expense: total
+  }));
+}, [
+  formData,
+  formData.tuition_amount,
+  formData.accommodation_fee,
+  formData.textbooks_fee,
+  formData.travel_fee
+]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -102,6 +136,15 @@ const UniversityDetailsDrawer = ({
       if (conditionalField && value === "No") {
         newFormData[conditionalField.amount] = "";
       }
+
+      // Handle Previous Bursary Org fields
+      const bursaryFields = bursaryConditionalFields.find(field => field.select === name);
+      if (bursaryFields && value !== "Yes") {
+        newFormData[bursaryFields.name] = "";
+        newFormData[bursaryFields.amount] = "";
+        newFormData[bursaryFields.contact] = "";
+      }
+
       return newFormData;
     });
   };
@@ -113,7 +156,18 @@ const UniversityDetailsDrawer = ({
       : `${API_BASE_URL}/university-details/insert`;
     const method = isUpdate ? "PUT" : "POST";
 
-    const body = { ...formData };
+    const body = {
+      ...formData,
+      // Convert Yes/No to boolean for API
+      // previous_bursary_org_1: formData.previous_bursary_org_1 === "Yes",
+      // previous_bursary_org_2: formData.previous_bursary_org_2 === "Yes",
+      // previous_bursary_org_3: formData.previous_bursary_org_3 === "Yes",
+      // previously_funded: formData.previously_funded === "Yes",
+      // tuition: formData.tuition === "Yes",
+      // accommodation: formData.accommodation === "Yes",
+      // textbooks: formData.textbooks === "Yes",
+      // travel: formData.travel === "Yes",
+    };
     if (!isUpdate) delete body.id;
 
     const res = await fetch(url, {
@@ -170,6 +224,27 @@ const UniversityDetailsDrawer = ({
     { select: "travel", amount: "travel_fee" },
   ];
 
+  const bursaryConditionalFields = [
+    {
+      select: "previous_bursary_org_1",
+      name: "previous_bursary_org_1_name",
+      amount: "previous_bursary_org_1_amount",
+      contact: "previous_bursary_org_1_contact"
+    },
+    {
+      select: "previous_bursary_org_2",
+      name: "previous_bursary_org_2_name",
+      amount: "previous_bursary_org_2_amount",
+      contact: "previous_bursary_org_2_contact"
+    },
+    {
+      select: "previous_bursary_org_3",
+      name: "previous_bursary_org_3_name",
+      amount: "previous_bursary_org_3_amount",
+      contact: "previous_bursary_org_3_contact"
+    }
+  ];
+
   const fieldStyles = {
     backgroundColor: isDarkMode ? '#1A202C' : '#ffffff',
     color: isDarkMode ? '#F7FAFC' : '#1E293B',
@@ -200,7 +275,11 @@ const UniversityDetailsDrawer = ({
       .join(" ");
 
     const isConditionalSelect = conditionalFields.some(field => field.select === key);
-    const isConditionalAmount = conditionalFields.some(field => field.amount === key);
+    const isConditionalamount = conditionalFields.some(field => field.amount === key);
+    const isBursarySelect = bursaryConditionalFields.some(field => field.select === key);
+    const isBursaryField = bursaryConditionalFields.some(field =>
+      field.name === key || field.amount === key || field.contact === key
+    );
 
     if (isConditionalSelect) {
       let customLabel = label;
@@ -212,7 +291,10 @@ const UniversityDetailsDrawer = ({
         customLabel = "Are you in need of financial assistance to cover your textbooks fees?";
       } else if (key === "travel") {
         customLabel = "Are you in need of financial assistance to cover your travel fees?";
+      } else if (key === "previously_funded") {
+        customLabel = "Were you previously Funded by the Willowton SANZAF Bursary Fund?";
       }
+
       return (
         <Grid item xs={12} key={index}>
           <Autocomplete
@@ -227,7 +309,34 @@ const UniversityDetailsDrawer = ({
       );
     }
 
-    if (isConditionalAmount) {
+    if (isBursarySelect) {
+      return (
+        <Grid item xs={12} key={index}>
+          <Autocomplete
+            value={formData[key] || ""}
+            onChange={(e, newValue) => handleAutocompleteChange(key, newValue)}
+            options={yesNoOptions}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Were you funded by an organization previously?"
+                sx={fieldStyles}
+                InputLabelProps={inputLabelProps}
+              />
+            )}
+          />
+        </Grid>
+      );
+    }
+
+    if (isBursaryField) {
+      const relatedBursary = bursaryConditionalFields.find(field =>
+        field.name === key || field.amount === key || field.contact === key
+      );
+      if (formData[relatedBursary.select] !== "Yes") return null;
+    }
+
+    if (isConditionalamount) {
       const relatedSelect = conditionalFields.find(field => field.amount === key).select;
       if (formData[relatedSelect] !== "Yes") return null;
     }
@@ -257,6 +366,22 @@ const UniversityDetailsDrawer = ({
             renderInput={(params) => (
               <TextField {...params} label={label} sx={fieldStyles} InputLabelProps={inputLabelProps} />
             )}
+          />
+        </Grid>
+      );
+    }
+
+    if (key === "total_university_expense") {
+      return (
+        <Grid item xs={12} key={index}>
+          <TextField
+            name={key}
+            label={label}
+            fullWidth
+            value={formData[key] || ""}
+            sx={fieldStyles}
+            InputLabelProps={inputLabelProps}
+            InputProps={{ readOnly: true }}
           />
         </Grid>
       );

@@ -587,7 +587,7 @@ const StudentDetails = () => {
     try {
       setIsLoading(true);
       const userId = user.user_id;
-      console.log("UserType: "+user.user_type ); // Debug log
+      console.log("UserType: " + user.user_type); // Debug log
       let response;
       if (isAdmin) {
         response = await fetch(`${API_BASE_URL}/student-details`);
@@ -689,14 +689,14 @@ const StudentDetails = () => {
       const data = await response.json();
       const formattedData = Array.isArray(data)
         ? data.map((item) => {
-            const updatedItem = { ...item };
-            Object.keys(updatedItem).forEach((key) => {
-              if (key.toLowerCase().endsWith("date_stamp")) {
-                updatedItem[key] = formatDate(updatedItem[key]);
-              }
-            });
-            return updatedItem;
-          })
+          const updatedItem = { ...item };
+          Object.keys(updatedItem).forEach((key) => {
+            if (key.toLowerCase().endsWith("date_stamp")) {
+              updatedItem[key] = formatDate(updatedItem[key]);
+            }
+          });
+          return updatedItem;
+        })
         : [];
       return formattedData;
     } catch (error) {
@@ -1172,12 +1172,12 @@ const StudentDetails = () => {
     const section = tabSections[tabValue];
     return section.key === "show_all"
       ? tabSections
-          .filter((s) => s.key !== "show_all")
-          .map((sec, i) => (
-            (isAdmin || (sec.key !== "payments" && sec.key !== "interviews")) && (
-              <TabContent key={i} sectionKey={sec.key} data={dataForSection(sec.key)} />
-            )
-          ))
+        .filter((s) => s.key !== "show_all")
+        .map((sec, i) => (
+          (isAdmin || (sec.key !== "payments" && sec.key !== "interviews")) && (
+            <TabContent key={i} sectionKey={sec.key} data={dataForSection(sec.key)} />
+          )
+        ))
       : <TabContent sectionKey={section.key} data={dataForSection(section.key)} />;
   };
 
@@ -1434,6 +1434,7 @@ const StudentDetails = () => {
                       <EditIcon sx={{ marginRight: 1, fontSize: "small" }} />
                       Edit
                     </Button>
+                    {isAdmin && (
                     <Button
                       variant="contained"
                       onClick={handleDownloadPDF}
@@ -1451,6 +1452,7 @@ const StudentDetails = () => {
                       <DownloadIcon sx={{ marginRight: 1, fontSize: "small" }} />
                       Download PDF
                     </Button>
+                  )}
                   </Box>
                 )}
               </Box>

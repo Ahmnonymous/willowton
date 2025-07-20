@@ -51,6 +51,7 @@ body {
 .generic-table th {
   position: relative;
   font-weight: 500; /* Slightly bolder headers for better distinction */
+  font-weight: bold;
 }
 
 /* Row hover effect */

@@ -30,8 +30,8 @@ import SearchIcon from "@mui/icons-material/Search";
 import ViewColumnIcon from "@mui/icons-material/ViewColumn";
 import DownloadIcon from "@mui/icons-material/Download";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDownward";
-import ArrowDropUpIcon from "@mui/icons-material/ArrowUpward";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ClearIcon from "@mui/icons-material/Clear";
@@ -558,9 +558,8 @@ const StudentDetails = () => {
   const [interviews, setInterviews] = useState(null);
   const [tasks, setTasks] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [pendingRequests, setPendingRequests] = useState(0);
-  const { isDarkMode } = useContext(ThemeContext);
 
+  const { isDarkMode } = useContext(ThemeContext);
   const user = JSON.parse(localStorage.getItem("user")) || {};
   const isAdmin = user?.user_type === "admin";
   const isStudent = user?.user_type === "student";
@@ -584,59 +583,94 @@ const StudentDetails = () => {
     return formattedDate.replace(/\//g, "/");
   };
 
-  const incrementPending = () => setPendingRequests((prev) => prev + 1);
-  const decrementPending = () => setPendingRequests((prev) => {
-    const newCount = Math.max(0, prev - 1);
-    if (newCount === 0) setIsLoading(false);
-    return newCount;
-  });
-
   const fetchStudentDetails = useCallback(async () => {
     try {
-      incrementPending();
+      setIsLoading(true);
       const userId = user.user_id;
+      console.log("UserType: "+user.user_type ); // Debug log
       let response;
       if (isAdmin) {
         response = await fetch(`${API_BASE_URL}/student-details`);
       } else if (isStudent && userId) {
         response = await fetch(`${API_BASE_URL}/student-detail/${userId}`);
       } else {
-        console.error("User type is neither admin nor student or user ID is missing");
-        return {};
+        // console.error("User type is neither admin nor student, or user ID is missing");
+        setStudentDetails([]);
+        setSelectedStudent(null);
+        setSelectedStudentid(null);
+        return [];
+      }
+
+      if (!response.ok) {
+        console.error(`API error: ${response.status} ${response.statusText}`);
+        setStudentDetails([]);
+        setSelectedStudent(null);
+        setSelectedStudentid(null);
+        return [];
       }
 
       const data = await response.json();
-      if (data) {
-        const updatedStudent = Array.isArray(data) ? data[0] : data;
-        Object.keys(updatedStudent).forEach((key) => {
-          if (key.toLowerCase().includes("date_stamp")) {
-            updatedStudent[key] = formatDate(updatedStudent[key]);
-          }
-        });
-        setStudentDetails(Array.isArray(data) ? data : [updatedStudent]);
-        setSelectedStudent(updatedStudent);
-        setSelectedStudentid(updatedStudent.id);
-      } else {
-        if (isStudent) {
-          setIsLoading(false);
+      // console.log("fetchStudentDetails response:", data); // Debug log
+      if (
+        data &&
+        ((Array.isArray(data) && data.length > 0 && data[0]?.id) ||
+          (!Array.isArray(data) && data?.id))
+      ) {
+        if (isAdmin) {
+          // For admin, return the full array with formatted dates
+          const formattedData = data.map((student) => {
+            const updatedStudent = { ...student };
+            Object.keys(updatedStudent).forEach((key) => {
+              if (key.toLowerCase().includes("date_stamp")) {
+                updatedStudent[key] = formatDate(updatedStudent[key]);
+              }
+            });
+            return updatedStudent;
+          });
+          setStudentDetails(formattedData);
+          setSelectedStudent(formattedData[0] || null);
+          setSelectedStudentid(formattedData[0]?.id || null);
+          // console.log("Setting studentDetails for admin:", formattedData); // Debug log
+          return formattedData; // Return the full array
+        } else {
+          // For student, return a single student object
+          const updatedStudent = Array.isArray(data) ? data[0] : data;
+          Object.keys(updatedStudent).forEach((key) => {
+            if (key.toLowerCase().includes("date_stamp")) {
+              updatedStudent[key] = formatDate(updatedStudent[key]);
+            }
+          });
+          setStudentDetails([updatedStudent]);
+          setSelectedStudent(updatedStudent);
+          setSelectedStudentid(updatedStudent.id);
+          // console.log("Setting selectedStudent for student:", updatedStudent); // Debug log
+          return updatedStudent; // Return the single student object
         }
+      } else {
+        // console.warn("No valid student data found in API response:", data);
+        setStudentDetails([]);
+        setSelectedStudent(null);
+        setSelectedStudentid(null);
+        return [];
       }
-      return data;
     } catch (error) {
       console.error("Error fetching student details:", error);
-      return {};
+      setStudentDetails([]);
+      setSelectedStudent(null);
+      setSelectedStudentid(null);
+      return [];
     } finally {
-      decrementPending();
+      setIsLoading(false);
     }
-  }, [isAdmin, isStudent, user.user_id]);
+  }, [isAdmin, isStudent, user.user_id, user.user_type]);
 
-  const fetchStudentData = async (studentId) => {
+  const fetchStudentData = useCallback(async (studentId) => {
     if (!studentId) {
       setStudentData(null);
       return;
     }
     try {
-      incrementPending();
+      setIsLoading(true);
       const response = await fetch(`${API_BASE_URL}/student-data/${studentId}`);
       const data = await response.json();
       setStudentData(data);
@@ -644,46 +678,47 @@ const StudentDetails = () => {
       console.error("Error fetching student data:", error);
       setStudentData(null);
     } finally {
-      decrementPending();
+      setIsLoading(false);
     }
-  };
+  }, []);
 
-  const fetchSectionData = async (key, studentId) => {
+  const fetchSectionData = useCallback(async (key, studentId) => {
     try {
-      incrementPending();
+      setIsLoading(true);
       const response = await fetch(`${API_BASE_URL}/${key}/${studentId}`);
       const data = await response.json();
       const formattedData = Array.isArray(data)
         ? data.map((item) => {
-          const updatedItem = { ...item };
-          Object.keys(updatedItem).forEach((key) => {
-            if (key.toLowerCase().endsWith("date_stamp")) {
-              updatedItem[key] = formatDate(updatedItem[key]);
-            }
-          });
-          return updatedItem;
-        })
+            const updatedItem = { ...item };
+            Object.keys(updatedItem).forEach((key) => {
+              if (key.toLowerCase().endsWith("date_stamp")) {
+                updatedItem[key] = formatDate(updatedItem[key]);
+              }
+            });
+            return updatedItem;
+          })
         : [];
       return formattedData;
     } catch (error) {
       console.error(`Error fetching ${key}:`, error);
       return [];
     } finally {
-      decrementPending();
+      setIsLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     let mounted = true;
     const initializeData = async () => {
+      setIsLoading(true);
       if (isStudent) {
         const data = await fetchStudentDetails();
-        if (mounted && data.length > 0) {
-          setIsLoading(true);
-          setPendingRequests(0);
-          setSelectedStudent(data[0]);
-          setSelectedStudentid(data[0].id);
-          await fetchStudentData(data[0].id);
+        // console.log("initializeData student data:", data); // Debug log
+        if (mounted && data && data.id) {
+          setStudentDetails([data]);
+          setSelectedStudent(data);
+          setSelectedStudentid(data.id);
+          await fetchStudentData(data.id);
 
           const sectionKeys = [
             "about-me",
@@ -698,7 +733,7 @@ const StudentDetails = () => {
           ].filter((key) => isAdmin || (key !== "payments" && key !== "interviews"));
 
           const responses = await Promise.all(
-            sectionKeys.map((key) => fetchSectionData(key, data[0].id))
+            sectionKeys.map((key) => fetchSectionData(key, data.id))
           );
 
           if (mounted) {
@@ -710,10 +745,6 @@ const StudentDetails = () => {
             setAssetsLiabilities(responses[sectionKeys.indexOf("assets-liabilities")]);
             setAcademicResults(responses[sectionKeys.indexOf("academic-results")]);
             setVoluntaryServices(responses[sectionKeys.indexOf("voluntary-services")]);
-            if (isAdmin) {
-              setPayments(responses[sectionKeys.indexOf("payments")]);
-              setInterviews(responses[sectionKeys.indexOf("interviews")]);
-            }
             setTasks(responses[sectionKeys.indexOf("tasks")]);
           }
         } else if (mounted) {
@@ -721,13 +752,12 @@ const StudentDetails = () => {
           setSelectedStudent(null);
           setSelectedStudentid(null);
           setStudentData(null);
-          setIsLoading(false);
         }
       } else if (isAdmin) {
-        setIsLoading(true);
-        setPendingRequests(0);
         const data = await fetchStudentDetails();
-        if (mounted && data.length > 0) {
+        // console.log("initializeData admin data:", data); // Debug log
+        if (mounted && Array.isArray(data) && data.length > 0) {
+          setStudentDetails(data);
           setSelectedStudent(data[0]);
           setSelectedStudentid(data[0].id);
           await fetchStudentData(data[0].id);
@@ -772,13 +802,135 @@ const StudentDetails = () => {
           setStudentData(null);
         }
       }
+      setIsLoading(false);
     };
 
     initializeData();
     return () => {
       mounted = false;
     };
-  }, [fetchStudentDetails, isAdmin, isStudent]);
+  }, [fetchStudentDetails, isAdmin, isStudent, fetchSectionData, fetchStudentData]);
+
+  const fetchAboutMe = useCallback(async (studentId) => {
+    try {
+      setIsLoading(true);
+      const data = await fetchSectionData("about-me", studentId);
+      setAboutMe(data);
+      await fetchStudentData(studentId);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [fetchSectionData, fetchStudentData]);
+
+  const fetchParentsDetails = useCallback(async (studentId) => {
+    try {
+      setIsLoading(true);
+      const data = await fetchSectionData("parents-details", studentId);
+      setParentsDetails(data);
+      await fetchStudentData(studentId);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [fetchSectionData, fetchStudentData]);
+
+  const fetchUniversityDetails = useCallback(async (studentId) => {
+    try {
+      setIsLoading(true);
+      const data = await fetchSectionData("university-details", studentId);
+      setUniversityDetails(data);
+      await fetchStudentData(studentId);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [fetchSectionData, fetchStudentData]);
+
+  const fetchAttachmentsDetails = useCallback(async (studentId) => {
+    try {
+      setIsLoading(true);
+      const data = await fetchSectionData("attachments", studentId);
+      setAttachments(data);
+      await fetchStudentData(studentId);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [fetchSectionData, fetchStudentData]);
+
+  const fetchExpenseDetails = useCallback(async (studentId) => {
+    try {
+      setIsLoading(true);
+      const data = await fetchSectionData("expenses-summary", studentId);
+      setExpensesSummary(data);
+      await fetchStudentData(studentId);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [fetchSectionData, fetchStudentData]);
+
+  const fetchAssetsLiabilities = useCallback(async (studentId) => {
+    try {
+      setIsLoading(true);
+      const data = await fetchSectionData("assets-liabilities", studentId);
+      setAssetsLiabilities(data);
+      await fetchStudentData(studentId);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [fetchSectionData, fetchStudentData]);
+
+  const fetchAcademicResults = useCallback(async (studentId) => {
+    try {
+      setIsLoading(true);
+      const data = await fetchSectionData("academic-results", studentId);
+      setAcademicResults(data);
+      await fetchStudentData(studentId);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [fetchSectionData, fetchStudentData]);
+
+  const fetchVoluntaryServices = useCallback(async (studentId) => {
+    try {
+      setIsLoading(true);
+      const data = await fetchSectionData("voluntary-services", studentId);
+      setVoluntaryServices(data);
+      await fetchStudentData(studentId);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [fetchSectionData, fetchStudentData]);
+
+  const fetchPaymentsDetails = useCallback(async (studentId) => {
+    try {
+      setIsLoading(true);
+      const data = await fetchSectionData("payments", studentId);
+      setPayments(data);
+      await fetchStudentData(studentId);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [fetchSectionData, fetchStudentData]);
+
+  const fetchInterviewsDetails = useCallback(async (studentId) => {
+    try {
+      setIsLoading(true);
+      const data = await fetchSectionData("interviews", studentId);
+      setInterviews(data);
+      await fetchStudentData(studentId);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [fetchSectionData, fetchStudentData]);
+
+  const fetchTasks = useCallback(async (studentId) => {
+    try {
+      setIsLoading(true);
+      const data = await fetchSectionData("tasks", studentId);
+      setTasks(data);
+      await fetchStudentData(studentId);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [fetchSectionData, fetchStudentData]);
 
   const handleDeleteStudent = async (studentId) => {
     if (isStudent) {
@@ -800,129 +952,6 @@ const StudentDetails = () => {
       await fetchStudentDetails();
     }
   };
-
-  const fetchAboutMe = async (studentId) => {
-    try {
-      incrementPending();
-      const data = await fetchSectionData("about-me", studentId);
-      setAboutMe(data);
-      await fetchStudentData(studentId);
-    } finally {
-      decrementPending();
-    }
-  };
-
-  const fetchParentsDetails = async (studentId) => {
-    try {
-      incrementPending();
-      const data = await fetchSectionData("parents-details", studentId);
-      setParentsDetails(data);
-      await fetchStudentData(studentId);
-    } finally {
-      decrementPending();
-    }
-  };
-
-  const fetchUniversityDetails = async (studentId) => {
-    try {
-      incrementPending();
-      const data = await fetchSectionData("university-details", studentId);
-      setUniversityDetails(data);
-      await fetchStudentData(studentId);
-    } finally {
-      decrementPending();
-    }
-  };
-
-  const fetchAttachmentsDetails = async (studentId) => {
-    try {
-      incrementPending();
-      const data = await fetchSectionData("attachments", studentId);
-      setAttachments(data);
-      await fetchStudentData(studentId);
-    } finally {
-      decrementPending();
-    }
-  };
-
-  const fetchExpenseDetails = async (studentId) => {
-    try {
-      incrementPending();
-      const data = await fetchSectionData("expenses-summary", studentId);
-      setExpensesSummary(data);
-      await fetchStudentData(studentId);
-    } finally {
-      decrementPending();
-    }
-  };
-
-  const fetchAssetsLiabilities = async (studentId) => {
-    try {
-      incrementPending();
-      const data = await fetchSectionData("assets-liabilities", studentId);
-      setAssetsLiabilities(data);
-      await fetchStudentData(studentId);
-    } finally {
-      decrementPending();
-    }
-  };
-
-  const fetchAcademicResults = async (studentId) => {
-    try {
-      incrementPending();
-      const data = await fetchSectionData("academic-results", studentId);
-      setAcademicResults(data);
-      await fetchStudentData(studentId);
-    } finally {
-      decrementPending();
-    }
-  };
-
-  const fetchVoluntaryServices = async (studentId) => {
-    try {
-      incrementPending();
-      const data = await fetchSectionData("voluntary-services", studentId);
-      setVoluntaryServices(data);
-      await fetchStudentData(studentId);
-    } finally {
-      decrementPending();
-    }
-  };
-
-  const fetchPaymentsDetails = async (studentId) => {
-    try {
-      incrementPending();
-      const data = await fetchSectionData("payments", studentId);
-      setPayments(data);
-      await fetchStudentData(studentId);
-    } finally {
-      decrementPending();
-    }
-  };
-
-  const fetchInterviewsDetails = async (studentId) => {
-    try {
-      incrementPending();
-      const data = await fetchSectionData("interviews", studentId);
-      setInterviews(data);
-      await fetchStudentData(studentId);
-    } finally {
-      decrementPending();
-    }
-  };
-
-  const fetchTasks = async (studentId) => {
-    try {
-      incrementPending();
-      const data = await fetchSectionData("tasks", studentId);
-      setTasks(data);
-      await fetchStudentData(studentId);
-    } finally {
-      decrementPending();
-    }
-  };
-
-  const handleTabChange = (event, newValue) => setTabValue(newValue);
 
   const renderDrawer = () => (
     <DrawerForm
@@ -1143,16 +1172,16 @@ const StudentDetails = () => {
     const section = tabSections[tabValue];
     return section.key === "show_all"
       ? tabSections
-        .filter((s) => s.key !== "show_all")
-        .map((sec, i) => (
-          (isAdmin || (sec.key !== "payments" && sec.key !== "interviews")) && (
-            <TabContent key={i} sectionKey={sec.key} data={dataForSection(sec.key)} />
-          )
-        ))
+          .filter((s) => s.key !== "show_all")
+          .map((sec, i) => (
+            (isAdmin || (sec.key !== "payments" && sec.key !== "interviews")) && (
+              <TabContent key={i} sectionKey={sec.key} data={dataForSection(sec.key)} />
+            )
+          ))
       : <TabContent sectionKey={section.key} data={dataForSection(section.key)} />;
   };
 
-  const handleDownloadPDF = async () => {
+  const handleDownloadPDF = (async () => {
     if (!selectedStudent || !studentData) {
       console.error("No selected student or student data available for PDF generation");
       return;
@@ -1170,9 +1199,9 @@ const StudentDetails = () => {
     } catch (error) {
       console.error("Failed to generate PDF:", error);
     }
-  };
+  });
 
-  const isStudentWithNoData = isStudent && !selectedStudent;
+  const isStudentWithNoData = isStudent && !isLoading && !selectedStudent;
   const isUserWithData = (isAdmin || isStudent) && selectedStudent;
 
   return (
@@ -1313,7 +1342,6 @@ const StudentDetails = () => {
                           setSelectedStudent(student);
                           setSelectedStudentid(student.id);
                           setIsLoading(true);
-                          setPendingRequests(0);
                           await fetchStudentData(student.id);
                           const sectionKeys = [
                             "about-me",
@@ -1465,7 +1493,7 @@ const StudentDetails = () => {
                 <Box sx={{ p: 1, overflowX: "auto" }}>
                   <Tabs
                     value={tabValue}
-                    onChange={handleTabChange}
+                    onChange={(event, newValue) => setTabValue(newValue)}
                     aria-label="tabs"
                     sx={{
                       "& .MuiTab-root": {

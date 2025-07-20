@@ -70,7 +70,6 @@ router.get("/view/student-details", async (req, res) => {
     const formattedResults = result.rows.map(student => {
       return {
         ...student,
-        student_dob: formatDate(student.student_dob),  // Format DOB field
       };
     });
 

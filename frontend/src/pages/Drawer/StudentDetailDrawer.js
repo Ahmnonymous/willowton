@@ -49,14 +49,13 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
   const [emergencyContactOption, setEmergencyContactOption] = useState("");
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
   const [deleteAttachmentConfirmationOpen, setDeleteAttachmentConfirmationOpen] = useState(false);
-  // const [successMessage, setSuccessMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState(""); // Added for error feedback
-  const [isLoading, setIsLoading] = useState(false); // Added for loading state
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const isLargeScreen = useMediaQuery("(min-width:600px)");
   const drawerWidth = isLargeScreen ? 500 : 330;
 
   const user = JSON.parse(localStorage.getItem("user"));
-  const userType = user?.user_type; // student or admin
+  const userType = user?.user_type;
   const isAdmin = userType === "admin";
 
   const relationshipTypes = [
@@ -133,7 +132,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
               throw new Error(`Failed to fetch student data: ${response.statusText}`);
             }
             const data = await response.json();
-            const dates = data.student_date_of_birth ? parse(data.student_date_of_birth, 'MM/dd/yyyy', new Date()) : null;
+            const dates = data.student_date_of_birth ? parse(data.student_date_of_birth, 'dd/MM/yyyy', new Date()) : null;
             setSelectedDate(dates);
             setFormData((prev) => ({
               ...prev,
@@ -148,7 +147,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
               relation_surname: data.relation_surname || "",
               relation_employee_code: data.relation_employee_code || "",
               relation_reference: data.relation_reference || "",
-              employment_status_attachment: null, // Don't preload binary data
+              employment_status_attachment: null,
               employment_status_attachment_name: data.employment_status_attachment_name || "",
             }));
             setEmergencyContactOption(data.student_emergency_contact_name ? "Add new" : "");
@@ -310,7 +309,6 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
           employment_status_attachment: null,
           employment_status_attachment_name: "",
         }));
-        // // setsuccessmessage("Attachment deleted successfully!");
         setDeleteAttachmentConfirmationOpen(false);
       } else {
         setErrorMessage("Failed to delete attachment. Please try again.");
@@ -351,71 +349,67 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
   };
 
   const handleSave = async () => {
-  // Validation checks
-  if (formData.student_email_address && !validateEmail(formData.student_email_address)) {
-    setEmailError("Please enter a valid email address");
-    return;
-  }
-  if (formData.student_whatsapp_number && !validateNumber(formData.student_whatsapp_number)) {
-    setWhatsappError("WhatsApp number must be exactly 10 digits");
-    return;
-  }
-  if (formData.student_alternative_number && !validateNumber(formData.student_alternative_number)) {
-    setAlternativeError("Alternative number must be exactly 10 digits");
-    return;
-  }
-  if (formData.student_emergency_contact_number && !validateNumber(formData.student_emergency_contact_number)) {
-    setEmergencyError("Emergency contact number must be exactly 10 digits");
-    return;
-  }
-
-  const userId = user?.user_id;
-  const url = studentId
-    ? `${API_BASE_URL}/student-details/update/${studentId}`
-    : `${API_BASE_URL}/student-details/insert`;
-  const method = studentId ? "PUT" : "POST";
-
-  const body = new FormData();
-  Object.keys(formData).forEach((key) => {
-    if (key !== "employment_status_attachment" && formData[key] !== null && formData[key] !== undefined) {
-      body.append(key, formData[key]);
+    if (formData.student_email_address && !validateEmail(formData.student_email_address)) {
+      setEmailError("Please enter a valid email address");
+      return;
     }
-  });
-  if (formData.employment_status_attachment) {
-    body.append("employment_status_attachment", formData.employment_status_attachment);
-  }
-  if (!studentId) {
-    body.append("user_id", userId);
-  }
+    if (formData.student_whatsapp_number && !validateNumber(formData.student_whatsapp_number)) {
+      setWhatsappError("WhatsApp number must be exactly 10 digits");
+      return;
+    }
+    if (formData.student_alternative_number && !validateNumber(formData.student_alternative_number)) {
+      setAlternativeError("Alternative number must be exactly 10 digits");
+      return;
+    }
+    if (formData.student_emergency_contact_number && !validateNumber(formData.student_emergency_contact_number)) {
+      setEmergencyError("Emergency contact number must be exactly 10 digits");
+      return;
+    }
 
-  try {
-    const response = await fetch(url, {
-      method,
-      body,
+    const userId = user?.user_id;
+    const url = studentId
+      ? `${API_BASE_URL}/student-details/update/${studentId}`
+      : `${API_BASE_URL}/student-details/insert`;
+    const method = studentId ? "PUT" : "POST";
+
+    const body = new FormData();
+    Object.keys(formData).forEach((key) => {
+      if (key !== "employment_status_attachment" && formData[key] !== null && formData[key] !== undefined) {
+        body.append(key, formData[key]);
+      }
     });
-
-    if (response.ok) {
-      const savedStudent = await response.json();
-      // Ensure savedStudent is a clean object
-      const cleanStudent = {
-        ...savedStudent,
-        // Remove any problematic fields (e.g., binary data or non-serializable objects)
-        employment_status_attachment: null,
-        employment_status_attachment_name: savedStudent.employment_status_attachment_name || "",
-      };
-      // // setsuccessmessage(studentId ? "Updated successfully!" : "Created successfully!");
-      onSave(cleanStudent); // Pass cleaned student data
-      onClose(); // Close the drawer
-    } else {
-      console.error("Failed to save data:", response.statusText);
-      // setsuccessmessage("Failed to save data. Please try again.");
+    if (formData.employment_status_attachment) {
+      body.append("employment_status_attachment", formData.employment_status_attachment);
     }
-  } catch (error) {
-    console.error("Error saving student data:", error);
-    // setsuccessmessage("An error occurred. Please try again.");
-    onClose(); // Close the drawer even on error
-  }
-};
+    if (!studentId) {
+      body.append("user_id", userId);
+    }
+
+    try {
+      const response = await fetch(url, {
+        method,
+        body,
+      });
+
+      if (response.ok) {
+        const savedStudent = await response.json();
+        const cleanStudent = {
+          ...savedStudent,
+          employment_status_attachment: null,
+          employment_status_attachment_name: savedStudent.employment_status_attachment_name || "",
+        };
+        onSave(cleanStudent);
+        onClose();
+      } else {
+        console.error("Failed to save data:", response.statusText);
+        setErrorMessage("Failed to save data. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error saving student data:", error);
+      setErrorMessage("An error occurred. Please try again.");
+      onClose();
+    }
+  };
 
   const handleDeleteClick = () => {
     setDeleteConfirmationOpen(true);
@@ -461,7 +455,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
       '& .MuiInputBase-input': {
         color: isDarkMode ? '#F7FAFC' : '#1E293B',
       },
-      '& .MuiFormLabel-root': {
+      '&& .MuiFormLabel-root': {
         color: isDarkMode ? '#F7FAFC' : '#1E293B',
       },
     };
@@ -609,6 +603,14 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
       }
     }
 
+    const employmentFields = ["student_job_title", "student_company_of_employment", "student_current_salary"];
+    if (employmentFields.includes(key)) {
+      const validEmploymentStatuses = ["Full Time Employed", "Part-Time Employed", "Self Employed"];
+      if (!validEmploymentStatuses.includes(formData.student_employment_status)) {
+        return null;
+      }
+    }
+
     if (key === "student_date_of_birth") {
       return (
         <Grid item xs={12} key={index}>
@@ -641,6 +643,26 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
             onChange={handleChange}
             sx={fieldStyles}
             InputLabelProps={inputLabelProps}
+          />
+        </Grid>
+      );
+    }
+
+    if (key === "student_siblings_bursary") {
+      return (
+        <Grid item xs={12} key={index}>
+          <Autocomplete
+            value={formData[key] || ""}
+            onChange={(e, newValue) => handleChange({ target: { name: key, value: newValue } })}
+            options={yes_no}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Have any of your siblings received or are receiving assistance from this bursary fund?"
+                sx={fieldStyles}
+                InputLabelProps={inputLabelProps}
+              />
+            )}
           />
         </Grid>
       );
@@ -1062,11 +1084,6 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
           <Typography variant="h6" sx={{ fontWeight: "bold", color: isDarkMode ? '#F7FAFC' : '#1E293B' }}>
             Student Details
           </Typography>
-          {/* {successMessage && (
-            <Typography variant="body2" color="success.main" sx={{ mt: 1 }}>
-              {successMessage}
-            </Typography>
-          )} */}
           {errorMessage && (
             <Typography variant="body2" color="error.main" sx={{ mt: 1 }}>
               {errorMessage}

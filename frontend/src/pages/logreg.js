@@ -1,10 +1,22 @@
 import React, { useState } from "react";
-import { Box, Button, TextField, Typography, ToggleButtonGroup, ToggleButton, IconButton, InputAdornment, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
+import { Box, Button, TextField, Typography, ToggleButtonGroup, ToggleButton, IconButton, InputAdornment, Dialog, DialogActions, DialogTitle, DialogContent } from "@mui/material";
 import { AccountCircle, Lock, PersonAdd, Email, Visibility, VisibilityOff } from "@mui/icons-material";
 import axios from "axios";
 import footerImage from '../images/footer.png';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
+// Whitelist of known valid email domains
+const validDomains = [
+  "gmail.com",
+  "yahoo.com",
+  "outlook.com",
+  "hotmail.com",
+  "aol.com",
+  "icloud.com",
+  // Add more domains as needed
+];
+
 const LoginSignup = () => {
   const [authMode, setAuthMode] = useState("login");
   const [showPassword, setShowPassword] = useState(false);
@@ -24,14 +36,27 @@ const LoginSignup = () => {
   const [forgotPasswordError, setForgotPasswordError] = useState("");
   const [forgotPasswordSuccess, setForgotPasswordSuccess] = useState("");
 
+  // Basic email format validation
+  const validateEmailFormat = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // Check if email domain exists via DNS MX record lookup
   const checkEmailDomainExists = async (email) => {
     const domain = email.split("@")[1];
+    if (validDomains.includes(domain)) {
+      console.log(`Skipping DNS check for whitelisted domain: ${domain}`);
+      return true; // Bypass DNS check for known domains
+    }
     try {
       const response = await fetch(`https://dns.google/resolve?name=${domain}&type=MX`);
       const data = await response.json();
+      console.log(`DNS Response for ${domain}:`, data); // Debug logging
       return data?.Answer && data.Answer.length > 0;
     } catch (error) {
-      return false;
+      console.error(`DNS Lookup Error for ${domain}:`, error);
+      return false; // Fallback to false on error
     }
   };
 
@@ -68,10 +93,6 @@ const LoginSignup = () => {
       }
     } catch (error) {
       setForgotPasswordError(error.response?.data?.msg);
-      //       setErrors((prevErrors) => ({
-      //   ...prevErrors,
-      //   email: error.response?.data?.msg,
-      // }))
     }
   };
 
@@ -99,8 +120,10 @@ const LoginSignup = () => {
       if (!formData.email_address) {
         newErrors.email = "Email is required";
         formValid = false;
-      }
-      else {
+      } else if (!validateEmailFormat(formData.email_address)) {
+        newErrors.email = "Invalid email format";
+        formValid = false;
+      } else {
         const domainExists = await checkEmailDomainExists(formData.email_address);
         if (!domainExists) {
           newErrors.email = "Email domain does not exist. Please enter a valid email.";
@@ -144,7 +167,6 @@ const LoginSignup = () => {
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("user", JSON.stringify(response.data.user));
 
-        // Log login activity
         await logActivity(response.data.user.user_id, "login");
 
         if (response.data.user.user_type === 'student') {
@@ -163,7 +185,6 @@ const LoginSignup = () => {
         localStorage.setItem("token", loginResponse.data.token);
         localStorage.setItem("user", JSON.stringify(loginResponse.data.user));
 
-        // Log login activity after successful registration
         await logActivity(loginResponse.data.user.user_id, "login");
 
         if (loginResponse.data.user.user_type === 'student') {
@@ -184,7 +205,6 @@ const LoginSignup = () => {
         setErrors({ email: "", password: "" });
       }
     }
-
   };
 
   return (

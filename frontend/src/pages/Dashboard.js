@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Card, CardContent, Typography, Grid, CircularProgress, Box, useTheme, useMediaQuery } from '@mui/material';
+import { Card, CardContent, Typography, Grid, Box, useTheme, useMediaQuery } from '@mui/material';
 import { People, Payment, VolunteerActivism, Work } from '@mui/icons-material';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts'; // Using Recharts for Pie Chart
 import { useContext } from 'react';
@@ -137,7 +137,8 @@ const Dashboard = () => {
   }, []);
 
   if (loading) {
-    return <CircularProgress />;
+    // return <CircularProgress />;
+    return null;
   }
 
   // Define chart colors

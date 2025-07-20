@@ -35,7 +35,6 @@ const UniversityDetailsDrawer = ({
 
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
   const [formData, setFormData] = useState({});
-  // const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
     if (open) {
@@ -43,15 +42,7 @@ const UniversityDetailsDrawer = ({
         fetch(`${API_BASE_URL}/university-details/id/${universityDetailsId}`)
           .then((res) => res.json())
           .then((data) => {
-            // Normalize the conditional fields to match yes_no options
-            const normalizedData = {
-              ...data,
-              // Previously_Funded: yes_no.includes(data.Previously_Funded) ? data.Previously_Funded : "",
-              // Tuition: yes_no.includes(data.Tuition) ? data.Tuition : "",
-              // Accommodation: yes_no.includes(data.Accommodation) ? data.Accommodation : "",
-              // Textbooks: yes_no.includes(data.Textbooks) ? data.Textbooks : "",
-              // Travel: yes_no.includes(data.Travel) ? data.Travel : "",
-            };
+            const normalizedData = { ...data };
             setFormData(normalizedData);
           });
       } else {
@@ -107,7 +98,6 @@ const UniversityDetailsDrawer = ({
   const handleAutocompleteChange = (name, value) => {
     setFormData((prev) => {
       const newFormData = { ...prev, [name]: value };
-      // Clear the corresponding amount field if the selection is "No"
       const conditionalField = conditionalFields.find(field => field.select === name);
       if (conditionalField && value === "No") {
         newFormData[conditionalField.amount] = "";
@@ -135,7 +125,6 @@ const UniversityDetailsDrawer = ({
     if (res.ok) {
       const result = await res.json();
       onSave(result);
-      // setsuccessmessage(isUpdate ? "Updated successfully!" : "Created successfully!");
       onClose();
     } else {
       console.error("Failed to save University Details");
@@ -157,7 +146,6 @@ const UniversityDetailsDrawer = ({
 
       if (res.ok) {
         onSave(null);
-        // setsuccessmessage("Deleted successfully!");
         onClose();
         setDeleteConfirmationOpen(false);
       } else {
@@ -215,6 +203,16 @@ const UniversityDetailsDrawer = ({
     const isConditionalAmount = conditionalFields.some(field => field.amount === key);
 
     if (isConditionalSelect) {
+      let customLabel = label;
+      if (key === "tuition") {
+        customLabel = "Are you in need of financial assistance to cover your tuition fees?";
+      } else if (key === "accommodation") {
+        customLabel = "Are you in need of financial assistance to cover your accommodation fees?";
+      } else if (key === "textbooks") {
+        customLabel = "Are you in need of financial assistance to cover your textbooks fees?";
+      } else if (key === "travel") {
+        customLabel = "Are you in need of financial assistance to cover your travel fees?";
+      }
       return (
         <Grid item xs={12} key={index}>
           <Autocomplete
@@ -222,7 +220,7 @@ const UniversityDetailsDrawer = ({
             onChange={(e, newValue) => handleAutocompleteChange(key, newValue)}
             options={yesNoOptions}
             renderInput={(params) => (
-              <TextField {...params} label={label} sx={fieldStyles} InputLabelProps={inputLabelProps} />
+              <TextField {...params} label={customLabel} sx={fieldStyles} InputLabelProps={inputLabelProps} />
             )}
           />
         </Grid>
@@ -296,11 +294,6 @@ const UniversityDetailsDrawer = ({
           <Typography variant="h6" sx={{ fontWeight: "bold", color: isDarkMode ? '#F7FAFC' : '#1E293B' }}>
             University Details
           </Typography>
-          {/* {successMessage && (
-            <Typography variant="body2" color="success.main" sx={{ mt: 1 }}>
-              {successMessage}
-            </Typography>
-          )} */}
         </Box>
 
         <Box sx={{ flex: 1, overflowY: "auto", p: 2 }}>

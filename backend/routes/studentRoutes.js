@@ -44,7 +44,7 @@ router.get("/student-details", async (req, res) => {
           student_type, student_religion, student_finance_type, student_whatsapp_number, 
           student_alternative_number, student_email_address, student_highest_education, 
           student_home_address, student_suburb, student_area_code, student_province, 
-          student_date_of_birth, student_race, student_marital_status, student_employment_status, 
+          to_char(student_date_of_birth,'DD/MM/YYYY') student_date_of_birth, student_race, student_marital_status, student_employment_status, 
           student_job_title, student_company_of_employment, student_current_salary, 
           student_number_of_siblings, student_siblings_bursary, student_willow_relationship, 
           relation_type, relation_hr_contact, relation_branch, relation_name, relation_surname, 
@@ -57,7 +57,7 @@ router.get("/student-details", async (req, res) => {
     );
     const formattedResults = result.rows.map(student => ({
       ...student,
-      student_date_of_birth: formatDate(student.student_date_of_birth),
+      // student_date_of_birth: formatDate(student.student_date_of_birth),
     }));
     res.json(formattedResults);
   } catch (error) {
@@ -125,8 +125,9 @@ router.get("/student-detail/:id", async (req, res) => {
       const student = result.rows[0];
       student.student_date_of_birth = formatDate(student.student_date_of_birth);
       res.json(student);
-    } else {
-      null;
+    } 
+    else {
+      res.json('');
     }
   } catch (error) {
     console.error("Error fetching student details:", error);

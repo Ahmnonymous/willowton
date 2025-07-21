@@ -148,27 +148,41 @@ const styles = StyleSheet.create({
     minHeight: 20, // Ensure minimum height for content
   },
   tableCellLabel: {
-  width: '40%',
-  padding: 4,
-  fontWeight: 'bold',
-  backgroundColor: '#f5f5f5',
-  borderRightWidth: 1,
-  borderRightColor: '#ccc',
-  wordBreak: 'keep-all',   // Don't break in the middle of words
-  minWidth: 0,
-  overflow: 'hidden'
-},
-tableCellValue: {
-  width: '60%',
-  padding: 4,
-  fontStyle: 'italic',
-  wordBreak: 'keep-all',   // Only break at natural word boundaries
-  minWidth: 0,
-  overflow: 'hidden',
-  lineHeight: 1.2
-},
+    width: '40%',
+    padding: 4,
+    fontWeight: 'bold',
+    backgroundColor: '#f5f5f5',
+    borderRightWidth: 1,
+    borderRightColor: '#ccc',
+    wordBreak: 'keep-all',   // Don't break in the middle of words
+    minWidth: 0,
+    overflow: 'hidden'
+  },
+  tableCellValue: {
+    width: 400,
+    padding: 4,
+    fontStyle: 'italic',
+    lineHeight: 0.7,
+  },
+
 
 });
+
+// Breaks long unbroken strings by inserting zero-width space every N characters
+const breakLongWords = (str, maxLen = 20) => {
+  if (typeof str !== 'string') return str;
+
+  return str
+    .split(' ')
+    .map(word => {
+      if (word.length <= maxLen) return word;
+
+      // insert soft hyphen every maxLen chars
+      return word.match(new RegExp(`.{1,${maxLen}}`, 'g')).join('\u00AD');
+    })
+    .join(' ');
+};
+
 
 // Converts snake_case or raw field names to Sentence Case
 const toSentenceCase = (str) => {
@@ -257,7 +271,7 @@ const RenderSection = ({ title, data }) => {
         {entries.map(([key, value], idx) => (
           <View key={idx} style={styles.tableRow} wrap={false}>
             <Text style={styles.tableCellLabel}>{mapQuestion(title, key)}</Text>
-            <Text style={styles.tableCellValue} numberOfLines={0}>{value || '—'}</Text> {/* Allow multiple lines */}
+            <Text style={styles.tableCellValue}>{breakLongWords(value || '—')}</Text>
           </View>
         ))}
       </View>
@@ -284,9 +298,10 @@ const RenderMultiple = ({ title, data }) => {
                 <Text style={styles.tableCellLabel}>
                   {removePrefix(key, title)}
                 </Text>
-                <Text style={styles.tableCellValue}>
+                {/* <Text style={styles.tableCellValue}>
                   {val || '—'}
-                </Text>
+                </Text> */}
+                <Text style={styles.tableCellValue}>{breakLongWords(val || '—')}</Text>
               </View>
             ))}
           </View>
@@ -303,7 +318,7 @@ const StudentPDFDocument = ({ studentData }) => (
       <View style={styles.header}>
         <Image src={logo} style={styles.logo} />
         <View style={styles.headerText}>
-          <Text style={styles.headerTitle1}>SANZAF Bursary</Text>
+          <Text style={styles.headerTitle1}>WillowTon & SANZAF Bursary</Text>
           <Text style={styles.headerTitle2}>Student Detailed Report</Text>
         </View>
         <Text style={styles.reportTime}>{getCurrentDateTime()}</Text>

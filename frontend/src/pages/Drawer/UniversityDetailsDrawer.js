@@ -44,15 +44,6 @@ const UniversityDetailsDrawer = ({
           .then((data) => {
             const normalizedData = {
               ...data,
-              // Normalize previous_bursary_org_X fields to "Yes" or "No"
-              // previous_bursary_org_1: data.previous_bursary_org_1 ? "Yes" : "No",
-              // previous_bursary_org_2: data.previous_bursary_org_2 ? "Yes" : "No",
-              // previous_bursary_org_3: data.previous_bursary_org_3 ? "Yes" : "No",
-              // previously_funded: data.previously_funded ? "Yes" : "No",
-              // tuition: data.tuition ? "Yes" : "No",
-              // accommodation: data.accommodation ? "Yes" : "No",
-              // textbooks: data.textbooks ? "Yes" : "No",
-              // travel: data.travel ? "Yes" : "No",
             };
             setFormData(normalizedData);
           });
@@ -61,7 +52,7 @@ const UniversityDetailsDrawer = ({
           student_details_portal_id: studentId,
           Institution_name: "",
           name_of_Course: "",
-          Intake_Year: "",
+          intake_year: "",
           Semester: "",
           NQF_Level: "",
           Current_Year: "",
@@ -99,32 +90,7 @@ const UniversityDetailsDrawer = ({
   }, [open, studentId, universityDetailsId]);
 
   // Calculate total university expense whenever relevant fields change
-  useEffect(() => {
-  const amountFields = [
-    'tuition_amount',
-    'accommodation_fee',
-    'textbooks_fee',
-    'travel_fee'
-  ];
-
-  const total = amountFields.reduce((sum, field) => {
-    const value = parseFloat(formData[field]) || 0;
-    return sum + value;
-  }, 0);
-
-  if (formData.total_university_expense !== total) {
-    setFormData((prev) => ({
-      ...prev,
-      total_university_expense: total
-    }));
-  }
-// eslint-disable-next-line react-hooks/exhaustive-deps
-}, [
-  formData.tuition_amount,
-  formData.accommodation_fee,
-  formData.textbooks_fee,
-  formData.travel_fee
-]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
 
 
   const handleChange = (e) => {
@@ -161,15 +127,6 @@ const UniversityDetailsDrawer = ({
 
     const body = {
       ...formData,
-      // Convert Yes/No to boolean for API
-      // previous_bursary_org_1: formData.previous_bursary_org_1 === "Yes",
-      // previous_bursary_org_2: formData.previous_bursary_org_2 === "Yes",
-      // previous_bursary_org_3: formData.previous_bursary_org_3 === "Yes",
-      // previously_funded: formData.previously_funded === "Yes",
-      // tuition: formData.tuition === "Yes",
-      // accommodation: formData.accommodation === "Yes",
-      // textbooks: formData.textbooks === "Yes",
-      // travel: formData.travel === "Yes",
     };
     if (!isUpdate) delete body.id;
 
@@ -218,6 +175,7 @@ const UniversityDetailsDrawer = ({
   };
 
   const yesNoOptions = ["Yes", "No"];
+  const intakeYearOptions = ["2025", "2026"];
 
   const conditionalFields = [
     { select: "previously_funded", amount: "previously_funded_amount" },
@@ -368,6 +326,26 @@ const UniversityDetailsDrawer = ({
             options={highestEducation}
             renderInput={(params) => (
               <TextField {...params} label={label} sx={fieldStyles} InputLabelProps={inputLabelProps} />
+            )}
+          />
+        </Grid>
+      );
+    }
+
+    if (key === "Intake_Year" || key === "intake_year") {
+      return (
+        <Grid item xs={12} key={index}>
+          <Autocomplete
+            value={formData[key] || ""}
+            onChange={(e, newValue) => handleAutocompleteChange(key, newValue)}
+            options={intakeYearOptions}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="My request for funding is for year"
+                sx={fieldStyles}
+                InputLabelProps={inputLabelProps}
+              />
             )}
           />
         </Grid>

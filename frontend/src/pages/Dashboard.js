@@ -2,40 +2,36 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Card, CardContent, Typography, Grid, Box, useTheme, useMediaQuery } from '@mui/material';
 import { People, Payment, VolunteerActivism, Work } from '@mui/icons-material';
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts'; // Using Recharts for Pie Chart
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { useContext } from 'react';
 import { ThemeContext } from '../config/ThemeContext';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 const Dashboard = () => {
-  const { isDarkMode } = useContext(ThemeContext); // Use theme context
+  const { isDarkMode } = useContext(ThemeContext);
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [nationalityData, setNationalityData] = useState([]); // Nationality data
-  const [educationData, setEducationData] = useState([]); // Highest Education data
-  const [currentEducationData, setCurrentEducationData] = useState([]); // Current Education data
-  const [raceData, setRaceData] = useState([]); // Race data
-  const [maritalData, setMaritalData] = useState([]); // Marital Status data
-  const [employmentData, setEmploymentData] = useState([]); // Employment Status data
+  const [nationalityData, setNationalityData] = useState([]);
+  const [educationData, setEducationData] = useState([]);
+  const [currentEducationData, setCurrentEducationData] = useState([]);
+  const [raceData, setRaceData] = useState([]);
+  const [maritalData, setMaritalData] = useState([]);
+  const [employmentData, setEmploymentData] = useState([]);
   const storedUser = JSON.parse(localStorage.getItem("user"));
   const userName = storedUser ? `${storedUser.first_name} ${storedUser.last_name}` : "Guest";
 
   const theme = useTheme();
-  // const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm')); // Detect small screen sizes (mobile)
-  // const isMediumScreen = useMediaQuery(theme.breakpoints.up('sm').and(theme.breakpoints.down('md'))); // Detect medium screen sizes (tablet)
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMediumScreen = useMediaQuery(theme.breakpoints.between('sm', 'md'));
 
-  // Detect screen sizes
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm')); // Detect small screen sizes (mobile)
-  const isMediumScreen = useMediaQuery(theme.breakpoints.between('sm', 'md')); // Detect medium screen sizes (tablet)
+  const chartColors = ['#4E79A7', '#A0CBE8', '#F28E2B', '#FFBE7D', '#59A14F', '#8CD17D', '#B6992D', '#F1CE63', '#499894', '#86BCB6'];
 
-  // Dynamically set the radius based on screen size
   const getOuterRadius = () => {
-    if (isSmallScreen) return 55; // Small screen: smaller radius
-    if (isMediumScreen) return 65; // Medium screen: medium radius
-    return 75; // Large screen: larger radius
+    if (isSmallScreen) return 55;
+    if (isMediumScreen) return 65;
+    return 75;
   };
 
-  // Fetch dashboard data from the API
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
@@ -51,10 +47,13 @@ const Dashboard = () => {
     const fetchNationalityData = async () => {
       try {
         const response = await axios.get(`${API_BASE_URL}/student-nationality-distribution`);
-        const updatedData = response.data.map(item => ({
-          ...item,
-          count: Number(item.count),
-        }));
+        const updatedData = response.data
+          .filter(item => item.student_nationality && item.student_nationality.toLowerCase() !== 'unknown')
+          .map(item => ({
+            ...item,
+            count: Number(item.count) || 0,
+            student_nationality: item.student_nationality
+          }));
         setNationalityData(updatedData);
       } catch (error) {
         console.error('Error fetching nationality data:', error);
@@ -64,10 +63,13 @@ const Dashboard = () => {
     const fetchEducationData = async () => {
       try {
         const response = await axios.get(`${API_BASE_URL}/student-highest-education-distribution`);
-        const updatedData = response.data.map(item => ({
-          ...item,
-          count: Number(item.count),
-        }));
+        const updatedData = response.data
+          .filter(item => item.student_highest_education && item.student_highest_education.toLowerCase() !== 'unknown')
+          .map(item => ({
+            ...item,
+            count: Number(item.count) || 0,
+            student_highest_education: item.student_highest_education
+          }));
         setEducationData(updatedData);
       } catch (error) {
         console.error('Error fetching education data:', error);
@@ -77,10 +79,13 @@ const Dashboard = () => {
     const fetchCurrentEducationData = async () => {
       try {
         const response = await axios.get(`${API_BASE_URL}/student-current-education-distribution`);
-        const updatedData = response.data.map(item => ({
-          ...item,
-          count: Number(item.count),
-        }));
+        const updatedData = response.data
+          .filter(item => item.student_type && item.student_type.toLowerCase() !== 'unknown')
+          .map(item => ({
+            ...item,
+            count: Number(item.count) || 0,
+            student_type: item.student_type
+          }));
         setCurrentEducationData(updatedData);
       } catch (error) {
         console.error('Error fetching current education data:', error);
@@ -90,10 +95,13 @@ const Dashboard = () => {
     const fetchRaceData = async () => {
       try {
         const response = await axios.get(`${API_BASE_URL}/student-race-distribution`);
-        const updatedData = response.data.map(item => ({
-          ...item,
-          count: Number(item.count),
-        }));
+        const updatedData = response.data
+          .filter(item => item.student_race && item.student_race.toLowerCase() !== 'unknown')
+          .map(item => ({
+            ...item,
+            count: Number(item.count) || 0,
+            student_race: item.student_race
+          }));
         setRaceData(updatedData);
       } catch (error) {
         console.error('Error fetching race data:', error);
@@ -103,10 +111,13 @@ const Dashboard = () => {
     const fetchMaritalData = async () => {
       try {
         const response = await axios.get(`${API_BASE_URL}/student-marital-status-distribution`);
-        const updatedData = response.data.map(item => ({
-          ...item,
-          count: Number(item.count),
-        }));
+        const updatedData = response.data
+          .filter(item => item.student_marital_status && item.student_marital_status.toLowerCase() !== 'unknown')
+          .map(item => ({
+            ...item,
+            count: Number(item.count) || 0,
+            student_marital_status: item.student_marital_status
+          }));
         setMaritalData(updatedData);
       } catch (error) {
         console.error('Error fetching marital data:', error);
@@ -116,17 +127,19 @@ const Dashboard = () => {
     const fetchEmploymentData = async () => {
       try {
         const response = await axios.get(`${API_BASE_URL}/student-employment-status-distribution`);
-        const updatedData = response.data.map(item => ({
-          ...item,
-          count: Number(item.count),
-        }));
+        const updatedData = response.data
+          .filter(item => item.student_employment_status && item.student_employment_status.toLowerCase() !== 'unknown')
+          .map(item => ({
+            ...item,
+            count: Number(item.count) || 0,
+            student_employment_status: item.student_employment_status
+          }));
         setEmploymentData(updatedData);
       } catch (error) {
         console.error('Error fetching employment data:', error);
       }
     };
 
-    // Fetch data for all categories
     fetchDashboardData();
     fetchNationalityData();
     fetchEducationData();
@@ -137,16 +150,34 @@ const Dashboard = () => {
   }, []);
 
   if (loading) {
-    // return <CircularProgress />;
     return null;
   }
 
-  // Define chart colors
-  const COLORS = [
-    '#4B8BBE', '#F79C42', '#61C0BF', '#F04E23', '#7B68EE', '#90EE90', '#FF6347', '#FFD700',
-    '#20B2AA', '#F08080', '#8A2BE2', '#32CD32', '#FF8C00', '#D2691E', '#98FB98', '#DC143C',
-    '#8B0000', '#FF4500', '#00FA9A', '#D3D3D3'
-  ];
+  // Custom legend formatter to set label color based on theme
+  const renderLegend = (props) => {
+    const { payload } = props;
+    return (
+      <ul style={{ listStyle: 'none', padding: 0, textAlign: 'center', marginTop: 10 }}>
+        {payload.map((entry, index) => (
+          <li key={`item-${index}`} style={{ display: 'inline-block', margin: '0 10px' }}>
+            <span
+              style={{
+                display: 'inline-block',
+                width: 10,
+                height: 10,
+                borderRadius: '50%',
+                backgroundColor: entry.color,
+                marginRight: 5,
+              }}
+            />
+            <span style={{ color: isDarkMode ? '#FFFFFF' : '#000000', fontSize: '12px' }}>
+              {entry.value}
+            </span>
+          </li>
+        ))}
+      </ul>
+    );
+  };
 
   return (
     <Box sx={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC', padding: '1px' }}>
@@ -219,187 +250,236 @@ const Dashboard = () => {
           </Card>
         </Grid>
 
-        {/* Nationality, Current Education, Highest Education - 3 charts in one row */}
+        {/* Nationality Chart */}
         <Grid item xs={12} sm={6} md={4}>
           <Card sx={{ ...cardStyles, backgroundColor: isDarkMode ? '#1E293B' : '#E1F5FE', border: '1px solid #ccc' }}>
             <CardContent>
               <Typography variant="h6" sx={{ color: isDarkMode ? '#FFFFFF' : '#000000' }}>Nationalities</Typography>
-              <ResponsiveContainer width="100%" height={200}>
-                <PieChart>
-                  <Pie data={nationalityData} dataKey="count" nameKey="student_nationality" cx="50%" cy="50%" outerRadius={getOuterRadius()} fill="#82ca9d">
-                    {nationalityData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                  <Legend
-                    iconType="square"
-                    layout="vertical"
-                    align="right"
-                    verticalAlign="middle"
-                    wrapperStyle={{ paddingLeft: "20px" }}
-                    payload={nationalityData.map((entry, index) => ({
-                      value: entry.student_nationality,
-                      type: "square",
-                      color: COLORS[index % COLORS.length],
-                    }))}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
+              <Box sx={{ height: 260 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={nationalityData}
+                      dataKey="count"
+                      nameKey="student_nationality"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={getOuterRadius()}
+                    >
+                      {nationalityData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={chartColors[index % chartColors.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend
+                      content={renderLegend}
+                      layout="horizontal"
+                      align="center"
+                      verticalAlign="bottom"
+                      payload={nationalityData.map((entry, index) => ({
+                        value: entry.student_nationality,
+                        type: 'circle',
+                        color: chartColors[index % chartColors.length],
+                      }))}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </Box>
             </CardContent>
           </Card>
         </Grid>
 
-        {/* Current Education, Highest Education */}
+        {/* Current Education Chart */}
         <Grid item xs={12} sm={6} md={4}>
           <Card sx={{ ...cardStyles, backgroundColor: isDarkMode ? '#1E293B' : '#E1F5FE', border: '1px solid #ccc' }}>
             <CardContent>
               <Typography variant="h6" sx={{ color: isDarkMode ? '#FFFFFF' : '#000000' }}>Current Education</Typography>
-              <ResponsiveContainer width="100%" height={200}>
-                <PieChart>
-                  <Pie data={currentEducationData} dataKey="count" nameKey="student_type" cx="50%" cy="50%" outerRadius={getOuterRadius()} fill="#82ca9d">
-                    {currentEducationData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                  <Legend
-                    iconType="square"
-                    layout="vertical"
-                    align="right"
-                    verticalAlign="middle"
-                    wrapperStyle={{ paddingLeft: "20px" }}
-                    payload={currentEducationData.map((entry, index) => ({
-                      value: entry.student_type,
-                      type: "square",
-                      color: COLORS[index % COLORS.length],
-                    }))}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
+              <Box sx={{ height: 260 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={currentEducationData}
+                      dataKey="count"
+                      nameKey="student_type"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={getOuterRadius()}
+                    >
+                      {currentEducationData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={chartColors[index % chartColors.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend
+                      content={renderLegend}
+                      layout="horizontal"
+                      align="center"
+                      verticalAlign="bottom"
+                      payload={currentEducationData.map((entry, index) => ({
+                        value: entry.student_type,
+                        type: 'circle',
+                        color: chartColors[index % chartColors.length],
+                      }))}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </Box>
             </CardContent>
           </Card>
         </Grid>
 
+        {/* Highest Education Chart */}
         <Grid item xs={12} sm={6} md={4}>
           <Card sx={{ ...cardStyles, backgroundColor: isDarkMode ? '#1E293B' : '#E1F5FE', border: '1px solid #ccc' }}>
             <CardContent>
               <Typography variant="h6" sx={{ color: isDarkMode ? '#FFFFFF' : '#000000' }}>Highest Education</Typography>
-              <ResponsiveContainer width="100%" height={200}>
-                <PieChart>
-                  <Pie data={educationData} dataKey="count" nameKey="student_highest_education" cx="50%" cy="50%" outerRadius={getOuterRadius()} fill="#82ca9d">
-                    {educationData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                  <Legend
-                    iconType="square"
-                    layout="vertical"
-                    align="right"
-                    verticalAlign="middle"
-                    wrapperStyle={{ paddingLeft: "20px" }}
-                    payload={educationData.map((entry, index) => ({
-                      value: entry.student_highest_education,
-                      type: "square",
-                      color: COLORS[index % COLORS.length],
-                    }))}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
+              <Box sx={{ height: 260 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={educationData}
+                      dataKey="count"
+                      nameKey="student_highest_education"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={getOuterRadius()}
+                    >
+                      {educationData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={chartColors[index % chartColors.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend
+                      content={renderLegend}
+                      layout="horizontal"
+                      align="center"
+                      verticalAlign="bottom"
+                      payload={educationData.map((entry, index) => ({
+                        value: entry.student_highest_education,
+                        type: 'circle',
+                        color: chartColors[index % chartColors.length],
+                      }))}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </Box>
             </CardContent>
           </Card>
         </Grid>
 
-        {/* Race, Marital Status, Employment Status - 3 charts in one row */}
+        {/* Race Chart */}
         <Grid item xs={12} sm={6} md={4}>
           <Card sx={{ ...cardStyles, backgroundColor: isDarkMode ? '#1E293B' : '#E1F5FE', border: '1px solid #ccc' }}>
             <CardContent>
               <Typography variant="h6" sx={{ color: isDarkMode ? '#FFFFFF' : '#000000' }}>Race</Typography>
-              <ResponsiveContainer width="100%" height={200}>
-                <PieChart>
-                  <Pie data={raceData} dataKey="count" nameKey="student_race" cx="50%" cy="50%" outerRadius={getOuterRadius()} fill="#82ca9d">
-                    {raceData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                  <Legend
-                    iconType="square"
-                    layout="vertical"
-                    align="right"
-                    verticalAlign="middle"
-                    wrapperStyle={{ paddingLeft: "20px" }}
-                    payload={raceData.map((entry, index) => ({
-                      value: entry.student_race,
-                      type: "square",
-                      color: COLORS[index % COLORS.length],
-                    }))}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
+              <Box sx={{ height: 260 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={raceData}
+                      dataKey="count"
+                      nameKey="student_race"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={getOuterRadius()}
+                    >
+                      {raceData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={chartColors[index % chartColors.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend
+                      content={renderLegend}
+                      layout="horizontal"
+                      align="center"
+                      verticalAlign="bottom"
+                      payload={raceData.map((entry, index) => ({
+                        value: entry.student_race,
+                        type: 'circle',
+                        color: chartColors[index % chartColors.length],
+                      }))}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </Box>
             </CardContent>
           </Card>
         </Grid>
 
-        {/* Marital Status */}
+        {/* Marital Status Chart */}
         <Grid item xs={12} sm={6} md={4}>
           <Card sx={{ ...cardStyles, backgroundColor: isDarkMode ? '#1E293B' : '#E1F5FE', border: '1px solid #ccc' }}>
             <CardContent>
               <Typography variant="h6" sx={{ color: isDarkMode ? '#FFFFFF' : '#000000' }}>Marital Status</Typography>
-              <ResponsiveContainer width="100%" height={200}>
-                <PieChart>
-                  <Pie data={maritalData} dataKey="count" nameKey="student_marital_status" cx="50%" cy="50%" outerRadius={getOuterRadius()} fill="#82ca9d">
-                    {maritalData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                  <Legend
-                    iconType="square"
-                    layout="vertical"
-                    align="right"
-                    verticalAlign="middle"
-                    wrapperStyle={{ paddingLeft: "20px" }}
-                    payload={maritalData.map((entry, index) => ({
-                      value: entry.student_marital_status,
-                      type: "square",
-                      color: COLORS[index % COLORS.length],
-                    }))}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
+              <Box sx={{ height: 260 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={maritalData}
+                      dataKey="count"
+                      nameKey="student_marital_status"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={getOuterRadius()}
+                    >
+                      {maritalData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={chartColors[index % chartColors.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend
+                      content={renderLegend}
+                      layout="horizontal"
+                      align="center"
+                      verticalAlign="bottom"
+                      payload={maritalData.map((entry, index) => ({
+                        value: entry.student_marital_status,
+                        type: 'circle',
+                        color: chartColors[index % chartColors.length],
+                      }))}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </Box>
             </CardContent>
           </Card>
         </Grid>
 
-        {/* Employment Status */}
+        {/* Employment Status Chart */}
         <Grid item xs={12} sm={6} md={4}>
           <Card sx={{ ...cardStyles, backgroundColor: isDarkMode ? '#1E293B' : '#E1F5FE', border: '1px solid #ccc' }}>
             <CardContent>
               <Typography variant="h6" sx={{ color: isDarkMode ? '#FFFFFF' : '#000000' }}>Employment Status</Typography>
-              <ResponsiveContainer width="100%" height={200}>
-                <PieChart>
-                  <Pie data={employmentData} dataKey="count" nameKey="student_employment_status" cx="50%" cy="50%" outerRadius={getOuterRadius()} fill="#82ca9d">
-                    {employmentData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                  <Legend
-                    iconType="square"
-                    layout="vertical"
-                    align="right"
-                    verticalAlign="middle"
-                    wrapperStyle={{ paddingLeft: "20px" }}
-                    payload={employmentData.map((entry, index) => ({
-                      value: entry.student_employment_status,
-                      type: "square",
-                      color: COLORS[index % COLORS.length],
-                    }))}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
+              <Box sx={{ height: 260 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={employmentData}
+                      dataKey="count"
+                      nameKey="student_employment_status"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={getOuterRadius()}
+                    >
+                      {employmentData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={chartColors[index % chartColors.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend
+                      content={renderLegend}
+                      layout="horizontal"
+                      align="center"
+                      verticalAlign="bottom"
+                      payload={employmentData.map((entry, index) => ({
+                        value: entry.student_employment_status,
+                        type: 'circle',
+                        color: chartColors[index % chartColors.length],
+                      }))}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </Box>
             </CardContent>
           </Card>
         </Grid>
@@ -408,7 +488,6 @@ const Dashboard = () => {
   );
 };
 
-// Styling for the cards
 const cardStyles = {
   borderRadius: 2,
   boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',

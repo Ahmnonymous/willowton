@@ -88,7 +88,7 @@ function GenericTable() {
 
       setAllStudents(records);
     } catch (error) {
-      console.error("Failed to fetch students:", error);
+      console.log("No Records Found");
       setAllStudents([]);
     }
   }, [calculateColumnWidth]);

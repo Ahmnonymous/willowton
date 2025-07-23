@@ -84,6 +84,10 @@ router.put("/about-me/update/:id", async (req, res) => {
   const updates = req.body;
 
   const fields = Object.keys(updates).filter((key) => key !== "id");
+  if (fields.length === 0) {
+    return res.status(400).json({ error: "No fields provided to update" });
+  }
+
   const values = fields.map((key) => updates[key]);
   const assignments = fields.map((field, i) => `${field} = $${i + 1}`).join(", ");
 
@@ -95,6 +99,9 @@ router.put("/about-me/update/:id", async (req, res) => {
       RETURNING *
     `;
     const result = await pool.query(query, [...values, id]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Record not found" });
+    }
     res.json(result.rows[0]);
   } catch (err) {
     console.error(err);

@@ -46,6 +46,8 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
   const [whatsappError, setWhatsappError] = useState("");
   const [alternativeError, setAlternativeError] = useState("");
   const [emergencyError, setEmergencyError] = useState("");
+  const [nameError, setNameError] = useState("");
+  const [surnameError, setSurnameError] = useState("");
   const [emergencyContactOption, setEmergencyContactOption] = useState("");
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
   const [deleteAttachmentConfirmationOpen, setDeleteAttachmentConfirmationOpen] = useState(false);
@@ -155,6 +157,8 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
             setWhatsappError(data.student_whatsapp_number && !validateNumber(data.student_whatsapp_number) ? "WhatsApp number must be exactly 10 digits" : "");
             setAlternativeError(data.student_alternative_number && !validateNumber(data.student_alternative_number) ? "Alternative number must be exactly 10 digits" : "");
             setEmergencyError(data.student_emergency_contact_number && !validateNumber(data.student_emergency_contact_number) ? "Emergency contact number must be exactly 10 digits" : "");
+            setNameError(data.student_name ? "" : "Student name is required");
+            setSurnameError(data.student_surname ? "" : "Student surname is required");
           } catch (error) {
             console.error("Error fetching student data:", error);
             setErrorMessage("Failed to load student data. Please try again.");
@@ -212,6 +216,8 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
         setWhatsappError("");
         setAlternativeError("");
         setEmergencyError("");
+        setNameError("");
+        setSurnameError("");
         setErrorMessage("");
       }
     }
@@ -232,6 +238,14 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     }
 
     setFormData((prevState) => ({ ...prevState, [name]: sanitizedValue }));
+
+    if (name === "student_name") {
+      setNameError(sanitizedValue ? "" : "Student name is required");
+    }
+
+    if (name === "student_surname") {
+      setSurnameError(sanitizedValue ? "" : "Student surname is required");
+    }
 
     if (name === "student_email_address") {
       setEmailError(value && !validateEmail(value) ? "Please enter a valid email address" : "");
@@ -349,6 +363,15 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
   };
 
   const handleSave = async () => {
+    // Validate required fields
+    if (!formData.student_name) {
+      setNameError("Student name is required");
+      return;
+    }
+    if (!formData.student_surname) {
+      setSurnameError("Student surname is required");
+      return;
+    }
     if (formData.student_email_address && !validateEmail(formData.student_email_address)) {
       setEmailError("Please enter a valid email address");
       return;
@@ -737,6 +760,44 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
             error={!!alternativeError}
             helperText={alternativeError}
             inputProps={{ maxLength: 10, pattern: "[0-9]*" }}
+            sx={fieldStyles}
+            InputLabelProps={inputLabelProps}
+          />
+        </Grid>
+      );
+    }
+
+    if (key === "student_name") {
+      return (
+        <Grid item xs={12} key={index}>
+          <TextField
+            label="Student Name"
+            name="student_name"
+            fullWidth
+            required
+            value={formData.student_name || ""}
+            onChange={handleChange}
+            error={!!nameError}
+            helperText={nameError}
+            sx={fieldStyles}
+            InputLabelProps={inputLabelProps}
+          />
+        </Grid>
+      );
+    }
+
+    if (key === "student_surname") {
+      return (
+        <Grid item xs={12} key={index}>
+          <TextField
+            label="Student Surname"
+            name="student_surname"
+            fullWidth
+            required
+            value={formData.student_surname || ""}
+            onChange={handleChange}
+            error={!!surnameError}
+            helperText={surnameError}
             sx={fieldStyles}
             InputLabelProps={inputLabelProps}
           />

@@ -6,7 +6,8 @@ import {
   List,
   ListItem,
   ListItemIcon,
-  ListItemText
+  ListItemText,
+  Link
 } from '@mui/material';
 import { MdPushPin } from 'react-icons/md';
 
@@ -155,7 +156,16 @@ const HomePage = () => {
               fontSize: fontSizes.caption,
             }}
           >
-            Developed by Uchakide.co.za
+            Developed by{' '}
+            <Link
+              href="https://uchakide.co.za"
+              target="_blank"
+              rel="noopener noreferrer"
+              underline="hover"
+              sx={{ color: '#000' }} // optional: match text color
+            >
+              uchakide.co.za
+            </Link>
           </Typography>
         </Box>
       </Box>

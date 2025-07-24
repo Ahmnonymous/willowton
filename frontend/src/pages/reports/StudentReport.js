@@ -14,6 +14,7 @@ import {
   Select,
   MenuItem as MuiMenuItem,
   Typography,
+  CircularProgress, // Import CircularProgress for the spinner
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
@@ -28,7 +29,7 @@ import { useTheme, useMediaQuery } from '@mui/material';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
 import { ThemeContext } from '../../config/ThemeContext.js';
-import './GenericTable.css';
+import '../../css/GenericTable.css';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -46,6 +47,7 @@ function GenericTable() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [columnSearchTerm, setColumnSearchTerm] = useState('');
   const [totalRecords, setTotalRecords] = useState(0);
+  const [loading, setLoading] = useState(false); // Add loading state
   const searchRef = useRef(null);
   const resizingRef = useRef(null);
   const open = Boolean(anchorEl);
@@ -59,18 +61,17 @@ function GenericTable() {
     return str.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
   }, []);
 
-
-  // Calculate default column width based on header length
   const calculateColumnWidth = useCallback((col) => {
     const headerText = sentenceCase(col);
     const charCount = headerText.length;
-    const pixelsPerChar = 10; // Adjust this value based on your font size/style
-    const minWidth = 50; // Minimum width to ensure usability
-    const calculatedWidth = charCount * pixelsPerChar + 40; // Add padding for sort icons and separator
+    const pixelsPerChar = 10;
+    const minWidth = 50;
+    const calculatedWidth = charCount * pixelsPerChar + 40;
     return Math.max(minWidth, calculatedWidth);
   }, [sentenceCase]);
 
   const fetchStudents = useCallback(async () => {
+    setLoading(true); // Set loading to true before fetching
     try {
       const res = await axios.get(`${API_BASE_URL}/view/student-details`);
       const records = Array.isArray(res.data) ? res.data : res?.data?.records ?? [];
@@ -79,7 +80,6 @@ function GenericTable() {
         const cols = Object.keys(records[0]).filter((c) => c !== 'id');
         setColumns(cols);
         setVisibleColumns(cols);
-        // Initialize column widths based on header length
         setColumnWidths(cols.reduce((acc, col) => ({
           ...acc,
           [col]: calculateColumnWidth(col),
@@ -90,6 +90,8 @@ function GenericTable() {
     } catch (error) {
       console.log("No Records Found");
       setAllStudents([]);
+    } finally {
+      setLoading(false); // Set loading to false after fetching
     }
   }, [calculateColumnWidth]);
 
@@ -107,7 +109,6 @@ function GenericTable() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Column resizing handlers
   const handleMouseMove = useCallback((e) => {
     if (resizingRef.current) {
       const { col, startX, startWidth } = resizingRef.current;
@@ -149,7 +150,6 @@ function GenericTable() {
 
   const resetColumns = () => {
     setVisibleColumns(columns);
-    // Reset column widths based on header length
     setColumnWidths(columns.reduce((acc, col) => ({
       ...acc,
       [col]: calculateColumnWidth(col),
@@ -221,11 +221,10 @@ function GenericTable() {
           Student Report
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          {/* Search input field */}
           <Box
             ref={searchRef}
             sx={{
-              width: showSearch ? (isSmallScreen ? 120 : 220) : 0, // Adjust width based on screen size
+              width: showSearch ? (isSmallScreen ? 120 : 220) : 0,
               height: 36,
               overflow: 'hidden',
               transition: 'width 0.3s ease-in-out, opacity 0.3s ease-in-out',
@@ -234,7 +233,6 @@ function GenericTable() {
               opacity: showSearch ? 1 : 0,
             }}
           >
-
             <InputBase
               placeholder="Search"
               value={searchTerm}
@@ -269,10 +267,8 @@ function GenericTable() {
                 )
               }
             />
-
           </Box>
 
-          {/* Search icon toggle */}
           <Tooltip title={showSearch ? 'Close Search' : 'Search'}>
             <IconButton
               size="small"
@@ -283,7 +279,6 @@ function GenericTable() {
             </IconButton>
           </Tooltip>
 
-          {/* Other icons – hidden on small screen when search is open */}
           {!(isSmallScreen && showSearch) && (
             <>
               <Typography sx={{ color: isDarkMode ? 'white' : 'black', fontSize: '1rem' }}>|</Typography>
@@ -301,7 +296,6 @@ function GenericTable() {
             </>
           )}
         </Box>
-
       </Box>
 
       <Menu
@@ -354,149 +348,160 @@ function GenericTable() {
       </Menu>
 
       <div className="generic-table-container">
-        <table className="generic-table" style={{ backgroundColor: isDarkMode ? '#1e293b' : '#fff', tableLayout: 'fixed' }}>
-          <thead>
-            <tr>
-              {visibleColumns.map((col) => (
-                <th
-                  key={col}
-                  style={{
-                    color: isDarkMode ? 'white' : '#1e293b',
-                    cursor: 'pointer',
-                    position: 'relative',
-                    width: columnWidths[col] || calculateColumnWidth(col),
-                    minWidth: 50,
-                  }}
-                  onClick={(e) => {
-                    if (e.target.className !== 'resize-handle') {
-                      handleSort(col);
-                    }
-                  }}
-                >
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingRight: '10px' }}>
-                    <span>{sentenceCase(col)}</span>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      {sortConfig.key === col && sortConfig.direction === 'asc' && <ArrowDropUpIcon fontSize="small" />}
-                      {sortConfig.key === col && sortConfig.direction === 'desc' && <ArrowDropDownIcon fontSize="small" />}
-                      {sortConfig.key === col && sortConfig.direction === null}
-                    </Box>
-                  </Box>
-                  <span
-                    className="resize-handle"
-                    onMouseDown={(e) => startResizing(e, col)}
+        {loading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
+            <CircularProgress sx={{ color: isDarkMode ? '#F7FAFC' : '#1e293b' }} />
+          </Box>
+        ) : (
+          <table className="generic-table" style={{ backgroundColor: isDarkMode ? '#1e293b' : '#fff', tableLayout: 'fixed' }}>
+            <thead>
+              <tr>
+                {visibleColumns.map((col) => (
+                  <th
+                    key={col}
                     style={{
-                      position: 'absolute',
-                      right: 0,
-                      top: 0,
-                      height: '100%',
-                      width: '5px',
-                      cursor: 'col-resize',
-                      background: isDarkMode ? '#4A5568' : '#CBD5E0',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      userSelect: 'none',
+                      color: isDarkMode ? 'white' : '#1e293b',
+                      cursor: 'pointer',
+                      position: 'relative',
+                      width: columnWidths[col] || calculateColumnWidth(col),
+                      minWidth: 50,
+                    }}
+                    onClick={(e) => {
+                      if (e.target.className !== 'resize-handle') {
+                        handleSort(col);
+                      }
                     }}
                   >
-                    <span style={{ fontSize: '12px', color: isDarkMode ? '#F7FAFC' : '#1e293b' }}>|</span>
-                  </span>
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {paginatedStudents.length > 0 ? (
-              paginatedStudents.map((student) => (
-                <tr key={student.id}>
-                  {visibleColumns.map((col) => (
-                    <td
-                      key={col}
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingRight: '10px' }}>
+                      <span>{sentenceCase(col)}</span>
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        {sortConfig.key === col && sortConfig.direction === 'asc' && <ArrowDropUpIcon fontSize="small" />}
+                        {sortConfig.key === col && sortConfig.direction === 'desc' && <ArrowDropDownIcon fontSize="small" />}
+                        {sortConfig.key === col && sortConfig.direction === null}
+                      </Box>
+                    </Box>
+                    <span
+                      className="resize-handle"
+                      onMouseDown={(e) => startResizing(e, col)}
                       style={{
-                        color: isDarkMode ? 'white' : '#1e293b',
-                        width: columnWidths[col] || calculateColumnWidth(col),
-                        minWidth: 50,
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
+                        position: 'absolute',
+                        right: 0,
+                        top: 0,
+                        height: '100%',
+                        width: '5px',
+                        cursor: 'col-resize',
+                        background: isDarkMode ? '#4A5568' : '#CBD5E0',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        userSelect: 'none',
                       }}
                     >
-                      {col.includes('date') ? formatDate(student[col]) : student[col]}
-                    </td>
-                  ))}
+                      <span style={{ fontSize: '12px', color: isDarkMode ? '#F7FAFC' : '#1e293b' }}>|</span>
+                    </span>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {paginatedStudents.length > 0 ? (
+                paginatedStudents.map((student) => (
+                  <tr key={student.id}>
+                    {visibleColumns.map((col) => (
+                      <td
+                        key={col}
+                        style={{
+                          color: isDarkMode ? 'white' : '#1e293b',
+                          width: columnWidths[col] || calculateColumnWidth(col),
+                          minWidth: 50,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {col.includes('date') ? formatDate(student[col]) : student[col]}
+                      </td>
+                    ))}
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={visibleColumns.length} className="no-matching-records">
+                    {allStudents.length === 0 ? 'No records found' : 'No matching records found'}
+                  </td>
                 </tr>
-              ))
-            ) : (
-              <tr><td colSpan={visibleColumns.length} className="no-matching-records">No matching records found</td></tr>
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        )}
       </div>
 
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'flex-end',
-          mt: 2,
-        }}
-      >
+      {!loading && (
         <Box
           sx={{
             display: 'flex',
-            alignItems: 'center',
-            gap: 2,
-            border: '1px solid',
-            borderColor: isDarkMode ? '#4A5568' : '#CBD5E0',
-            borderRadius: '8px',
-            padding: '6px 12px',
-            backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
-            color: isDarkMode ? '#F7FAFC' : '#1e293b',
+            justifyContent: 'flex-end',
+            mt: 2,
           }}
         >
-          <Typography variant="caption" sx={{ whiteSpace: 'nowrap' }}>
-            Rows per page:
-          </Typography>
-          <Select
-            value={rowsPerPage}
-            onChange={(e) => {
-              setRowsPerPage(parseInt(e.target.value));
-              setPage(0);
-            }}
-            size="small"
+          <Box
             sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 2,
+              border: '1px solid',
+              borderColor: isDarkMode ? '#4A5568' : '#CBD5E0',
+              borderRadius: '8px',
+              padding: '6px 12px',
+              backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
               color: isDarkMode ? '#F7FAFC' : '#1e293b',
-              '.MuiSelect-icon': { color: isDarkMode ? '#F7FAFC' : '#1e293b' },
-              backgroundColor: isDarkMode ? '#4A5568' : '#E2E8F0',
-              borderRadius: '4px',
-              fontSize: '0.85rem',
-              minWidth: '60px',
             }}
           >
-            {[10, 15, 25, 50, 100].map((n) => (
-              <MuiMenuItem key={n} value={n}>{n}</MuiMenuItem>
-            ))}
-          </Select>
-          <Typography variant="caption" sx={{ whiteSpace: 'nowrap' }}>
-            {page * rowsPerPage + 1}-{Math.min((page + 1) * rowsPerPage, totalRecords)} of {totalRecords}
-          </Typography>
-          <IconButton
-            onClick={() => setPage((p) => Math.max(0, p - 1))}
-            disabled={page === 0}
-            size="small"
-            sx={{ color: isDarkMode ? '#F7FAFC' : '#1e293b' }}
-          >
-            <ArrowBackIosIcon fontSize="small" />
-          </IconButton>
-          <IconButton
-            onClick={() => setPage((p) => (p + 1) * rowsPerPage < totalRecords ? p + 1 : p)}
-            disabled={(page + 1) * rowsPerPage >= totalRecords}
-            size="small"
-            sx={{ color: isDarkMode ? '#F7FAFC' : '#1e293b' }}
-          >
-            <ArrowForwardIosIcon fontSize="small" />
-          </IconButton>
+            <Typography variant="caption" sx={{ whiteSpace: 'nowrap' }}>
+              Rows per page:
+            </Typography>
+            <Select
+              value={rowsPerPage}
+              onChange={(e) => {
+                setRowsPerPage(parseInt(e.target.value));
+                setPage(0);
+              }}
+              size="small"
+              sx={{
+                color: isDarkMode ? '#F7FAFC' : '#1e293b',
+                '.MuiSelect-icon': { color: isDarkMode ? '#F7FAFC' : '#1e293b' },
+                backgroundColor: isDarkMode ? '#4A5568' : '#E2E8F0',
+                borderRadius: '4px',
+                fontSize: '0.85rem',
+                minWidth: '60px',
+              }}
+            >
+              {[10, 15, 25, 50, 100].map((n) => (
+                <MuiMenuItem key={n} value={n}>{n}</MuiMenuItem>
+              ))}
+            </Select>
+            <Typography variant="caption" sx={{ whiteSpace: 'nowrap' }}>
+              {page * rowsPerPage + 1}-{Math.min((page + 1) * rowsPerPage, totalRecords)} of {totalRecords}
+            </Typography>
+            <IconButton
+              onClick={() => setPage((p) => Math.max(0, p - 1))}
+              disabled={page === 0}
+              size="small"
+              sx={{ color: isDarkMode ? '#F7FAFC' : '#1e293b' }}
+            >
+              <ArrowBackIosIcon fontSize="small" />
+            </IconButton>
+            <IconButton
+              onClick={() => setPage((p) => (p + 1) * rowsPerPage < totalRecords ? p + 1 : p)}
+              disabled={(page + 1) * rowsPerPage >= totalRecords}
+              size="small"
+              sx={{ color: isDarkMode ? '#F7FAFC' : '#1e293b' }}
+            >
+              <ArrowForwardIosIcon fontSize="small" />
+            </IconButton>
+          </Box>
         </Box>
-      </Box>
-
+      )}
     </Box>
   );
 }

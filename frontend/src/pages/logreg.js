@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Button, TextField, Typography, ToggleButtonGroup, ToggleButton, IconButton, InputAdornment, Dialog, DialogActions, DialogTitle, DialogContent } from "@mui/material";
+import { Box, Button, TextField, Typography, ToggleButtonGroup, ToggleButton, IconButton, InputAdornment, Dialog, DialogActions, DialogTitle, DialogContent, Link } from "@mui/material";
 import { AccountCircle, Lock, PersonAdd, Email, Visibility, VisibilityOff } from "@mui/icons-material";
 import axios from "axios";
 import footerImage from '../images/footer.png';
@@ -27,6 +27,14 @@ const LoginSignup = () => {
     password: "",
     user_type: "student",
   });
+  // Define font sizes as variables
+  const fontSizes = {
+    h4: '2.5rem',
+    body1: '1.2rem',
+    h6: '1.2rem',
+    listItemText: '1.1rem',
+    caption: '1rem',
+  };
   const [errors, setErrors] = useState({
     email: "",
     password: "",
@@ -436,8 +444,24 @@ const LoginSignup = () => {
         sx={{ width: '100%', height: 'auto', mt: 'auto', mb: 1 }}
       />
       <Box sx={{ textAlign: 'center', py: 2, mt: 0, color: 'black' }}>
-        <Typography variant="caption" sx={{ color: 'black', fontFamily: 'Sansation Light, sans-serif', fontSize: '1rem' }}>
-          Developed by Uchakide.co.za
+        <Typography
+          variant="caption"
+          sx={{
+            color: 'black',
+            fontFamily: 'Sansation Light, Arial, sans-serif',
+            fontSize: fontSizes.caption,
+          }}
+        >
+          Developed by{' '}
+          <Link
+            href="https://uchakide.co.za"
+            target="_blank"
+            rel="noopener noreferrer"
+            underline="hover"
+            sx={{ color: 'black' }} // optional: match text color
+          >
+            uchakide.co.za
+          </Link>
         </Typography>
       </Box>
     </Box>

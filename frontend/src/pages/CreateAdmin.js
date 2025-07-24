@@ -42,7 +42,7 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 import * as XLSX from "xlsx";
 import { ThemeContext } from '../config/ThemeContext';
-import '../pages/reports/GenericTable.css'; // Reusing the same CSS for consistent styling
+import '../css/GenericTable.css';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 

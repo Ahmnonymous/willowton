@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Typography, Box, Divider } from '@mui/material';
+import { Container, Typography, Box, Divider, Link } from '@mui/material';
 import footerImage from '../images/footer.png';
 
 const AboutUsPage = () => {
@@ -116,8 +116,24 @@ const AboutUsPage = () => {
           sx={{ width: '100%', height: 'auto', mb: 1 }}
         />
         <Box sx={{ textAlign: 'center', py: 2, mt: 0, color: 'black' }}>
-          <Typography variant="caption" sx={{ color: 'white', fontFamily: 'Sansation Light, sans-serif', fontSize: fontSizes.caption }}>
-            Developed by Uchakide.co.za
+          <Typography
+            variant="caption"
+            sx={{
+              color: 'white',
+              fontFamily: 'Sansation Light, Arial, sans-serif',
+              fontSize: fontSizes.caption,
+            }}
+          >
+            Developed by{' '}
+            <Link
+              href="https://uchakide.co.za"
+              target="_blank"
+              rel="noopener noreferrer"
+              underline="hover"
+              sx={{ color: 'white' }} // optional: match text color
+            >
+              uchakide.co.za
+            </Link>
           </Typography>
         </Box>
       </Box>

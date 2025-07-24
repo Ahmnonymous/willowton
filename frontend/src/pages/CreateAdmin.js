@@ -20,8 +20,9 @@ import {
   Grid,
   Dialog,
   DialogActions,
-  DialogContent,
   DialogTitle,
+  DialogContent,
+  CircularProgress, // Added for loading spinner
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import ViewColumnIcon from "@mui/icons-material/ViewColumn";
@@ -75,6 +76,7 @@ const UserReport = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [columnSearchTerm, setColumnSearchTerm] = useState('');
   const [totalRecords, setTotalRecords] = useState(0);
+  const [loading, setLoading] = useState(false); // Added loading state
   const searchRef = useRef(null);
   const resizingRef = useRef(null);
   const open = Boolean(anchorEl);
@@ -96,6 +98,7 @@ const UserReport = () => {
   }, [sentenceCase]);
 
   const fetchUsers = useCallback(async () => {
+    setLoading(true); // Set loading to true before fetching
     let apiUrl = userType === "admin" ? `${API_BASE_URL}/users` : `${API_BASE_URL}/users/${JSON.parse(localStorage.getItem("user"))?.user_id}`;
     try {
       const response = await fetch(apiUrl);
@@ -114,6 +117,8 @@ const UserReport = () => {
     } catch (error) {
       console.error("Error fetching users:", error);
       setUsers([]);
+    } finally {
+      setLoading(false); // Set loading to false after fetching
     }
   }, [userType, calculateColumnWidth]);
 
@@ -158,12 +163,15 @@ const UserReport = () => {
   );
 
   const fetchUserById = async (id) => {
+    setLoading(true); // Set loading to true before fetching
     try {
       const response = await fetch(`${API_BASE_URL}/users/${id}`);
       const data = await response.json();
       setEditUser(data);
     } catch (error) {
       console.error("Error fetching user by ID:", error);
+    } finally {
+      setLoading(false); // Set loading to false after fetching
     }
   };
 
@@ -178,6 +186,7 @@ const UserReport = () => {
     validationSchema: validationSchema,
     enableReinitialize: true,
     onSubmit: async (values) => {
+      setLoading(true); // Set loading to true before saving
       try {
         const response = editUser
           ? await fetch(`${API_BASE_URL}/users/${editUser.user_id}`, {
@@ -203,6 +212,8 @@ const UserReport = () => {
         }
       } catch (error) {
         console.error("Error saving user:", error);
+      } finally {
+        setLoading(false); // Set loading to false after saving
       }
     },
   });
@@ -223,6 +234,7 @@ const UserReport = () => {
 
   const handleDeleteConfirm = async () => {
     if (!editUser) return;
+    setLoading(true); // Set loading to true before deleting
     try {
       await fetch(`${API_BASE_URL}/users/${editUser.user_id}`, {
         method: "DELETE",
@@ -232,6 +244,8 @@ const UserReport = () => {
       setDrawerOpen(false);
     } catch (error) {
       console.error("Failed to delete user:", error);
+    } finally {
+      setLoading(false); // Set loading to false after deleting
     }
   };
 
@@ -318,11 +332,10 @@ const UserReport = () => {
   });
 
   return (
-    // <Box sx={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC', minHeight: '100vh', p: 2 }}>
     <Box
-          sx={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC', minHeight: '100vh', p: 2 }}
-          className={isDarkMode ? 'dark-mode' : ''}
-        >
+      sx={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC', minHeight: '100vh', p: 2 }}
+      className={isDarkMode ? 'dark-mode' : ''}
+    >
       {/* Header Section with Search and Icons */}
       <Box sx={{ padding: "12px", backgroundColor: isDarkMode ? '#1e293b' : '#e1f5fe', borderRadius: "8px", marginBottom: "12px", border: '1px solid #ccc', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography variant="h6" sx={{ color: isDarkMode ? 'white' : 'black', fontWeight: "bold" }}>
@@ -481,175 +494,185 @@ const UserReport = () => {
         </MenuItem>
       </Menu>
 
-      {/* Table */}
+      {/* Table with Loading Spinner */}
       <div className="generic-table-container">
-        <table className="generic-table" style={{ backgroundColor: isDarkMode ? '#1e293b' : '#fff', tableLayout: 'fixed' }}>
-          <thead>
-            <tr>
-              <th style={{ color: isDarkMode ? 'white' : '#1e293b', width: 50, minWidth: 50 }}></th>
-              {visibleColumns.map((col) => (
-                <th
-                  key={col}
-                  style={{
-                    color: isDarkMode ? 'white' : '#1e293b',
-                    cursor: 'pointer',
-                    position: 'relative',
-                    width: columnWidths[col] || calculateColumnWidth(col),
-                    minWidth: 50,
-                  }}
-                  onClick={(e) => {
-                    if (e.target.className !== 'resize-handle') {
-                      handleSort(col);
-                    }
-                  }}
-                >
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingRight: '10px' }}>
-                    <span>{sentenceCase(col)}</span>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      {sortConfig.key === col && sortConfig.direction === 'asc' && <ArrowDropUpIcon fontSize="small" />}
-                      {sortConfig.key === col && sortConfig.direction === 'desc' && <ArrowDropDownIcon fontSize="small" />}
-                      {sortConfig.key === col && sortConfig.direction === null}
-                    </Box>
-                  </Box>
-                  <span
-                    className="resize-handle"
-                    onMouseDown={(e) => startResizing(e, col)}
+        {loading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
+            <CircularProgress sx={{ color: isDarkMode ? '#F7FAFC' : '#1e293b' }} />
+          </Box>
+        ) : (
+          <table className="generic-table" style={{ backgroundColor: isDarkMode ? '#1e293b' : '#fff', tableLayout: 'fixed' }}>
+            <thead>
+              <tr>
+                <th style={{ color: isDarkMode ? 'white' : '#1e293b', width: 50, minWidth: 50 }}></th>
+                {visibleColumns.map((col) => (
+                  <th
+                    key={col}
                     style={{
-                      position: 'absolute',
-                      right: 0,
-                      top: 0,
-                      height: '100%',
-                      width: '5px',
-                      cursor: 'col-resize',
-                      background: isDarkMode ? '#4A5568' : '#CBD5E0',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      userSelect: 'none',
+                      color: isDarkMode ? 'white' : '#1e293b',
+                      cursor: 'pointer',
+                      position: 'relative',
+                      width: columnWidths[col] || calculateColumnWidth(col),
+                      minWidth: 50,
+                    }}
+                    onClick={(e) => {
+                      if (e.target.className !== 'resize-handle') {
+                        handleSort(col);
+                      }
                     }}
                   >
-                    <span style={{ fontSize: '12px', color: isDarkMode ? '#F7FAFC' : '#1e293b' }}>|</span>
-                  </span>
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {paginatedUsers.length > 0 ? (
-              paginatedUsers.map((user) => (
-                <tr key={user.user_id}>
-                  <td style={{ color: isDarkMode ? 'white' : '#1e293b', width: 50, minWidth: 50 }}>
-                    <Button
-                      onClick={() => handleEditClick(user)}
-                      size="small"
-                      sx={{ color: isDarkMode ? '#F7FAFC' : '#1E293B' }}
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingRight: '10px' }}>
+                      <span>{sentenceCase(col)}</span>
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        {sortConfig.key === col && sortConfig.direction === 'asc' && <ArrowDropUpIcon fontSize="small" />}
+                        {sortConfig.key === col && sortConfig.direction === 'desc' && <ArrowDropDownIcon fontSize="small" />}
+                        {sortConfig.key === col && sortConfig.direction === null}
+                      </Box>
+                    </Box>
+                    <span
+                      className="resize-handle"
+                      onMouseDown={(e) => startResizing(e, col)}
+                      style={{
+                        position: 'absolute',
+                        right: 0,
+                        top: 0,
+                        height: '100%',
+                        width: '5px',
+                        cursor: 'col-resize',
+                        background: isDarkMode ? '#4A5568' : '#CBD5E0',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        userSelect: 'none',
+                      }}
                     >
-                      <EditIcon fontSize="small" />
-                    </Button>
+                      <span style={{ fontSize: '12px', color: isDarkMode ? '#F7FAFC' : '#1e293b' }}>|</span>
+                    </span>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {paginatedUsers.length > 0 ? (
+                paginatedUsers.map((user) => (
+                  <tr key={user.user_id}>
+                    <td style={{ color: isDarkMode ? 'white' : '#1e293b', width: 50, minWidth: 50 }}>
+                      <Button
+                        onClick={() => handleEditClick(user)}
+                        size="small"
+                        sx={{ color: isDarkMode ? '#F7FAFC' : '#1E293B' }}
+                      >
+                        <EditIcon fontSize="small" />
+                      </Button>
+                    </td>
+                    {visibleColumns.map((col) => {
+                      const isUserTypeCol = col === 'user_type';
+                      return (
+                        <td
+                          key={col}
+                          style={{
+                            color: isDarkMode ? 'white' : '#1e293b',
+                            width: columnWidths[col] || calculateColumnWidth(col),
+                            minWidth: 50,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {isUserTypeCol ? (
+                            <span
+                              style={{
+                                backgroundColor: user[col] === 'student' ? '#1e88e5' : user[col] === 'admin' ? '#43a047' : '#9e9e9e',
+                                color: '#fff',
+                                padding: '2px 8px',
+                                borderRadius: '12px',
+                                fontSize: '0.75rem',
+                                display: 'inline-block',
+                                textTransform: 'capitalize',
+                                whiteSpace: 'nowrap',
+                              }}
+                            >
+                              {user[col]}
+                            </span>
+                          ) : (
+                            user[col]
+                          )}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={visibleColumns.length + 1} className="no-matching-records">
+                    {users.length === 0 ? 'No records found' : 'No matching records found'}
                   </td>
-                  {visibleColumns.map((col) => {
-  const isUserTypeCol = col === 'user_type';
-
-  return (
-    <td
-      key={col}
-      style={{
-        color: isDarkMode ? 'white' : '#1e293b',
-        width: columnWidths[col] || calculateColumnWidth(col),
-        minWidth: 50,
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap',
-      }}
-    >
-      {isUserTypeCol ? (
-        <span
-          style={{
-            backgroundColor: user[col] === 'student' ? '#1e88e5' : user[col] === 'admin' ? '#43a047' : '#9e9e9e',
-            color: '#fff',
-            padding: '2px 8px',
-            borderRadius: '12px',
-            fontSize: '0.75rem',
-            display: 'inline-block',
-            textTransform: 'capitalize',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {user[col]}
-        </span>
-      ) : (
-        user[col]
-      )}
-    </td>
-  );
-})}
-
                 </tr>
-              ))
-            ) : (
-              <tr><td colSpan={visibleColumns.length + 1} className="no-matching-records">No matching records found</td></tr>
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        )}
       </div>
 
       {/* Pagination */}
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-        <Box sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 2,
-          border: '1px solid',
-          borderColor: isDarkMode ? '#4A5568' : '#CBD5E0',
-          borderRadius: '8px',
-          padding: '6px 12px',
-          backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
-          color: isDarkMode ? '#F7FAFC' : '#1e293b',
-        }}>
-          <Typography variant="caption" sx={{ whiteSpace: 'nowrap' }}>
-            Rows per page:
-          </Typography>
-          <Select
-            value={rowsPerPage}
-            onChange={(e) => {
-              setRowsPerPage(parseInt(e.target.value));
-              setPage(0);
-            }}
-            size="small"
-            sx={{
-              color: isDarkMode ? '#F7FAFC' : '#1e293b',
-              '.MuiSelect-icon': { color: isDarkMode ? '#F7FAFC' : '#1e293b' },
-              backgroundColor: isDarkMode ? '#4A5568' : '#E2E8F0',
-              borderRadius: '4px',
-              fontSize: '0.85rem',
-              minWidth: '60px',
-            }}
-          >
-            {[10, 15, 25, 50, 100].map((n) => (
-              <MuiMenuItem key={n} value={n}>{n}</MuiMenuItem>
-            ))}
-          </Select>
-          <Typography variant="caption" sx={{ whiteSpace: 'nowrap' }}>
-            {page * rowsPerPage + 1}-{Math.min((page + 1) * rowsPerPage, totalRecords)} of {totalRecords}
-          </Typography>
-          <IconButton
-            onClick={() => setPage((p) => Math.max(0, p - 1))}
-            disabled={page === 0}
-            size="small"
-            sx={{ color: isDarkMode ? '#F7FAFC' : '#1e293b' }}
-          >
-            <ArrowBackIosIcon fontSize="small" />
-          </IconButton>
-          <IconButton
-            onClick={() => setPage((p) => (p + 1) * rowsPerPage < totalRecords ? p + 1 : p)}
-            disabled={(page + 1) * rowsPerPage >= totalRecords}
-            size="small"
-            sx={{ color: isDarkMode ? '#F7FAFC' : '#1e293b' }}
-          >
-            <ArrowForwardIosIcon fontSize="small" />
-          </IconButton>
+      {!loading && (
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+          <Box sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+            border: '1px solid',
+            borderColor: isDarkMode ? '#4A5568' : '#CBD5E0',
+            borderRadius: '8px',
+            padding: '6px 12px',
+            backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+            color: isDarkMode ? '#F7FAFC' : '#1e293b',
+          }}>
+            <Typography variant="caption" sx={{ whiteSpace: 'nowrap' }}>
+              Rows per page:
+            </Typography>
+            <Select
+              value={rowsPerPage}
+              onChange={(e) => {
+                setRowsPerPage(parseInt(e.target.value));
+                setPage(0);
+              }}
+              size="small"
+              sx={{
+                color: isDarkMode ? '#F7FAFC' : '#1e293b',
+                '.MuiSelect-icon': { color: isDarkMode ? '#F7FAFC' : '#1e293b' },
+                backgroundColor: isDarkMode ? '#4A5568' : '#E2E8F0',
+                borderRadius: '4px',
+                fontSize: '0.85rem',
+                minWidth: '60px',
+              }}
+            >
+              {[10, 15, 25, 50, 100].map((n) => (
+                <MuiMenuItem key={n} value={n}>{n}</MuiMenuItem>
+              ))}
+            </Select>
+            <Typography variant="caption" sx={{ whiteSpace: 'nowrap' }}>
+              {page * rowsPerPage + 1}-{Math.min((page + 1) * rowsPerPage, totalRecords)} of {totalRecords}
+            </Typography>
+            <IconButton
+              onClick={() => setPage((p) => Math.max(0, p - 1))}
+              disabled={page === 0}
+              size="small"
+              sx={{ color: isDarkMode ? '#F7FAFC' : '#1e293b' }}
+            >
+              <ArrowBackIosIcon fontSize="small" />
+            </IconButton>
+            <IconButton
+              onClick={() => setPage((p) => (p + 1) * rowsPerPage < totalRecords ? p + 1 : p)}
+              disabled={(page + 1) * rowsPerPage >= totalRecords}
+              size="small"
+              sx={{ color: isDarkMode ? '#F7FAFC' : '#1e293b' }}
+            >
+              <ArrowForwardIosIcon fontSize="small" />
+            </IconButton>
+          </Box>
         </Box>
-      </Box>
+      )}
 
       {/* Drawer for creating or editing user */}
       <Drawer anchor="right" open={drawerOpen} onClose={handleCloseDrawer}>

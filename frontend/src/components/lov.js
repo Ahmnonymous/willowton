@@ -1,8 +1,8 @@
 export const races = [
-  "Asian",
   "Black",
+  "Indian",
   "Caucasian",
-  "Multiracial"
+  "Coloured"
 ];
 
 export const provinces = [
@@ -40,21 +40,25 @@ export const employmentStatus = [
 ];
 
 export const highestEducation = [
-  // "NQF 1", "NQF 2", "NQF 3", "NQF 4",
-  // "NQF 5", "NQF 6", "NQF 7", "NQF 8",
-  // "NQF 9", "NQF 10", "Matric",
-  "NQF 5 - Matric/Higher Certificate","NQF 6 - Diploma",
-  "NQF 7 - Degree","NQF 8 - Honors/Postgraduate","NQF 9 - Masters","NQF 10 - PhD/Doctorate"
+  "NQF 5 - Matric/Higher Certificate",
+  "NQF 6 - Diploma",
+  "NQF 7 - Degree",
+  "NQF 8 - Honors/Postgraduate",
+  "NQF 9 - Masters",
+  "NQF 10 - PhD/Doctorate"
 ];
 
 export const semesters = [
-  "1st Semester (January-June)", "2nd Semester (July-Decemeber)"
-]
+  "1st Semester (January-June)",
+  "2nd Semester (July-December)"
+];
 
 export const financeType = [
   "Staff Bursary",
   "Student Loan",
-  "Zakah"
+  "Zakah",
+  "Willowton Group Family Member",
+  "Willowton Group Director Referral"
 ];
 
 export const religions = [
@@ -67,22 +71,44 @@ export const religions = [
 
 export const studentType = [
   "Currently in matric",
+  "Completed Matric",
   "Currently in university"
 ];
 
 export const nationality = [
-  "Angola", "Congo", "Equatorial Quinea", "Kenya",
-  "Mozambique", "Nigeria", "Uganda", "India",
-  "Botswana", "Central African Republic", "Ghana",
-  "Malawi", "Pakistan", "South African", "Bangladesh",
-  "Somalian", "Lesotho", "Ivory Coast", "Burundi"
+  "Angola",
+  "Congo",
+  "Equatorial Guinea",
+  "Kenya",
+  "Mozambique",
+  "Nigeria",
+  "Uganda",
+  "India",
+  "Botswana",
+  "Central African Republic",
+  "Ghana",
+  "Malawi",
+  "Pakistan",
+  "South African",
+  "Bangladesh",
+  "Somalian",
+  "Lesotho",
+  "Ivory Coast",
+  "Burundi"
 ];
 
 export const emergencyContactRelationship = [
-  "Mother", "Father", "Brother", "Sister",
-  "Aunty", "Uncle", "Grand Mother", "Grand Father"
+  "Mother",
+  "Father",
+  "Brother",
+  "Sister",
+  "Aunty",
+  "Uncle",
+  "Grand Mother",
+  "Grand Father"
 ];
 
 export const parentRelationship = [
-  "Mother", "Father"
+  "Mother",
+  "Father"
 ];

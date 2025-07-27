@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Button, TextField, Typography, ToggleButtonGroup, ToggleButton, IconButton, InputAdornment, Dialog, DialogActions, DialogTitle, DialogContent, Link } from "@mui/material";
+import { Box, Button, TextField, Typography, ToggleButtonGroup, ToggleButton, IconButton, InputAdornment, Dialog, DialogActions, DialogTitle, DialogContent, Link, FormControlLabel, Checkbox } from "@mui/material";
 import { AccountCircle, Lock, PersonAdd, Email, Visibility, VisibilityOff } from "@mui/icons-material";
 import axios from "axios";
 import footerImage from '../images/footer.png';
@@ -27,6 +27,7 @@ const LoginSignup = () => {
     password: "",
     user_type: "student",
   });
+  const [isTermsAccepted, setIsTermsAccepted] = useState(false);
   // Define font sizes as variables
   const fontSizes = {
     h4: '2.5rem',
@@ -78,6 +79,10 @@ const LoginSignup = () => {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleTermsChange = (e) => {
+    setIsTermsAccepted(e.target.checked);
   };
 
   const handleForgotPasswordChange = (e) => {
@@ -141,6 +146,11 @@ const LoginSignup = () => {
 
       if (formData.password.length < 8) {
         newErrors.password = "Password must be at least 8 characters";
+        formValid = false;
+      }
+
+      if (!isTermsAccepted) {
+        newErrors.terms = "You must agree to the Terms & Conditions and POPIA consent.";
         formValid = false;
       }
     }
@@ -384,6 +394,26 @@ const LoginSignup = () => {
                   error={!!errors.password}
                   helperText={errors.password}
                 />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={isTermsAccepted}
+                      onChange={handleTermsChange}
+                      sx={{ color: 'black', '&.Mui-checked': { color: 'black' } }}
+                    />
+                  }
+                  label={
+                    <Typography sx={{ fontFamily: "Sansation Light", fontSize: { xs: '0.8rem', sm: '0.9rem', md: '1rem' }, color: 'black', textAlign: 'left' }}>
+                      By continuing, you agree to our Terms & Conditions and give consent in terms of the POPIA Act to process and store your personal information for service delivery purposes.
+                    </Typography>
+                  }
+                  sx={{ mb: 2 }}
+                />
+                {errors.terms && (
+                  <Typography color="error" sx={{ fontFamily: "Sansation Light", fontSize: { xs: '0.8rem', sm: '0.9rem', md: '1rem' }, mb: 2 }}>
+                    {errors.terms}
+                  </Typography>
+                )}
                 <Button type="submit" fullWidth variant="contained" sx={{ backgroundColor: 'black', fontFamily: "Sansation Light", mt: 1, fontSize: { xs: '0.9rem', sm: '1rem', md: '1.2rem' } }}>
                   REGISTER
                 </Button>
@@ -458,7 +488,7 @@ const LoginSignup = () => {
             target="_blank"
             rel="noopener noreferrer"
             underline="hover"
-            sx={{ color: 'black' }} // optional: match text color
+            sx={{ color: 'black' }}
           >
             uchakide.co.za
           </Link>

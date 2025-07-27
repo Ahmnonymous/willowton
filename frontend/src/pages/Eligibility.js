@@ -39,10 +39,10 @@ const EligibilityPage = () => {
 
         <Box component="ul" sx={{ pl: 2, m: 0, color: "black", fontFamily: "Sansation Light", listStyleType: "disc" }}>
           {[
-            "You must be a South African citizen or a foreign national with a valid study permit.",
+            "You must be a South African citizen.",
             "You must reside in the province for which you are applying.",
             "You must demonstrate financial need.",
-            "You must have applied for NSFAS funding before applying for this bursary. (Apply for NSFAS funding here).",
+            "You must have applied for NSFAS funding before applying for this bursary.",
             "You must be currently studying or planning to study at a recognized University, University of Technology, or TVET College in South Africa.",
             "You must fall under one of the following categories:"
           ].map((text, idx) => (
@@ -132,7 +132,7 @@ const EligibilityPage = () => {
         <List>
           <List sx={{ listStyleType: "decimal", pl: 2, m: 0, color: 'black' }}>
             {[
-              "Submit your application online at www.wosanzafbursary.online.",
+              "Submit your application online at www.wosanzafbursary.co.za.",
               "Upload clear copies of the required supporting documentation..."
             ].map((text, idx) => (
               <Box key={idx} component="li" sx={{ mb: 1, fontSize: fontSizes.body1 }}>
@@ -206,7 +206,7 @@ const EligibilityPage = () => {
         <Divider />
         <List sx={{ listStyleType: "disc", pl: 3, m: 0, color: 'black', fontSize: fontSizes.body1 }}>
           <Box component="li" sx={{ mb: 1 }}>
-            Applications for 2023 must be submitted by 30th September 2022.
+            Applications for 2026 must be submitted by 30th September 2025.
           </Box>
           <Box component="li" sx={{ mb: 3 }}>
             All supporting documentation must be submitted by the closing date. Incomplete applications will be disqualified.
@@ -255,7 +255,7 @@ const EligibilityPage = () => {
             target="_blank"
             rel="noopener noreferrer"
             underline="hover"
-            sx={{ color: 'black' }} // optional: match text color
+            sx={{ color: 'black' }}
           >
             uchakide.co.za
           </Link>

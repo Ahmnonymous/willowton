@@ -35,15 +35,15 @@ const ContactUs = () => {
     <Box
       display="flex"
       flexDirection="column"
-      minHeight="100vh" // Ensures the parent takes at least the full screen height
+      minHeight="100vh"
     >
       <Container
         sx={{
           py: 4,
           mb: 0,
-          maxWidth: 'none', // Removes the max-width constraint
+          maxWidth: 'none',
           '@media (min-width:1200px)': {
-            maxWidth: '100%', // Ensures the container spans the full width on larger screens
+            maxWidth: '100%',
           },
         }}
       >
@@ -132,7 +132,6 @@ const ContactUs = () => {
         </Box>
       </Container>
 
-      {/* Footer-style Region */}
       <Box
         sx={{
           backgroundColor: "#db3d35",
@@ -165,18 +164,18 @@ const ContactUs = () => {
           <Grid item xs={12} md={4} textAlign="center">
             <Typography variant="h6" fontWeight={'bold'} sx={{ fontFamily: "Sansation Light" }}>ON</Typography>
             <Typography sx={{ ...textStyle }}>Phone: (+27) 31 309 6786</Typography>
+            <Typography sx={{ ...textStyle }}>WhatsApp: 0641336761</Typography>
             <Typography sx={{ ...textStyle }}>Name: Humza Mthembu</Typography>
             <Typography sx={{ ...textStyle }}>Mail: humza.mthembu@sanzaf.org.za</Typography>
+            <Typography sx={{ ...textStyle }}>CC: sanmbf.bursary@sanzaf.org.za</Typography>
           </Grid>
           <Grid item xs={12} md={4} textAlign="center">
             <Typography sx={{ fontFamily: "Sansation Light" }} fontWeight={'bold'} variant="h6">DURING</Typography>
-            <Typography sx={{ ...textStyle }}>Monday - Friday:</Typography>
-            <Typography sx={{ ...textStyle }}>08:00 a.m. - 4:00 p.m</Typography>
+            <Typography sx={{ ...textStyle }}>Contact us (for Bursary Queries) during Monday to Friday, 2 p.m. - 4 p.m.</Typography>
           </Grid>
         </Grid>
       </Box>
 
-      {/* Footer Section */}
       <Box sx={{ marginTop: 'auto' }}>
         <Box
           component="img"
@@ -199,7 +198,7 @@ const ContactUs = () => {
               target="_blank"
               rel="noopener noreferrer"
               underline="hover"
-              sx={{ color: 'white' }} // optional: match text color
+              sx={{ color: 'white' }}
             >
               uchakide.co.za
             </Link>

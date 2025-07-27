@@ -164,14 +164,14 @@ const ContactUs = () => {
           <Grid item xs={12} md={4} textAlign="center">
             <Typography variant="h6" fontWeight={'bold'} sx={{ fontFamily: "Sansation Light" }}>ON</Typography>
             <Typography sx={{ ...textStyle }}>Phone: (+27) 31 309 6786</Typography>
-            <Typography sx={{ ...textStyle }}>WhatsApp: 0641336761</Typography>
+            <Typography sx={{ ...textStyle }}>WhatsApp: (+27) 64 133 6761</Typography>
             <Typography sx={{ ...textStyle }}>Name: Humza Mthembu</Typography>
             <Typography sx={{ ...textStyle }}>Mail: humza.mthembu@sanzaf.org.za</Typography>
             <Typography sx={{ ...textStyle }}>CC: sanmbf.bursary@sanzaf.org.za</Typography>
           </Grid>
           <Grid item xs={12} md={4} textAlign="center">
             <Typography sx={{ fontFamily: "Sansation Light" }} fontWeight={'bold'} variant="h6">DURING</Typography>
-            <Typography sx={{ ...textStyle }}>Contact us (for Bursary Queries) during Monday to Friday, 2 p.m. - 4 p.m.</Typography>
+            <Typography sx={{ ...textStyle }}>Monday to Friday <br></br> 2 p.m. - 4 p.m.</Typography>
           </Grid>
         </Grid>
       </Box>

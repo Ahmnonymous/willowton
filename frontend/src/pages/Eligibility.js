@@ -132,7 +132,7 @@ const EligibilityPage = () => {
         <List>
           <List sx={{ listStyleType: "decimal", pl: 2, m: 0, color: 'black' }}>
             {[
-              "Submit your application online at www.wosanzafbursary.co.za.",
+              "Submit your application online at www.willowtonbursary.co.za",
               "Upload clear copies of the required supporting documentation..."
             ].map((text, idx) => (
               <Box key={idx} component="li" sx={{ mb: 1, fontSize: fontSizes.body1 }}>

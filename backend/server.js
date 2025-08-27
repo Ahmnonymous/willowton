@@ -1,5 +1,6 @@
 // backend/server.js
 const express = require("express");
+const path = require("path");
 const cors = require("cors");
 const session = require("express-session");  // Import session
 const allRoutes = require("./routes/allroutes"); 
@@ -17,7 +18,6 @@ const interviewroutes = require("./routes/interviewroutes");
 const reportroutes = require("./routes/reportroutes");
 const dashboardroutes = require("./routes/dashboardroutes");
 const createadmin = require("./routes/createadmin");
-const emailRoutes = require('./routes/emailRoutes');
 const taskdetailsroutes = require("./routes/taskdetailsroutes");
 const activitylogroutes = require("./routes/activitylogroutes");
 const studentPDFroutes = require("./routes/studentPDFroutes");
@@ -53,11 +53,10 @@ app.use("/api", interviewroutes);
 app.use("/api", reportroutes);
 app.use("/api", dashboardroutes);
 app.use("/api", createadmin);
-app.use("/api", emailRoutes);
 app.use("/api", taskdetailsroutes);
 app.use("/api", activitylogroutes);
 app.use("/api", studentPDFroutes);
-
+app.use("/api/images", express.static(path.join(process.cwd(), "public/images")));
 
 // Start the server
 const PORT = process.env.PORT || 5000;

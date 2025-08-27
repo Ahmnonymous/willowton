@@ -1,5 +1,5 @@
 import React, { lazy, Suspense, useState } from "react";
-import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, useLocation, Navigate } from "react-router-dom";
 import { Box, CssBaseline } from "@mui/material";
 import { FontSizeProvider } from "./config/FontSizeProvider";
 import { ThemeProvider } from "./config/ThemeContext";
@@ -130,7 +130,13 @@ const LayoutHandler = () => {
             <Route path="/contact-us" element={<ContactUs />} />
             <Route path="/eligibility" element={<Eligibility />} />
             <Route path="/popia" element={<POPIA />} />
-            <Route path="/login-register" element={<LogReg />} />
+            {/* <Route path="/login-register" element={<LogReg />} /> */}
+            <Route
+              path="/login-register"
+              element={
+                isLoggedIn ? <Navigate to="/" replace /> : <LogReg />
+              }
+            />
             <Route path="/send-email" element={<SendEmail />} />
 
             {/* Protected Routes */}

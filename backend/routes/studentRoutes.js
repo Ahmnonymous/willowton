@@ -3,6 +3,12 @@ const router = express.Router();
 const pool = require("../db");
 const multer = require("multer");
 
+const postmark = require('postmark');
+
+// Live/ Demo
+const MODE = process.env.REACT_APP_MODE;
+const API_BASE_URL = MODE === "live" ? process.env.REACT_APP_API_BASE_URL_LIVE : process.env.REACT_APP_API_BASE_URL_DEMO;
+
 // Set up multer for file uploads
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
@@ -92,7 +98,7 @@ router.get("/student-details/:id", async (req, res) => {
       student.student_date_of_birth = formatDate(student.student_date_of_birth);
       res.json(student);
     } else {
-      null;
+      res.status(404).json({ error: "Student not found" });
     }
   } catch (error) {
     console.error("Error fetching student details:", error);
@@ -125,9 +131,8 @@ router.get("/student-detail/:id", async (req, res) => {
       const student = result.rows[0];
       student.student_date_of_birth = formatDate(student.student_date_of_birth);
       res.json(student);
-    } 
-    else {
-      res.json('');
+    } else {
+      res.json(null);
     }
   } catch (error) {
     console.error("Error fetching student details:", error);
@@ -143,7 +148,6 @@ router.get("/student-details/view-attachment/:id", async (req, res) => {
       'SELECT employment_status_attachment, employment_status_attachment_name FROM Student_Details_Portal WHERE id = $1',
       [id]
     );
-
     if (result.rows.length > 0) {
       const file = result.rows[0];
       const fileName = file.employment_status_attachment_name;
@@ -278,6 +282,51 @@ router.post("/student-details/insert", upload.single('employment_status_attachme
     if (newStudentResult.rows.length > 0) {
       const student = newStudentResult.rows[0];
       student.student_date_of_birth = formatDate(student.student_date_of_birth);
+
+      // Use the email template HTML with dynamic values
+      const bgImage = `${API_BASE_URL}/NewStudent.png`;
+      const logoImage = `${API_BASE_URL}/uchakide_logo.png`;
+      const loginUrl = 'https://willowtonbursary.co.za/dashboard';
+      const emailHtml = `
+        <body style="background-color: #f7f5f5;">
+        <div style="width:60%; margin:20px auto;background-color:#fff;padding:20px;border-radius:8px;text-align:center;font-family:Arial,sans-serif;">
+          <h1 style="color:#2d2d2d;font-size:36px;">New Student Alert</h1>
+          <div style="background-color:#8f98ff; border-radius: 20px;">
+          <img src="${bgImage}" alt="New Student" style="max-width:60%;height:auto;border-radius:8px;background:#8F98FF;" />
+          </div>
+          <p style="color:#666;font-size:14px;line-height:1.6;">Dear SANZAF Team,</p>
+          <p style="color:#666;font-size:14px;line-height:1.6;">We are pleased to inform you that a new student has been enrolled.</p>
+          <p style="color:#666;font-size:14px;line-height:1.6;">You may view the student's details by logging into your dashboard using the link below:</p>
+          <p style="color:#666;font-size:14px;line-height:1.6;">
+            <strong>Student Name: ${student.student_name} ${student.student_surname}</strong>
+          </p>
+          <a href="${loginUrl}" target="_blank" style="display:inline-block;background-color:#8F98FF;color:#fff;padding:15px 60px;text-decoration:none;margin-top:20px;border-radius:5px;font-size:14px;">
+            LOGIN HERE
+          </a>
+          <div style="color:#999;">
+            <img src="${logoImage}" alt="Uchakide Logo" style="max-width:30%;height:auto;border-radius:8px;background:white;" />
+          </div>
+        </div>
+        </body>
+      `;
+
+      // Send email in the background without blocking
+      const client = new postmark.ServerClient(process.env.POSTMARK_SERVER_TOKEN);
+      client.sendEmail({
+        From: process.env.EMAIL_FROM,
+        To: process.env.EMAIL_TO,
+        Subject: 'New Student Alert - Willowton & SANZAF Bursary Fund',
+        HtmlBody: emailHtml,
+        MessageStream: 'outbound',
+      }).then(() => {
+        // Optional: Log success if needed
+        // console.log('Email Sent!');
+      }).catch(error => {
+        console.error("Error sending email:", error);
+        // Optional: Add more error handling, e.g., save to a log file or database for retries
+      });
+
+      // Send response immediately
       res.status(201).json(student);
     } else {
       res.status(404).json({ error: "Student created but not found" });
@@ -429,7 +478,52 @@ router.put("/student-details/update/:id", upload.single('employment_status_attac
 
     if (result.rows.length > 0) {
       const student = result.rows[0];
-      student.student_date_of_birth = formatDate(student.student_date_of_birth); // Format for response
+      student.student_date_of_birth = formatDate(student.student_date_of_birth);
+
+      // Use the email template HTML with dynamic values for update
+      const bgImage = `${API_BASE_URL}/StudentDetails.png`;
+      const logoImage = `${API_BASE_URL}/uchakide_logo.png`;
+      const loginUrl = 'https://willowtonbursary.co.za/dashboard';
+      const emailHtml = `
+        <body style="background-color: #f7f5f5;">
+        <div style="width:60%; margin:20px auto;background-color:#fff;padding:20px;border-radius:8px;text-align:center;font-family:Arial,sans-serif;">
+          <h1 style="color:#2d2d2d;font-size:36px;">Student Details Update</h1>
+          <div style="background-color:#F8FFA8; border-radius: 20px;">
+          <img src="${bgImage}" alt="Updated Student" style="max-width:60%;height:auto;border-radius:8px;background:#F8FFA8;" />
+          </div>
+          <p style="color:#666;font-size:14px;line-height:1.6;">Dear SANZAF Team,</p>
+          <p style="color:#666;font-size:14px;line-height:1.6;">
+          👉 <strong>${student.student_name} ${student.student_surname}</strong>
+          </p>
+          <p style="color:#666;font-size:14px;line-height:1.6;">
+          has updated updated some of their personal details have a look below.
+          </p>
+          <a href="${loginUrl}" target="_blank" style="display:inline-block;background-color:#F8FFA8;color:black;padding:15px 60px;text-decoration:none;margin-top:20px;border-radius:5px;font-size:14px;">
+            LOGIN HERE
+          </a>
+          <div style="color:#999;">
+            <img src="${logoImage}" alt="Uchakide Logo" style="max-width:30%;height:auto;border-radius:8px;background:white;" />
+          </div>
+        </div>
+      `;
+
+      // Send email in the background without blocking
+      const client = new postmark.ServerClient(process.env.POSTMARK_SERVER_TOKEN);
+      client.sendEmail({
+        From: process.env.EMAIL_FROM,
+        To: process.env.EMAIL_TO,
+        Subject: 'Student Details Update - Willowton & SANZAF Bursary Fund',
+        HtmlBody: emailHtml,
+        MessageStream: 'outbound',
+      }).then(() => {
+        // Optional: Log success if needed
+        // console.log('Update Email Sent!');
+      }).catch(error => {
+        console.error("Error sending update email:", error);
+        // Optional: Add more error handling, e.g., save to a log file or database for retries
+      });
+
+      // Send response immediately
       res.status(200).json(student);
     } else {
       res.status(404).json({ error: "Student not found after update" });

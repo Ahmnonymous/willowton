@@ -2,6 +2,11 @@ const express = require("express");
 const router = express.Router();
 const pool = require("../db");
 const multer = require("multer");
+const postmark = require('postmark');
+
+// Live/ Demo
+const MODE = process.env.REACT_APP_MODE;
+const API_BASE_URL = MODE === "live" ? process.env.REACT_APP_API_BASE_URL_LIVE : process.env.REACT_APP_API_BASE_URL_DEMO;
 
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -64,6 +69,57 @@ router.post("/academic-results/insert", upload.single("Results_Attachment"), asy
       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
       [Results_Module, Results_Percentage, Student_Details_Portal_id, fileBuffer, fileName]
     );
+
+    // Fetch student details to get name for email
+    const studentResult = await pool.query(
+      "SELECT student_name, student_surname FROM Student_Details_Portal WHERE id = $1",
+      [Student_Details_Portal_id]
+    );
+    const student = studentResult.rows[0] || { student_name: "Unknown", student_surname: "Student" };
+
+    // Email notification
+    const bgImage = `${API_BASE_URL}/StudentAcademic.png`;
+    const logoImage = `${API_BASE_URL}/uchakide_logo.png`;
+    const loginUrl = 'https://willowtonbursary.co.za/dashboard';
+    const emailHtml = `
+      <body style="background-color: #f7f5f5;">
+        <div style="width:60%; margin:20px auto;background-color:#fff;padding:20px;border-radius:8px;text-align:center;font-family:Arial,sans-serif;">
+          <h1 style="color:#2d2d2d;font-size:36px;">Student Academic Results</h1>
+          <div style="background-color:#C5F8FF; border-radius: 20px;">
+            <img src="${bgImage}" alt="Academic Results" style="max-width:60%;height:auto;border-radius:8px;background:#C5F8FF;" />
+          </div>
+          <p style="color:#666;font-size:14px;line-height:1.6;">Dear SANZAF Team,</p>
+          <p style="color:#666;font-size:14px;line-height:1.6;">
+            👉 <strong>${student.student_name} ${student.student_surname}</strong> 
+          </p>
+          <p style="color:#666;font-size:14px;line-height:1.6;">Seems like contributions are bearing some fruits, have a look below.</p>
+          <a href="${loginUrl}" target="_blank" style="display:inline-block;background-color:#C5F8FF;color:black;padding:15px 60px;text-decoration:none;margin-top:20px;border-radius:5px;font-size:14px;">
+            LOGIN HERE
+          </a>
+          <div style="color:#999;">
+            <img src="${logoImage}" alt="Uchakide Logo" style="max-width:30%;height:auto;border-radius:8px;background:white;" />
+          </div>
+        </div>
+      </body>
+    `;
+
+    // Send email in the background without blocking
+    const client = new postmark.ServerClient(process.env.POSTMARK_SERVER_TOKEN);
+    client.sendEmail({
+      From: process.env.EMAIL_FROM,
+      To: process.env.EMAIL_TO,
+      Subject: 'Student Academic Results - Willowton & SANZAF Bursary Fund',
+      HtmlBody: emailHtml,
+      MessageStream: 'outbound',
+    }).then(() => {
+      // Optional: Log success if needed
+      // console.log('Academic Result Email Sent!');
+    }).catch(error => {
+      console.error("Error sending academic result email:", error);
+      // Optional: Add more error handling, e.g., save to a log file or database
+    });
+
+    // Send response immediately
     res.status(201).json(result.rows[0]);
   } catch (err) {
     console.error(err);
@@ -94,6 +150,58 @@ router.put("/academic-results/update/:id", upload.single("Results_Attachment"), 
     }
 
     const result = await pool.query(query, values);
+
+    // Fetch student details to get name for email (optional, added for consistency)
+    const academicResult = result.rows[0];
+    const studentResult = await pool.query(
+      "SELECT student_name, student_surname FROM Student_Details_Portal WHERE id = $1",
+      [academicResult.student_details_portal_id]
+    );
+    const student = studentResult.rows[0] || { student_name: "Unknown", student_surname: "Student" };
+
+    // Email notification (optional, added for consistency)
+    const bgImage = `${API_BASE_URL}/StudentAcademic.png`;
+    const logoImage = `${API_BASE_URL}/uchakide_logo.png`;
+    const loginUrl = 'https://willowtonbursary.co.za/dashboard';
+    const emailHtml = `
+      <body style="background-color: #f7f5f5;">
+        <div style="width:60%; margin:20px auto;background-color:#fff;padding:20px;border-radius:8px;text-align:center;font-family:Arial,sans-serif;">
+          <h1 style="color:#2d2d2d;font-size:36px;">Student Academic Results Updated</h1>
+          <div style="background-color:#C5F8FF; border-radius: 20px;">
+            <img src="${bgImage}" alt="Updated Academic Results" style="max-width:60%;height:auto;border-radius:8px;background:#C5F8FF;" />
+          </div>
+          <p style="color:#666;font-size:14px;line-height:1.6;">Dear SANZAF Team,</p>
+          <p style="color:#666;font-size:14px;line-height:1.6;">
+            👉 <strong>${student.student_name} ${student.student_surname}</strong> 
+          </p>
+          <p style="color:#666;font-size:14px;line-height:1.6;">has updated their academic results, have a look below.</p>
+          <a href="${loginUrl}" target="_blank" style="display:inline-block;background-color:#C5F8FF;color:black;padding:15px 60px;text-decoration:none;margin-top:20px;border-radius:5px;font-size:14px;">
+            LOGIN HERE
+          </a>
+          <div style="color:#999;">
+            <img src="${logoImage}" alt="Uchakide Logo" style="max-width:30%;height:auto;border-radius:8px;background:white;" />
+          </div>
+        </div>
+      </body>
+    `;
+
+    // Send email in the background without blocking
+    const client = new postmark.ServerClient(process.env.POSTMARK_SERVER_TOKEN);
+    client.sendEmail({
+      From: process.env.EMAIL_FROM,
+      To: process.env.EMAIL_TO,
+      Subject: 'Student Academic Results Updated - Willowton & SANZAF Bursary Fund',
+      HtmlBody: emailHtml,
+      MessageStream: 'outbound',
+    }).then(() => {
+      // Optional: Log success if needed
+      // console.log('Update Academic Result Email Sent!');
+    }).catch(error => {
+      console.error("Error sending update academic result email:", error);
+      // Optional: Add more error handling, e.g., save to a log file or database
+    });
+
+    // Send response immediately
     res.json(result.rows[0]);
   } catch (err) {
     console.error(err);

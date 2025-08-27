@@ -1,6 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const pool = require("../db");
+const postmark = require('postmark');
+
+// Live/ Demo
+const MODE = process.env.REACT_APP_MODE;
+const API_BASE_URL = MODE === "live" ? process.env.REACT_APP_API_BASE_URL_LIVE : process.env.REACT_APP_API_BASE_URL_DEMO;
 
 // GET: All expense details by student ID
 router.get("/expense-details/:studentId", async (req, res) => {
@@ -60,9 +65,6 @@ router.post("/expense-details/insert", async (req, res) => {
     total_expenses
   } = req.body;
 
-  // Log the incoming data to check if totals are received
-  // console.log('Received Data:', req.body);
-
   try {
     const query = `
       INSERT INTO Student_Portal_Expense_Details (
@@ -115,6 +117,58 @@ router.post("/expense-details/insert", async (req, res) => {
     ];
 
     const result = await pool.query(query, values);
+
+    // Fetch student details to get name for email
+    const studentResult = await pool.query(
+      "SELECT student_name, student_surname FROM Student_Details_Portal WHERE id = $1",
+      [student_details_portal_id]
+    );
+    const student = studentResult.rows[0] || { student_name: "Unknown", student_surname: "Student" };
+
+    // Email notification
+    const bgImage = `${API_BASE_URL}/StudentExpense.png`;
+    const logoImage = `${API_BASE_URL}/uchakide_logo.png`;
+    const loginUrl = 'https://willowtonbursary.co.za/dashboard';
+    const emailHtml = `
+      <body style="background-color: #f7f5f5;">
+        <div style="width:60%; margin:20px auto;background-color:#fff;padding:20px;border-radius:8px;text-align:center;font-family:Arial,sans-serif;">
+          <h1 style="color:#2d2d2d;font-size:36px;">Student Expense Update</h1>
+          <div style="background-color:#FFC28A; border-radius: 20px;">
+        <img src="${bgImage}" alt="Updated Expense Details" style="max-width:60%;height:auto;border-radius:8px;background:#FFC28A;" />
+        </div>
+        <p style="color:#666;font-size:14px;line-height:1.6;">Dear SANZAF Team,</p>
+        <p style="color:#666;font-size:14px;line-height:1.6;">
+          👉 <strong>${student.student_name} ${student.student_surname}</strong> 
+        </p>
+        <p style="color:#666;font-size:14px;line-height:1.6;">has updated updated some of their Income and</p>
+        <p style="color:#666;font-size:14px;line-height:1.6;">expense details have a look below.</p>
+        <a href="${loginUrl}" target="_blank" style="display:inline-block;background-color:#FFC28A;color:black;padding:15px 60px;text-decoration:none;margin-top:20px;border-radius:5px;font-size:14px;">
+          LOGIN HERE
+        </a>
+        <div style="color:#999;">
+          <img src="${logoImage}" alt="Uchakide Logo" style="max-width:30%;height:auto;border-radius:8px;background:white;" />
+        </div>
+      </div>
+    </body>
+    `;
+
+    // Send email in the background without blocking
+    const client = new postmark.ServerClient(process.env.POSTMARK_SERVER_TOKEN);
+    client.sendEmail({
+      From: process.env.EMAIL_FROM,
+      To: process.env.EMAIL_TO,
+      Subject: 'Student Expense Update - Willowton & SANZAF Bursary Fund',
+      HtmlBody: emailHtml,
+      MessageStream: 'outbound',
+    }).then(() => {
+      // Optional: Log success if needed
+      // console.log('Expense Email Sent!');
+    }).catch(error => {
+      console.error("Error sending expense email:", error);
+      // Optional: Add more error handling, e.g., save to a log file or database
+    });
+
+    // Send response immediately
     res.status(201).json(result.rows[0]);
   } catch (err) {
     console.error(err);
@@ -135,6 +189,58 @@ router.put("/expense-details/update/:id", async (req, res) => {
     const query = `UPDATE Student_Portal_Expense_Details SET ${assignments} WHERE id = $${fields.length + 1
       } RETURNING *`;
     const result = await pool.query(query, [...values, id]);
+
+    // Fetch student details to get name for email
+    const expense = result.rows[0];
+    const studentResult = await pool.query(
+      "SELECT student_name, student_surname FROM Student_Details_Portal WHERE id = $1",
+      [expense.student_details_portal_id]
+    );
+    const student = studentResult.rows[0] || { student_name: "Unknown", student_surname: "Student" };
+
+    // Email notification
+    const bgImage = `${API_BASE_URL}/StudentExpense.png`;
+    const logoImage = `${API_BASE_URL}/uchakide_logo.png`;
+    const loginUrl = 'https://willowtonbursary.co.za/dashboard';
+    const emailHtml = `
+      <body style="background-color: #f7f5f5;">
+        <div style="width:60%; margin:20px auto;background-color:#fff;padding:20px;border-radius:8px;text-align:center;font-family:Arial,sans-serif;">
+          <h1 style="color:#2d2d2d;font-size:36px;">Student Expense Update</h1>
+          <div style="background-color:#FFC28A; border-radius: 20px;">
+            <img src="${bgImage}" alt="Updated Expense Details" style="max-width:60%;height:auto;border-radius:8px;background:#FFC28A;" />
+          </div>
+          <p style="color:#666;font-size:14px;line-height:1.6;">Dear SANZAF Team,</p>
+          <p style="color:#666;font-size:14px;line-height:1.6;">
+            👉 <strong>${student.student_name} ${student.student_surname}</strong> 
+          </p>
+          <p style="color:#666;font-size:14px;line-height:1.6;">has updated some of their Income and expense details have a look below.</p>
+          <a href="${loginUrl}" target="_blank" style="display:inline-block;background-color:#FFC28A;color:black;padding:15px 60px;text-decoration:none;margin-top:20px;border-radius:5px;font-size:14px;">
+            LOGIN HERE
+          </a>
+          <div style="color:#999;">
+            <img src="${logoImage}" alt="Uchakide Logo" style="max-width:30%;height:auto;border-radius:8px;background:white;" />
+          </div>
+        </div>
+      </body>
+    `;
+
+    // Send email in the background without blocking
+    const client = new postmark.ServerClient(process.env.POSTMARK_SERVER_TOKEN);
+    client.sendEmail({
+      From: process.env.EMAIL_FROM,
+      To: process.env.EMAIL_TO,
+      Subject: 'Student Expense Update - Willowton & SANZAF Bursary Fund',
+      HtmlBody: emailHtml,
+      MessageStream: 'outbound',
+    }).then(() => {
+      // Optional: Log success if needed
+      // console.log('Update Expense Email Sent!');
+    }).catch(error => {
+      console.error("Error sending update expense email:", error);
+      // Optional: Add more error handling, e.g., save to a log file or database
+    });
+
+    // Send response immediately
     res.json(result.rows[0]);
   } catch (err) {
     console.error(err);

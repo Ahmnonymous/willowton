@@ -291,13 +291,13 @@ router.post("/student-details/insert", upload.single('employment_status_attachme
         <body style="background-color: #f7f5f5;">
         <div style="width:60%; margin:20px auto;background-color:#fff;padding:20px;border-radius:8px;text-align:center;font-family:Arial,sans-serif;">
           <h1 style="color:#2d2d2d;font-size:36px;">New Student Alert</h1>
-          <div style="background-color:#8f98ff; border-radius: 20px;">
+          <div style="background-color:#8f98ff; border-radius: 20px;margin-top:10px;">
           <img src="${bgImage}" alt="New Student" style="max-width:60%;height:auto;border-radius:8px;background:#8F98FF;" />
           </div>
-          <p style="color:#666;font-size:14px;line-height:1.6;">Dear SANZAF Team,</p>
-          <p style="color:#666;font-size:14px;line-height:1.6;">We are pleased to inform you that a new student has been enrolled.</p>
-          <p style="color:#666;font-size:14px;line-height:1.6;">You may view the student's details by logging into your dashboard using the link below:</p>
-          <p style="color:#666;font-size:14px;line-height:1.6;">
+          <p style="color:#666;font-size:14px;line-height:1.6;margin-top:10px;">Dear SANZAF Team,</p>
+          <p style="color:#666;font-size:14px;line-height:1.6;margin-top:10px;">We are pleased to inform you that a new student has been enrolled.</p>
+          <p style="color:#666;font-size:14px;line-height:1.6;margin-top:10px;">You may view the student's details by logging into your dashboard using the link below:</p>
+          <p style="color:#666;font-size:14px;line-height:1.6;margin-top:10px;">
             <strong>Student Name: ${student.student_name} ${student.student_surname}</strong>
           </p>
           <a href="${loginUrl}" target="_blank" style="display:inline-block;background-color:#8F98FF;color:#fff;padding:15px 60px;text-decoration:none;margin-top:20px;border-radius:5px;font-size:14px;">
@@ -315,12 +315,14 @@ router.post("/student-details/insert", upload.single('employment_status_attachme
       client.sendEmail({
         From: process.env.EMAIL_FROM,
         To: process.env.EMAIL_TO,
+        // To: student.student_email_address,
+        // Cc: process.env.EMAIL_CC,
         Subject: 'New Student Alert - Willowton & SANZAF Bursary Fund',
         HtmlBody: emailHtml,
         MessageStream: 'outbound',
       }).then(() => {
         // Optional: Log success if needed
-        // console.log('Email Sent!');
+        // console.log('New Student Email Sent!');
       }).catch(error => {
         console.error("Error sending email:", error);
         // Optional: Add more error handling, e.g., save to a log file or database for retries
@@ -488,14 +490,14 @@ router.put("/student-details/update/:id", upload.single('employment_status_attac
         <body style="background-color: #f7f5f5;">
         <div style="width:60%; margin:20px auto;background-color:#fff;padding:20px;border-radius:8px;text-align:center;font-family:Arial,sans-serif;">
           <h1 style="color:#2d2d2d;font-size:36px;">Student Details Update</h1>
-          <div style="background-color:#F8FFA8; border-radius: 20px;">
+          <div style="background-color:#F8FFA8; border-radius: 20px;margin-top:10px;">
           <img src="${bgImage}" alt="Updated Student" style="max-width:60%;height:auto;border-radius:8px;background:#F8FFA8;" />
           </div>
-          <p style="color:#666;font-size:14px;line-height:1.6;">Dear SANZAF Team,</p>
-          <p style="color:#666;font-size:14px;line-height:1.6;">
+          <p style="color:#666;font-size:14px;line-height:1.6;margin-top:10px;">Dear SANZAF Team,</p>
+          <p style="color:#666;font-size:14px;line-height:1.6;margin-top:10px;">
           👉 <strong>${student.student_name} ${student.student_surname}</strong>
           </p>
-          <p style="color:#666;font-size:14px;line-height:1.6;">
+          <p style="color:#666;font-size:14px;line-height:1.6;margin-top:10px;">
           has updated updated some of their personal details have a look below.
           </p>
           <a href="${loginUrl}" target="_blank" style="display:inline-block;background-color:#F8FFA8;color:black;padding:15px 60px;text-decoration:none;margin-top:20px;border-radius:5px;font-size:14px;">
@@ -517,7 +519,7 @@ router.put("/student-details/update/:id", upload.single('employment_status_attac
         MessageStream: 'outbound',
       }).then(() => {
         // Optional: Log success if needed
-        // console.log('Update Email Sent!');
+        // console.log('Student Update Email Sent!');
       }).catch(error => {
         console.error("Error sending update email:", error);
         // Optional: Add more error handling, e.g., save to a log file or database for retries

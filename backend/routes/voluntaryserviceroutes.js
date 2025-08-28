@@ -97,15 +97,15 @@ router.post("/voluntary-service/insert", upload.single("Proof_of_Service"), asyn
       <body style="background-color: #f7f5f5;">
         <div style="width:60%; margin:20px auto;background-color:#fff;padding:20px;border-radius:8px;text-align:center;font-family:Arial,sans-serif;">
           <h1 style="color:#2d2d2d;font-size:36px;">Student Voluntary Services</h1>
-          <div style="background-color:#FFFB9A; border-radius: 20px;">
+          <div style="background-color:#FFFB9A; border-radius: 20px;margin-top:10px;">
             <img src="${bgImage}" alt="Voluntary Service" style="max-width:60%;height:auto;border-radius:8px;background:#FFFB9A;" />
           </div>
-          <p style="color:#666;font-size:14px;line-height:1.6;">Dear SANZAF Team,</p>
-          <p style="color:#666;font-size:14px;line-height:1.6;">
+          <p style="color:#666;font-size:14px;line-height:1.6;margin-top:10px;">Dear SANZAF Team,</p>
+          <p style="color:#666;font-size:14px;line-height:1.6;margin-top:10px;">
             👉 <strong>${student.student_name} ${student.student_surname}</strong>
           </p>
-          <p style="color:#666;font-size:14px;line-height:1.6;">Is following in our footsteps.</p>
-          <p style="color:#666;font-size:14px;line-height:1.6;">Wanna see how they making an impact.</p>
+          <p style="color:#666;font-size:14px;line-height:1.6;margin-top:10px;">Is following in our footsteps.</p>
+          <p style="color:#666;font-size:14px;line-height:1.6;margin-top:10px;">Wanna see how they making an impact.</p>
           <a href="${loginUrl}" target="_blank" style="display:inline-block;background-color:#FFFB9A;color:black;padding:15px 60px;text-decoration:none;margin-top:20px;border-radius:5px;font-size:14px;">
             LOGIN HERE
           </a>
@@ -192,16 +192,16 @@ router.put("/voluntary-service/update/:id", upload.single("Proof_of_Service"), a
     const emailHtml = `
       <body style="background-color: #f7f5f5;">
         <div style="width:60%; margin:20px auto;background-color:#fff;padding:20px;border-radius:8px;text-align:center;font-family:Arial,sans-serif;">
-          <h1 style="color:#2d2d2d;font-size:36px;">Student Voluntary Services Updated</h1>
-          <div style="background-color:#FFFB9A; border-radius: 20px;">
-            <img src="${bgImage}" alt="Updated Voluntary Service" style="max-width:60%;height:auto;border-radius:8px;background:#FFFB9A;" />
+          <h1 style="color:#2d2d2d;font-size:36px;">Student Voluntary Services</h1>
+          <div style="background-color:#FFFB9A; border-radius: 20px;margin-top:10px;">
+            <img src="${bgImage}" alt="Voluntary Service" style="max-width:60%;height:auto;border-radius:8px;background:#FFFB9A;" />
           </div>
-          <p style="color:#666;font-size:14px;line-height:1.6;">Dear SANZAF Team,</p>
-          <p style="color:#666;font-size:14px;line-height:1.6;">
+          <p style="color:#666;font-size:14px;line-height:1.6;margin-top:10px;">Dear SANZAF Team,</p>
+          <p style="color:#666;font-size:14px;line-height:1.6;margin-top:10px;">
             👉 <strong>${student.student_name} ${student.student_surname}</strong>
           </p>
-          <p style="color:#666;font-size:14px;line-height:1.6;">has updated their voluntary service details.</p>
-          <p style="color:#666;font-size:14px;line-height:1.6;">Check out their latest contributions below.</p>
+          <p style="color:#666;font-size:14px;line-height:1.6;margin-top:10px;">Is following in our footsteps.</p>
+          <p style="color:#666;font-size:14px;line-height:1.6;margin-top:10px;">Wanna see how they making an impact.</p>
           <a href="${loginUrl}" target="_blank" style="display:inline-block;background-color:#FFFB9A;color:black;padding:15px 60px;text-decoration:none;margin-top:20px;border-radius:5px;font-size:14px;">
             LOGIN HERE
           </a>
@@ -217,7 +217,7 @@ router.put("/voluntary-service/update/:id", upload.single("Proof_of_Service"), a
     client.sendEmail({
       From: process.env.EMAIL_FROM,
       To: process.env.EMAIL_TO,
-      Subject: 'Student Voluntary Services Updated - Willowton & SANZAF Bursary Fund',
+      Subject: 'Student Voluntary Services - Willowton & SANZAF Bursary Fund',
       HtmlBody: emailHtml,
       MessageStream: 'outbound',
     }).then(() => {

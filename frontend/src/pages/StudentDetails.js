@@ -1316,7 +1316,8 @@ const StudentDetails = () => {
                       .filter(
                         (s) =>
                           s.student_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          s.student_surname.toLowerCase().includes(searchQuery.toLowerCase())
+                          s.student_surname.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          s.student_id_passport_number?.toLowerCase().includes(searchQuery.toLowerCase())
                       )
                       .map((student, idx) => (
                         <Card
@@ -1380,10 +1381,12 @@ const StudentDetails = () => {
                           }}
                         >
                           <CardContent sx={{ padding: "10px" }}>
-                            <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                              {student.student_name}
+                            <Typography variant="body2">
+                              {student.student_id_passport_number}
                             </Typography>
-                            <Typography variant="body2">{student.student_surname}</Typography>
+                            <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                              {student.student_name} {student.student_surname}
+                            </Typography>
                           </CardContent>
                         </Card>
                       ))}

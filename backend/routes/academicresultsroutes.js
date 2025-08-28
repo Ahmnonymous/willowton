@@ -85,14 +85,14 @@ router.post("/academic-results/insert", upload.single("Results_Attachment"), asy
       <body style="background-color: #f7f5f5;">
         <div style="width:60%; margin:20px auto;background-color:#fff;padding:20px;border-radius:8px;text-align:center;font-family:Arial,sans-serif;">
           <h1 style="color:#2d2d2d;font-size:36px;">Student Academic Results</h1>
-          <div style="background-color:#C5F8FF; border-radius: 20px;">
+          <div style="background-color:#C5F8FF; border-radius: 20px;margin-top:10px;">
             <img src="${bgImage}" alt="Academic Results" style="max-width:60%;height:auto;border-radius:8px;background:#C5F8FF;" />
           </div>
-          <p style="color:#666;font-size:14px;line-height:1.6;">Dear SANZAF Team,</p>
-          <p style="color:#666;font-size:14px;line-height:1.6;">
+          <p style="color:#666;font-size:14px;line-height:1.6;margin-top:10px;">Dear SANZAF Team,</p>
+          <p style="color:#666;font-size:14px;line-height:1.6;margin-top:10px;">
             👉 <strong>${student.student_name} ${student.student_surname}</strong> 
           </p>
-          <p style="color:#666;font-size:14px;line-height:1.6;">Seems like contributions are bearing some fruits, have a look below.</p>
+          <p style="color:#666;font-size:14px;line-height:1.6;margin-top:10px;">Seems like contributions are bearing some fruits, have a look below.</p>
           <a href="${loginUrl}" target="_blank" style="display:inline-block;background-color:#C5F8FF;color:black;padding:15px 60px;text-decoration:none;margin-top:20px;border-radius:5px;font-size:14px;">
             LOGIN HERE
           </a>
@@ -167,14 +167,14 @@ router.put("/academic-results/update/:id", upload.single("Results_Attachment"), 
       <body style="background-color: #f7f5f5;">
         <div style="width:60%; margin:20px auto;background-color:#fff;padding:20px;border-radius:8px;text-align:center;font-family:Arial,sans-serif;">
           <h1 style="color:#2d2d2d;font-size:36px;">Student Academic Results Updated</h1>
-          <div style="background-color:#C5F8FF; border-radius: 20px;">
+          <div style="background-color:#C5F8FF; border-radius: 20px;margin-top:10px;">
             <img src="${bgImage}" alt="Updated Academic Results" style="max-width:60%;height:auto;border-radius:8px;background:#C5F8FF;" />
           </div>
-          <p style="color:#666;font-size:14px;line-height:1.6;">Dear SANZAF Team,</p>
-          <p style="color:#666;font-size:14px;line-height:1.6;">
+          <p style="color:#666;font-size:14px;line-height:1.6;margin-top:10px;">Dear SANZAF Team,</p>
+          <p style="color:#666;font-size:14px;line-height:1.6;margin-top:10px;">
             👉 <strong>${student.student_name} ${student.student_surname}</strong> 
           </p>
-          <p style="color:#666;font-size:14px;line-height:1.6;">has updated their academic results, have a look below.</p>
+          <p style="color:#666;font-size:14px;line-height:1.6;margin-top:10px;">has updated their academic results, have a look below.</p>
           <a href="${loginUrl}" target="_blank" style="display:inline-block;background-color:#C5F8FF;color:black;padding:15px 60px;text-decoration:none;margin-top:20px;border-radius:5px;font-size:14px;">
             LOGIN HERE
           </a>
@@ -190,7 +190,7 @@ router.put("/academic-results/update/:id", upload.single("Results_Attachment"), 
     client.sendEmail({
       From: process.env.EMAIL_FROM,
       To: process.env.EMAIL_TO,
-      Subject: 'Student Academic Results Updated - Willowton & SANZAF Bursary Fund',
+      Subject: 'Student Academic Results - Willowton & SANZAF Bursary Fund',
       HtmlBody: emailHtml,
       MessageStream: 'outbound',
     }).then(() => {

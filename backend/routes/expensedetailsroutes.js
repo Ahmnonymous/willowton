@@ -133,15 +133,15 @@ router.post("/expense-details/insert", async (req, res) => {
       <body style="background-color: #f7f5f5;">
         <div style="width:60%; margin:20px auto;background-color:#fff;padding:20px;border-radius:8px;text-align:center;font-family:Arial,sans-serif;">
           <h1 style="color:#2d2d2d;font-size:36px;">Student Expense Update</h1>
-          <div style="background-color:#FFC28A; border-radius: 20px;">
+          <div style="background-color:#FFC28A; border-radius: 20px;margin-top:10px;">
         <img src="${bgImage}" alt="Updated Expense Details" style="max-width:60%;height:auto;border-radius:8px;background:#FFC28A;" />
         </div>
-        <p style="color:#666;font-size:14px;line-height:1.6;">Dear SANZAF Team,</p>
-        <p style="color:#666;font-size:14px;line-height:1.6;">
+        <p style="color:#666;font-size:14px;line-height:1.6;margin-top:10px;">Dear SANZAF Team,</p>
+        <p style="color:#666;font-size:14px;line-height:1.6;margin-top:10px;">
           👉 <strong>${student.student_name} ${student.student_surname}</strong> 
         </p>
-        <p style="color:#666;font-size:14px;line-height:1.6;">has updated updated some of their Income and</p>
-        <p style="color:#666;font-size:14px;line-height:1.6;">expense details have a look below.</p>
+        <p style="color:#666;font-size:14px;line-height:1.6;margin-top:10px;">has updated updated some of their Income and</p>
+        <p style="color:#666;font-size:14px;line-height:1.6;margin-top:10px;">expense details have a look below.</p>
         <a href="${loginUrl}" target="_blank" style="display:inline-block;background-color:#FFC28A;color:black;padding:15px 60px;text-decoration:none;margin-top:20px;border-radius:5px;font-size:14px;">
           LOGIN HERE
         </a>
@@ -206,14 +206,14 @@ router.put("/expense-details/update/:id", async (req, res) => {
       <body style="background-color: #f7f5f5;">
         <div style="width:60%; margin:20px auto;background-color:#fff;padding:20px;border-radius:8px;text-align:center;font-family:Arial,sans-serif;">
           <h1 style="color:#2d2d2d;font-size:36px;">Student Expense Update</h1>
-          <div style="background-color:#FFC28A; border-radius: 20px;">
+          <div style="background-color:#FFC28A; border-radius: 20px;margin-top:10px;">
             <img src="${bgImage}" alt="Updated Expense Details" style="max-width:60%;height:auto;border-radius:8px;background:#FFC28A;" />
           </div>
-          <p style="color:#666;font-size:14px;line-height:1.6;">Dear SANZAF Team,</p>
-          <p style="color:#666;font-size:14px;line-height:1.6;">
+          <p style="color:#666;font-size:14px;line-height:1.6;margin-top:10px;">Dear SANZAF Team,</p>
+          <p style="color:#666;font-size:14px;line-height:1.6;margin-top:10px;">
             👉 <strong>${student.student_name} ${student.student_surname}</strong> 
           </p>
-          <p style="color:#666;font-size:14px;line-height:1.6;">has updated some of their Income and expense details have a look below.</p>
+          <p style="color:#666;font-size:14px;line-height:1.6;margin-top:10px;">has updated some of their Income and expense details have a look below.</p>
           <a href="${loginUrl}" target="_blank" style="display:inline-block;background-color:#FFC28A;color:black;padding:15px 60px;text-decoration:none;margin-top:20px;border-radius:5px;font-size:14px;">
             LOGIN HERE
           </a>

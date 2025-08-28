@@ -4,14 +4,16 @@ echo Starting Backend, Frontend and Nginx
 echo ========================================
 
 REM ===== Start Backend =====
-cd /d D:\WORK\LUQMAN\WillowTon_react\willowTon\backend
+@REM cd /d D:\WORK\LUQMAN\WillowTon_react\willowTon\backend
+cd /d C:\willowton\backend
 call forever stop server.js >nul 2>&1
 call forever start -a -l backend.log -o backend-out.log -e backend-err.log server.js
 
 REM ===== Start Frontend =====
-cd /d D:\WORK\LUQMAN\WillowTon_react\willowTon\frontend
+@REM cd /d D:\WORK\LUQMAN\WillowTon_react\willowTon\frontend
+cd /d C:\willowton\frontend
 call forever stop "npx serve -s build -l 3000" >nul 2>&1
-call forever start -c "npx" -a -l frontend.log -o frontend-out.log -e frontend-err.log serve -s build -l 3000
+call forever start -a -l frontend.log -o frontend-out.log -e frontend-err.log node_modules\serve\build\main.js -s build -l 3000
 
 REM ===== Start Nginx =====
 cd /d C:\nginx

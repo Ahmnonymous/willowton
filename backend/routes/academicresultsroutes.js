@@ -62,18 +62,23 @@ router.post("/academic-results/insert", upload.single("Results_Attachment"), asy
   const fileBuffer = req.file ? req.file.buffer : null;
   const fileName = req.file ? req.file.originalname : null;
 
+  // Validate Student_Details_Portal_id
+  if (!Student_Details_Portal_id || isNaN(parseInt(Student_Details_Portal_id))) {
+    return res.status(400).json({ error: "Invalid or missing Student_Details_Portal_id" });
+  }
+
   try {
     const result = await pool.query(
       `INSERT INTO Student_Portal_Results 
       (Results_Module, Results_Percentage, Student_Details_Portal_id, Results_Attachment, Results_Attachment_Name) 
       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-      [Results_Module, Results_Percentage, Student_Details_Portal_id, fileBuffer, fileName]
+      [Results_Module, Results_Percentage, parseInt(Student_Details_Portal_id), fileBuffer, fileName]
     );
 
     // Fetch student details to get name for email
     const studentResult = await pool.query(
       "SELECT student_name, student_surname FROM Student_Details_Portal WHERE id = $1",
-      [Student_Details_Portal_id]
+      [parseInt(Student_Details_Portal_id)]
     );
     const student = studentResult.rows[0] || { student_name: "Unknown", student_surname: "Student" };
 
@@ -111,12 +116,8 @@ router.post("/academic-results/insert", upload.single("Results_Attachment"), asy
       Subject: 'Student Academic Results - Willowton & SANZAF Bursary Fund',
       HtmlBody: emailHtml,
       MessageStream: 'outbound',
-    }).then(() => {
-      // Optional: Log success if needed
-      // console.log('Academic Result Email Sent!');
     }).catch(error => {
       console.error("Error sending academic result email:", error);
-      // Optional: Add more error handling, e.g., save to a log file or database
     });
 
     // Send response immediately

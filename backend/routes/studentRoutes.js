@@ -334,8 +334,12 @@ router.post("/student-details/insert", upload.single('employment_status_attachme
       res.status(404).json({ error: "Student created but not found" });
     }
   } catch (error) {
-    console.error("Error creating student:", error);
-    res.status(500).json({ error: "Failed to create student" });
+    if (error.code === '23505' && error.constraint === 'STUDENT_DETAIL_PORTAL_UNIQ_USER_ID') {
+      res.status(409).json({ error: `User ID ${error.detail.match(/\(.*?\)=\((.*?)\)/)[1]} already exists` });
+    } else {
+      console.error("Error creating student:", error);
+      res.status(500).json({ error: "Failed to create student" });
+    }
   }
 });
 

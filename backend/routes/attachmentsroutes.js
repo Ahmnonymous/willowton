@@ -76,6 +76,12 @@ router.get("/attachments/id/:id", async (req, res) => {
 router.post("/attachments/insert", upload.single('Attachment'), async (req, res) => {
   const { Attachments_Name, Attachments_Description, Student_Details_Portal_id } = req.body;
   const attachmentBuffer = req.file ? req.file.buffer : null;
+
+  // Validate Student_Details_Portal_id
+  if (!Student_Details_Portal_id || isNaN(parseInt(Student_Details_Portal_id))) {
+    return res.status(400).json({ error: "Invalid or missing Student_Details_Portal_id" });
+  }
+
   const query = `
     INSERT INTO Student_Portal_Attachments (
       Attachments_Name, Attachments_Description, Student_Details_Portal_id, Attachment
@@ -86,7 +92,7 @@ router.post("/attachments/insert", upload.single('Attachment'), async (req, res)
     const result = await pool.query(query, [
       Attachments_Name,
       Attachments_Description,
-      Student_Details_Portal_id,
+      parseInt(Student_Details_Portal_id),
       attachmentBuffer,
     ]);
     res.status(201).json(result.rows[0]);
@@ -100,6 +106,12 @@ router.put("/attachments/update/:id", upload.single('Attachment'), async (req, r
   const { id } = req.params;
   const { Attachments_Name, Attachments_Description } = req.body;
   const attachmentBuffer = req.file ? req.file.buffer : null;
+
+  // Validate id
+  if (!id || isNaN(parseInt(id))) {
+    return res.status(400).json({ error: "Invalid or missing ID" });
+  }
+
   const query = `
     UPDATE Student_Portal_Attachments
     SET Attachments_Name = $1, Attachments_Description = $2, Attachment = $3
@@ -110,8 +122,11 @@ router.put("/attachments/update/:id", upload.single('Attachment'), async (req, r
       Attachments_Name,
       Attachments_Description,
       attachmentBuffer,
-      id,
+      parseInt(id),
     ]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Attachment not found" });
+    }
     res.json(result.rows[0]);
   } catch (err) {
     console.error(err);

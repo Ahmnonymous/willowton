@@ -50,7 +50,6 @@ router.get("/about-me/id/:id", async (req, res) => {
   }
 });
 
-
 router.post("/about-me/insert", async (req, res) => {
   const {
     student_details_portal_id,
@@ -59,6 +58,16 @@ router.post("/about-me/insert", async (req, res) => {
 
   const fields = Object.keys(questions);
   const values = Object.values(questions);
+
+  // Validate that there are fields to insert
+  if (fields.length === 0) {
+    return res.status(400).json({ error: "No fields provided to insert" });
+  }
+
+  // Validate student_details_portal_id
+  if (!student_details_portal_id || isNaN(parseInt(student_details_portal_id))) {
+    return res.status(400).json({ error: "Invalid or missing student_details_portal_id" });
+  }
 
   const placeholders = fields.map((_, i) => `$${i + 2}`).join(", ");
 
@@ -71,7 +80,7 @@ router.post("/about-me/insert", async (req, res) => {
       ) RETURNING *
     `;
 
-    const result = await pool.query(query, [student_details_portal_id, ...values]);
+    const result = await pool.query(query, [parseInt(student_details_portal_id), ...values]);
     res.status(201).json(result.rows[0]);
   } catch (err) {
     console.error(err);
@@ -108,7 +117,7 @@ router.put("/about-me/update/:id", async (req, res) => {
     res.status(500).json({ error: "Error updating About Me" });
   }
 });
-  
+
 router.delete("/about-me/delete/:id", async (req, res) => {
   const { id } = req.params;
   try {

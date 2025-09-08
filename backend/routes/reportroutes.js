@@ -258,4 +258,82 @@ router.get('/view/student-voluntary-service', async (req, res) => {
 });
 
 
+// Route for Voluntary Servies
+router.get('/view/university-report', async (req, res) => {
+  try {
+    // SQL Query to fetch required columns from both Student_Details_Portal and Student_Portal_Voluntary_Service
+    const query = `
+        SELECT 
+            COALESCE(CONCAT(spu.first_name, ' ', spu.last_name), 'N/A') AS "Full Name",
+            COALESCE(spu.last_name, 'N/A') AS "Surname",
+            COALESCE(spu.email_address, 'N/A') AS "Email Address",
+            COALESCE(sdp.Student_Whatsapp_Number, 'N/A') AS "Cell Number (WhatsApp)",
+            COALESCE(sdp.Student_Date_of_Birth::TEXT, 'N/A') AS "Date of Birth",
+            COALESCE(sdp.Student_ID_Passport_Number, 'N/A') AS "ID/Passport Number",
+            COALESCE(sdp.Student_Nationality, 'N/A') AS "Nationality",
+            COALESCE(sdp.Student_Race, 'N/A') AS "Race",
+            COALESCE(sdp.Student_Religion, 'N/A') AS "Religion",
+            COALESCE(sdp.Student_Marital_Status, 'N/A') AS "Marital Status",
+            COALESCE(sdp.Student_Home_Address, 'N/A') AS "Home Address",
+            COALESCE(sdp.Student_Suburb, 'N/A') AS "Suburb",
+            COALESCE(sdp.Student_Province, 'N/A') AS "Province",
+            COALESCE(sdp.Student_Area_Code, 'N/A') AS "Area Code",
+            COALESCE(spud.Institution_Name, 'N/A') AS "University",
+            COALESCE(spud.Name_of_Course, 'N/A') AS "Field of Study",
+            COALESCE(sdp.Student_Type, 'N/A') AS "Application Type",
+            COALESCE(spud.Current_Year, 'N/A') AS "Year of Study",
+            COALESCE(sdp.Student_Highest_Education, 'N/A') AS "Highest Qualification",
+            COALESCE(spud.Student_Number, 'N/A') AS "Student Number",
+            COALESCE(sdp.Student_Alternative_Number, 'N/A') AS "Alternative Contact Number",
+            COALESCE(sdp.Student_Email_Address, 'N/A') AS "Alternative Email Address",
+            COALESCE(sdp.Student_Employment_Status, 'N/A') AS "Employment Status",
+            COALESCE(sdp.Student_Company_of_Employment, 'N/A') AS "Company of Employment",
+            COALESCE(sdp.Student_Job_Title, 'N/A') AS "Job Title",
+            COALESCE(sdp.Student_Current_Salary::TEXT, 'N/A') AS "Current Salary",
+            COALESCE(sdp.Student_Finance_Type, 'N/A') AS "Finance Type",
+            COALESCE(sdp.Student_Number_of_Siblings::TEXT, 'N/A') AS "Number of Siblings",
+            COALESCE(sdp.Student_Siblings_Bursary::TEXT, 'N/A') AS "Siblings on Bursary",
+            COALESCE(spud.Previously_Funded_Amount::TEXT, 'N/A') AS "Bursary Amount Requested",
+            COALESCE('N/A', 'N/A') AS "Bursary Amount Approved",
+            COALESCE(sdp.Student_Emergency_Contact_Name, 'N/A') AS "Emergency Contact Name",
+            COALESCE(sdp.Student_Emergency_Contact_Relationship, 'N/A') AS "Emergency Contact Relationship",
+            COALESCE(sdp.Student_Emergency_Contact_Number, 'N/A') AS "Emergency Contact Number",
+            COALESCE(sdp.Student_Emergency_Contact_Address, 'N/A') AS "Emergency Contact Address",
+            COALESCE(sdp.Student_Willow_Relationship, 'N/A') AS "Willow Relationship",
+            COALESCE(sdp.relation_name, 'N/A') AS "Relation Name",
+            COALESCE(sdp.relation_surname, 'N/A') AS "Relation Surname",
+            COALESCE(sdp.relation_type, 'N/A') AS "Relation Type",
+            COALESCE(sdp.relation_reference, 'N/A') AS "Relation Reference",
+            COALESCE(sdp.relation_employee_code, 'N/A') AS "Relation Employee Code",
+            COALESCE(sdp.relation_hr_contact, 'N/A') AS "Relation HR Contact",
+            COALESCE(sdp.relation_branch, 'N/A') AS "Relation Branch",
+            COALESCE(sdp.student_status_comment, 'N/A') AS "Status Comment",
+            COALESCE(sdp.student_status, 'N/A') AS "Application Status",
+            COALESCE(sdp.Student_Date_Stamp::TEXT, 'N/A') AS "Date of Application",
+            COALESCE('N/A', 'N/A') AS "Reviewed By",
+            COALESCE('N/A', 'N/A') AS "Decision Date",
+            COALESCE(TO_CHAR(sdp.student_date_stamp, 'DDth Mon YYYY HH12:MI:SS PM'), 'N/A') AS "Created On"
+        FROM 
+            Student_portal_users spu
+        LEFT JOIN 
+            Student_Details_Portal sdp ON spu.user_id = sdp.user_id
+        LEFT JOIN 
+            Student_Portal_University_Details spud ON sdp.id = spud.Student_Details_Portal_id;
+      `;
+
+    const result = await pool.query(query);
+
+    // If no data is found
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'No records found' });
+    }
+
+    // Send the result back to the client
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server Error' });
+  }
+});
+
 module.exports = router;

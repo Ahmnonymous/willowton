@@ -50,6 +50,7 @@ const SideNavMenu = ({ open }) => {
               { text: "Student Equity", path: "/reports/student-equity", icon: <BalanceIcon /> },
               { text: "Payment Report", path: "/reports/payment-report", icon: <PaymentsIcon /> },
               { text: "Voluntary Service", path: "/reports/voluntary-report", icon: <AssistWalkerIcon /> },
+              { text: "University Report", path: "/reports/university-report", icon: <SchoolIcon /> },
               { text: "Activity Logs", path: "/reports/activity-logs", icon: <ActivityLogsIcon /> },
             ],
           },

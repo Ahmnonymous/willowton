@@ -32,6 +32,7 @@ const StudentEquity = lazy(() => import("./pages/reports/StudentEquity"));
 const PaymentReport = lazy(() => import("./pages/reports/PaymentReport"));
 const StudentReport = lazy(() => import("./pages/reports/StudentReport"));
 const VoluntaryReport = lazy(() => import("./pages/reports/VoluntaryReport"));
+const UniversityReport = lazy(() => import("./pages/reports/UniversityReport"));
 const ActivityReport = lazy(() => import("./pages/reports/ActivityReport"));
 
 // Page title updater component
@@ -57,6 +58,7 @@ const PageTitleUpdater = () => {
       else if (path === "/reports/payment-report") title = "Payment Report";
       else if (path === "/reports/student-report") title = "Student Report";
       else if (path === "/reports/voluntary-report") title = "Voluntary Report";
+      else if (path === "/reports/university-report") title = "University Report";
       else if (path === "/reports/activity-logs") title = "Activity Logs";
       else title = "Page Not Found";
     } else {
@@ -150,6 +152,7 @@ const LayoutHandler = () => {
             <Route path="/reports/payment-report" element={<RequireAdmin><PaymentReport /></RequireAdmin>} />
             <Route path="/reports/student-report" element={<RequireAdmin><StudentReport /></RequireAdmin>} />
             <Route path="/reports/voluntary-report" element={<RequireAdmin><VoluntaryReport /></RequireAdmin>} />
+            <Route path="/reports/university-report" element={<RequireAdmin><UniversityReport /></RequireAdmin>} />
             <Route path="/reports/activity-logs" element={<RequireAdmin><ActivityReport /></RequireAdmin>} />
 
             {/* Fallback */}

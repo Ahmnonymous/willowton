@@ -294,7 +294,6 @@ router.post("/student-details/insert", upload.single('employment_status_attachme
           <div style="background-color:#8f98ff; border-radius: 20px;margin-top:10px;">
           <img src="${bgImage}" alt="New Student" style="max-width:60%;height:auto;border-radius:8px;background:#8F98FF;" />
           </div>
-          <p style="color:#666;font-size:14px;line-height:1.6;margin-top:10px;">Dear SANZAF Team,</p>
           <p style="color:#666;font-size:14px;line-height:1.6;margin-top:10px;">We are pleased to inform you that a new student has been enrolled.</p>
           <p style="color:#666;font-size:14px;line-height:1.6;margin-top:10px;">You may view the student's details by logging into your dashboard using the link below:</p>
           <p style="color:#666;font-size:14px;line-height:1.6;margin-top:10px;">
@@ -314,9 +313,9 @@ router.post("/student-details/insert", upload.single('employment_status_attachme
       const client = new postmark.ServerClient(process.env.POSTMARK_SERVER_TOKEN);
       client.sendEmail({
         From: process.env.EMAIL_FROM,
-        To: process.env.EMAIL_TO,
-        // To: student.student_email_address,
-        // Cc: process.env.EMAIL_CC,
+        // To: process.env.EMAIL_TO,
+        To: student.student_email_address,
+        Cc: process.env.EMAIL_CC,
         Subject: 'New Student Alert - Willowton & SANZAF Bursary Fund',
         HtmlBody: emailHtml,
         MessageStream: 'outbound',

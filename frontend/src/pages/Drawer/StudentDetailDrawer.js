@@ -153,7 +153,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
               employment_status_attachment_name: data.employment_status_attachment_name || "",
             }));
             setEmergencyContactOption(data.student_emergency_contact_name ? "Add new" : "");
-            setEmailError(data.student_email_address && !validateEmail(data.student_email_address) ? "Please enter a valid email address" : "");
+            setEmailError(!data.student_email_address ? "Email address is required" : !validateEmail(data.student_email_address) ? "Please enter a valid email address" : "");
             setWhatsappError(data.student_whatsapp_number && !validateNumber(data.student_whatsapp_number) ? "WhatsApp number must be exactly 10 digits" : "");
             setAlternativeError(data.student_alternative_number && !validateNumber(data.student_alternative_number) ? "Alternative number must be exactly 10 digits" : "");
             setEmergencyError(data.student_emergency_contact_number && !validateNumber(data.student_emergency_contact_number) ? "Emergency contact number must be exactly 10 digits" : "");
@@ -212,7 +212,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
           employment_status_attachment_name: '',
         });
         setEmergencyContactOption("");
-        setEmailError("");
+        setEmailError("Email address is required");
         setWhatsappError("");
         setAlternativeError("");
         setEmergencyError("");
@@ -248,7 +248,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     }
 
     if (name === "student_email_address") {
-      setEmailError(value && !validateEmail(value) ? "Please enter a valid email address" : "");
+      setEmailError(!sanitizedValue ? "Email address is required" : !validateEmail(sanitizedValue) ? "Please enter a valid email address" : "");
     }
 
     if (name === "student_whatsapp_number") {
@@ -370,6 +370,10 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
     }
     if (!formData.student_surname) {
       setSurnameError("Student surname is required");
+      return;
+    }
+    if (!formData.student_email_address) {
+      setEmailError("Email address is required");
       return;
     }
     if (formData.student_email_address && !validateEmail(formData.student_email_address)) {
@@ -716,6 +720,7 @@ const StudentDetailDrawer = ({ open, onClose, studentId, onSave, onDelete }) => 
             name="student_email_address"
             type="email"
             fullWidth
+            required
             value={formData.student_email_address || ""}
             onChange={handleChange}
             error={!!emailError}

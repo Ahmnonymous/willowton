@@ -1,8 +1,8 @@
+// routes/AttachmentsRoutes.js
 const express = require("express");
 const router = express.Router();
 const pool = require("../db");
 const multer = require("multer");
-const mime = require('mime-types');
 
 // Set up multer for file uploads
 const storage = multer.memoryStorage();
@@ -33,17 +33,22 @@ router.get('/attachments/view/:id', async (req, res) => {
 
     if (result.rows.length > 0) {
       const file = result.rows[0];
-      const fileName = file.attachments_name || "attachment.pdf";
 
-      // Validate file name and get MIME type
+      // Ensure Attachments_Name exists before trying to split it
+      const fileName = file.attachments_name;
       if (!fileName) {
         return res.status(400).send("File name is missing.");
       }
 
-      const mimeType = mime.lookup(fileName) || 'application/octet-stream';
+      // Manually extracting the filename and extension
+      const extname = fileName.split('.').pop();
+      const baseName = fileName.substring(0, fileName.lastIndexOf('.'));
 
+      // Set content headers for file download/view
       res.setHeader('Content-Disposition', `inline; filename="${fileName}"`);
-      res.setHeader('Content-Type', mimeType);
+      res.setHeader('Content-Type', `application/${extname}`);
+
+      // Send the file content as the response
       res.send(file.attachment);
     } else {
       res.status(404).send("File not found");

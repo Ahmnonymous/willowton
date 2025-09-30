@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const pool = require("../db");
 const multer = require("multer");
-const mime = require('mime-types');
 
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -156,16 +155,10 @@ router.get("/payments/view/:id", async (req, res) => {
     if (result.rows.length > 0) {
       const file = result.rows[0];
       const fileName = file.payments_attachment_name || "proof.pdf";
+      const ext = fileName.split(".").pop();
 
-      // Validate file name and get MIME type
-      if (!fileName) {
-        return res.status(400).send("File name is missing.");
-      }
-
-      const mimeType = mime.lookup(fileName) || 'application/octet-stream';
-
-      res.setHeader("Content-Disposition", `inline; filename="${fileName}"`);
-      res.setHeader("Content-Type", mimeType);
+      res.setHeader("Content-Disposition", `inline; filename=\"${fileName}\"`);
+      res.setHeader("Content-Type", `application/${ext}`);
       res.send(file.proof_of_payment);
     } else {
       res.status(404).send("File not found");

@@ -3,7 +3,6 @@ const router = express.Router();
 const pool = require("../db");
 const multer = require("multer");
 const postmark = require('postmark');
-const mime = require('mime-types');
 
 // Live/ Demo
 const MODE = process.env.REACT_APP_MODE;
@@ -11,98 +10,61 @@ const API_BASE_URL = MODE === "live" ? process.env.REACT_APP_API_BASE_URL_LIVE :
 
 const upload = multer({ storage: multer.memoryStorage() });
 
-// Route to fetch academic results by student ID
 router.get("/academic-results/:studentId", async (req, res) => {
-  const { studentId } = req.params;
-  if (!studentId || isNaN(parseInt(studentId))) {
-    return res.status(400).json({ error: "Invalid or missing studentId" });
-  }
   try {
     const result = await pool.query(
       "SELECT * FROM Student_Portal_Results WHERE student_details_portal_id = $1",
-      [parseInt(studentId)]
+      [req.params.studentId]
     );
     res.json(result.rows);
   } catch (err) {
-    console.error("Error fetching academic results:", err.message);
     res.status(500).json({ error: "Error fetching academic results" });
   }
 });
 
-// Route to fetch academic result by ID
 router.get("/academic-results/id/:id", async (req, res) => {
-  const { id } = req.params;
-  if (!id || isNaN(parseInt(id))) {
-    return res.status(400).json({ error: "Invalid or missing ID" });
-  }
   try {
     const result = await pool.query(
       "SELECT * FROM Student_Portal_Results WHERE id = $1",
-      [parseInt(id)]
+      [req.params.id]
     );
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: "Academic result not found" });
-    }
     res.json(result.rows[0]);
   } catch (err) {
-    console.error("Error fetching academic result by ID:", err.message);
     res.status(500).json({ error: "Error fetching academic result by ID" });
   }
 });
 
-// Route to fetch academic file attachment by ID
 router.get("/academic-results/view/:id", async (req, res) => {
-  const { id } = req.params;
-  if (!id || isNaN(parseInt(id))) {
-    return res.status(400).send("Invalid or missing ID");
-  }
   try {
     const result = await pool.query(
       "SELECT results_attachment, results_attachment_name FROM Student_Portal_Results WHERE id = $1",
-      [parseInt(id)]
+      [req.params.id]
     );
-    if (result.rows.length === 0) {
-      return res.status(404).send("File not found");
+    if (result.rows.length > 0) {
+      const file = result.rows[0];
+      const fileName = file.results_attachment_name || "";
+      const ext = fileName.split(".").pop();
+
+      res.setHeader("Content-Disposition", `inline; filename=\"${fileName}\"`);
+      res.setHeader("Content-Type", `application/${ext}`);
+      res.send(file.results_attachment);
+    } else {
+      res.status(404).send("File not found");
     }
-
-    const file = result.rows[0];
-    const fileName = file.results_attachment_name || "results.pdf";
-
-    // Validate file name and attachment
-    if (!fileName) {
-      return res.status(400).send("File name is missing");
-    }
-    if (!file.results_attachment) {
-      return res.status(400).send("File attachment is missing or corrupted");
-    }
-
-    // Get MIME type with fallback
-    const mimeType = mime.lookup(fileName) || 'application/octet-stream';
-
-    // Sanitize fileName to prevent header injection
-    const safeFileName = fileName.replace(/[\r\n"]/g, '');
-    
-    res.setHeader("Content-Disposition", `inline; filename="${safeFileName}"`);
-    res.setHeader("Content-Type", mimeType);
-    res.send(file.results_attachment);
   } catch (err) {
-    console.error("Error fetching academic file:", err.message);
+    console.error("Error fetching academic file:", err);
     res.status(500).send("Server error");
   }
 });
 
-// Route to insert a new academic result
 router.post("/academic-results/insert", upload.single("Results_Attachment"), async (req, res) => {
   const { Results_Module, Results_Percentage, Student_Details_Portal_id } = req.body;
   const fileBuffer = req.file ? req.file.buffer : null;
   const fileName = req.file ? req.file.originalname : null;
 
-  // Validate inputs
+  // Validate Student_Details_Portal_id
   if (!Student_Details_Portal_id || isNaN(parseInt(Student_Details_Portal_id))) {
     return res.status(400).json({ error: "Invalid or missing Student_Details_Portal_id" });
-  }
-  if (!Results_Module || !Results_Percentage) {
-    return res.status(400).json({ error: "Missing required fields: Results_Module or Results_Percentage" });
   }
 
   try {
@@ -113,7 +75,7 @@ router.post("/academic-results/insert", upload.single("Results_Attachment"), asy
       [Results_Module, Results_Percentage, parseInt(Student_Details_Portal_id), fileBuffer, fileName]
     );
 
-    // Fetch student details for email
+    // Fetch student details to get name for email
     const studentResult = await pool.query(
       "SELECT student_name, student_surname FROM Student_Details_Portal WHERE id = $1",
       [parseInt(Student_Details_Portal_id)]
@@ -146,7 +108,7 @@ router.post("/academic-results/insert", upload.single("Results_Attachment"), asy
       </body>
     `;
 
-    // Send email in the background
+    // Send email in the background without blocking
     const client = new postmark.ServerClient(process.env.POSTMARK_SERVER_TOKEN);
     client.sendEmail({
       From: process.env.EMAIL_FROM,
@@ -155,30 +117,21 @@ router.post("/academic-results/insert", upload.single("Results_Attachment"), asy
       HtmlBody: emailHtml,
       MessageStream: 'outbound',
     }).catch(error => {
-      console.error("Error sending academic result email:", error.message);
+      console.error("Error sending academic result email:", error);
     });
 
+    // Send response immediately
     res.status(201).json(result.rows[0]);
   } catch (err) {
-    console.error("Error inserting academic result:", err.message);
+    console.error(err);
     res.status(500).json({ error: "Error inserting academic result" });
   }
 });
 
-// Route to update an academic result
 router.put("/academic-results/update/:id", upload.single("Results_Attachment"), async (req, res) => {
-  const { id } = req.params;
   const { Results_Module, Results_Percentage } = req.body;
   const fileBuffer = req.file ? req.file.buffer : null;
   const fileName = req.file ? req.file.originalname : null;
-
-  // Validate inputs
-  if (!id || isNaN(parseInt(id))) {
-    return res.status(400).json({ error: "Invalid or missing ID" });
-  }
-  if (!Results_Module || !Results_Percentage) {
-    return res.status(400).json({ error: "Missing required fields: Results_Module or Results_Percentage" });
-  }
 
   try {
     let query, values;
@@ -188,21 +141,18 @@ router.put("/academic-results/update/:id", upload.single("Results_Attachment"), 
         UPDATE Student_Portal_Results
         SET Results_Module = $1, Results_Percentage = $2, Results_Attachment = $3, Results_Attachment_Name = $4
         WHERE id = $5 RETURNING *`;
-      values = [Results_Module, Results_Percentage, fileBuffer, fileName, parseInt(id)];
+      values = [Results_Module, Results_Percentage, fileBuffer, fileName, req.params.id];
     } else {
       query = `
         UPDATE Student_Portal_Results
         SET Results_Module = $1, Results_Percentage = $2
         WHERE id = $3 RETURNING *`;
-      values = [Results_Module, Results_Percentage, parseInt(id)];
+      values = [Results_Module, Results_Percentage, req.params.id];
     }
 
     const result = await pool.query(query, values);
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: "Academic result not found" });
-    }
 
-    // Fetch student details for email
+    // Fetch student details to get name for email (optional, added for consistency)
     const academicResult = result.rows[0];
     const studentResult = await pool.query(
       "SELECT student_name, student_surname FROM Student_Details_Portal WHERE id = $1",
@@ -210,7 +160,7 @@ router.put("/academic-results/update/:id", upload.single("Results_Attachment"), 
     );
     const student = studentResult.rows[0] || { student_name: "Unknown", student_surname: "Student" };
 
-    // Email notification
+    // Email notification (optional, added for consistency)
     const bgImage = `${API_BASE_URL}/StudentAcademic.png`;
     const logoImage = `${API_BASE_URL}/uchakide_logo.png`;
     const loginUrl = 'https://willowtonbursary.co.za/dashboard';
@@ -236,7 +186,7 @@ router.put("/academic-results/update/:id", upload.single("Results_Attachment"), 
       </body>
     `;
 
-    // Send email in the background
+    // Send email in the background without blocking
     const client = new postmark.ServerClient(process.env.POSTMARK_SERVER_TOKEN);
     client.sendEmail({
       From: process.env.EMAIL_FROM,
@@ -244,34 +194,27 @@ router.put("/academic-results/update/:id", upload.single("Results_Attachment"), 
       Subject: 'Student Academic Results - Willowton & SANZAF Bursary Fund',
       HtmlBody: emailHtml,
       MessageStream: 'outbound',
+    }).then(() => {
+      // Optional: Log success if needed
+      // console.log('Update Academic Result Email Sent!');
     }).catch(error => {
-      console.error("Error sending update academic result email:", error.message);
+      console.error("Error sending update academic result email:", error);
+      // Optional: Add more error handling, e.g., save to a log file or database
     });
 
+    // Send response immediately
     res.json(result.rows[0]);
   } catch (err) {
-    console.error("Error updating academic result:", err.message);
+    console.error(err);
     res.status(500).json({ error: "Error updating academic result" });
   }
 });
 
-// Route to delete an academic result
 router.delete("/academic-results/delete/:id", async (req, res) => {
-  const { id } = req.params;
-  if (!id || isNaN(parseInt(id))) {
-    return res.status(400).json({ error: "Invalid or missing ID" });
-  }
   try {
-    const result = await pool.query(
-      "DELETE FROM Student_Portal_Results WHERE id = $1 RETURNING *",
-      [parseInt(id)]
-    );
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: "Academic result not found" });
-    }
+    await pool.query("DELETE FROM Student_Portal_Results WHERE id = $1", [req.params.id]);
     res.status(200).json({ message: "Deleted successfully" });
   } catch (err) {
-    console.error("Error deleting academic result:", err.message);
     res.status(500).json({ error: "Error deleting academic result" });
   }
 });

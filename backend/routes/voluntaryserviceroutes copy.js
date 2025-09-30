@@ -3,7 +3,6 @@ const router = express.Router();
 const pool = require("../db");
 const multer = require("multer");
 const postmark = require('postmark');
-const mime = require('mime-types');
 
 // Live/ Demo
 const MODE = process.env.REACT_APP_MODE;
@@ -48,16 +47,10 @@ router.get("/voluntary-service/view/:id", async (req, res) => {
     if (result.rows.length > 0) {
       const file = result.rows[0];
       const fileName = file.service_attachment_name || "proof.pdf";
+      const ext = fileName.split(".").pop();
 
-      // Validate file name and get MIME type
-      if (!fileName) {
-        return res.status(400).send("File name is missing.");
-      }
-
-      const mimeType = mime.lookup(fileName) || 'application/octet-stream';
-
-      res.setHeader("Content-Disposition", `inline; filename="${fileName}"`);
-      res.setHeader("Content-Type", mimeType);
+      res.setHeader("Content-Disposition", `inline; filename=\"${fileName}\"`);
+      res.setHeader("Content-Type", `application/${ext}`);
       res.send(file.proof_of_service);
     } else {
       res.status(404).send("File not found");

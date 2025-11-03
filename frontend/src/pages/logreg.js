@@ -333,7 +333,8 @@ const LoginSignup = () => {
           ) : (
             <>
               <Typography variant="h6" mb={2} sx={{ fontFamily: "Sansation Light", textAlign: 'center', fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.8rem' }, color: 'black' }}>
-                REGISTER
+                {/* REGISTER */}
+                APPLICATIONS FOR THE 2026 ACADEMIC YEAR CLOSED ON 30 SEPTEMBER 2025. WE APPRECIATE YOUR INTEREST AND ENCOURAGE YOU TO APPLY IN THE NEXT INTAKE.
               </Typography>
 
               <Box width="100%" textAlign="center" maxWidth="400px">
@@ -415,8 +416,7 @@ const LoginSignup = () => {
                   </Typography>
                 )}
                 <Button type="submit" fullWidth variant="contained" sx={{ backgroundColor: 'black', fontFamily: "Sansation Light", mt: 1, fontSize: { xs: '0.9rem', sm: '1rem', md: '1.2rem' } }}>
-                  {/* REGISTER */}
-                  APPLICATIONS FOR THE 2026 ACADEMIC YEAR CLOSED ON 30 SEPTEMBER 2025. WE APPRECIATE YOUR INTEREST AND ENCOURAGE YOU TO APPLY IN THE NEXT INTAKE.
+                  REGISTER
                 </Button>
               </Box>
             </>

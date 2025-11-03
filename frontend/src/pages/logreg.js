@@ -415,7 +415,8 @@ const LoginSignup = () => {
                   </Typography>
                 )}
                 <Button type="submit" fullWidth variant="contained" sx={{ backgroundColor: 'black', fontFamily: "Sansation Light", mt: 1, fontSize: { xs: '0.9rem', sm: '1rem', md: '1.2rem' } }}>
-                  REGISTER
+                  {/* REGISTER */}
+                  APPLICATIONS FOR THE 2026 ACADEMIC YEAR CLOSED ON 30 SEPTEMBER 2025. WE APPRECIATE YOUR INTEREST AND ENCOURAGE YOU TO APPLY IN THE NEXT INTAKE.
                 </Button>
               </Box>
             </>

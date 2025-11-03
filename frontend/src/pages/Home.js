@@ -43,9 +43,10 @@ const HomePage = () => {
             fontFamily: 'Sansation Light, Arial, sans-serif',
           }}
         >
-          "No country can really develop unless its citizens are educated"
+          {/* "No country can really develop unless its citizens are educated" */}
+          APPLICATIONS FOR THE 2026 ACADEMIC YEAR CLOSED ON 30 SEPTEMBER 2025. WE APPRECIATE YOUR INTEREST AND ENCOURAGE YOU TO APPLY IN THE NEXT INTAKE.
         </Typography>
-        <Typography
+        {/* <Typography
           variant="h6"
           sx={{
             textAlign: 'center',
@@ -55,7 +56,7 @@ const HomePage = () => {
           }}
         >
           "Nelson Mandela"
-        </Typography>
+        </Typography> */}
 
         <Box
           component="img"

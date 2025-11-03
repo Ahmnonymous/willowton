@@ -323,7 +323,7 @@ const LoginSignup = () => {
                 </Button>
                 <Typography
                   variant="body2"
-                  sx={{ cursor: 'pointer', fontFamily: "Sansation Light", mt: 2, color: 'black', fontWeight: 'bold', fontSize: { xs: '0.8rem', sm: '0.8rem', md: '0.8rem' } }}
+                  sx={{ cursor: 'pointer', fontFamily: "Sansation Light", mt: 2, textAlign: 'center', color: 'black', fontWeight: 'bold', fontSize: { xs: '0.8rem', sm: '0.8rem', md: '0.8rem' } }}
                   onClick={() => setOpenForgotPassword(true)}
                 >
                   FORGOT PASSWORD?
@@ -337,7 +337,8 @@ const LoginSignup = () => {
                 APPLICATIONS FOR THE 2026 ACADEMIC YEAR CLOSED ON 30 SEPTEMBER 2025. WE APPRECIATE YOUR INTEREST AND ENCOURAGE YOU TO APPLY IN THE NEXT INTAKE.
               </Typography>
 
-              <Box width="100%" textAlign="center" maxWidth="400px">
+              <Box width="100%" textAlign="center">
+                 {/* maxWidth="400px"> */}
                 <TextField
                   name="first_name"
                   fullWidth
